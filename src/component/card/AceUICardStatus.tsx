@@ -65,7 +65,7 @@ function AceUICardStatus({
         {toggle && (
           <div className="relative inline-block w-11 h-5 justify-self-end mt-2">
             <input
-              defaultChecked
+              defaultChecked={false}
               id={switchId}
               type="checkbox"
               className="peer appearance-none w-11 h-6 bg-slate-200 rounded-full checked:bg-cyan-700 cursor-pointer transition-colors duration-300"
