@@ -15,7 +15,7 @@ function AceUITemplateWithSidebar({
         <div className="col-span-1 p-4">
           <h1 className="text-2xl font-bold">{appname}</h1>
         </div>
-        <div className="col-span-4 p-10 bg-[#f0f7ff] rounded-l-3xl">
+        <div className="col-span-4 p-10 bg-[#f0f7ff] rounded-l-3xl overflow-y-auto">
           {children}
         </div>
       </div>
