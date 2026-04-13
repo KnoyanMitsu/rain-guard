@@ -1,6 +1,11 @@
+import AceUICard from "@/component/card/AceUICard";
+import AceUIInput from "@/component/input/AceUIInput";
+import AceUITemplateTwoGrid from "@/component/template/AceUITemplateTwoGrid";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import AceUIAppname from "@/component/aestetic/AceUIAppname";
 
 const TampilanLogin = () => {
   const { push } = useRouter();
@@ -9,7 +14,7 @@ const TampilanLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
       alert("Username dan password wajib diisi!");
       return;
@@ -17,73 +22,76 @@ const TampilanLogin = () => {
 
     setLoading(true);
 
-    setTimeout(() => {
-      document.cookie = "isLoginRainGuard=true; path=/";
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        fullname: username,
+        password: password,
+      });
+
+      if (res?.error) {
+        alert("Login gagal, pastikan credential Anda benar.");
+      } else {
+        push("/dashboard");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan sistem, silakan coba lagi.");
+    } finally {
       setLoading(false);
-      push("/dashboard");
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl shadow-blue-100 w-full max-w-md border border-blue-100">
-
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-blue-800">
-            Rain Guard
-          </h1>
-          <p className="text-blue-400 mt-2">
-            Login untuk mengakses dashboard
-          </p>
+    <>
+      <AceUITemplateTwoGrid>
+        {/* Ini akan menjadi kolom kiri */}
+        <div className="">
+          <AceUIAppname appname="Rain Guard" description="Loremipsum" />
         </div>
+        {/* Ini akan menjadi kolom kanan */}
+        <div className="flex items-center justify-center">
+          <div className="min-h-screen w-screen bg-blue-50 flex items-center justify-center p-4">
+            <AceUICard>
+              {/* Header */}
+              <div className="text-center mb-8 mt-8">
+                <h1 className="text-3xl font-extrabold text-black">
+                  Dashboard
+                </h1>
+              </div>
 
-        {/* Input */}
-        <div className="flex flex-col gap-4 mb-6">
-          <div>
-            <label className="text-sm font-semibold text-blue-700 ml-1">
-              Username
-            </label>
-            <input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full mt-1 border-2 border-blue-100 p-3 rounded-xl"
-              type="text"
-              placeholder="Masukkan username"
-            />
+              {/* Input */}
+              <div className="flex flex-col gap-4 mb-6">
+                <AceUIInput
+                  label="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Masukkan username"
+                  type="text"
+                />
+
+                <AceUIInput
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  type="password"
+                />
+              </div>
+
+              {/* Button */}
+              <button
+                onClick={handleLogin}
+                disabled={loading}
+                className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl"
+              >
+                {loading ? "Memproses..." : "Masuk"}
+              </button>
+            </AceUICard>
           </div>
-
-          <div>
-            <label className="text-sm font-semibold text-blue-700 ml-1">
-              Password
-            </label>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 border-2 border-blue-100 p-3 rounded-xl"
-              type="password"
-              placeholder="••••••••"
-            />
-          </div>
         </div>
-
-        {/* Button */}
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl"
-        >
-          {loading ? "Memproses..." : "Masuk"}
-        </button>
-
-        {/* Link */}
-        <div className="mt-6 text-center">
-          <Link href="/auth/register" className="text-blue-600 font-bold">
-            Daftar akun
-          </Link>
-        </div>
-      </div>
-    </div>
+      </AceUITemplateTwoGrid>
+    </>
   );
 };
 
