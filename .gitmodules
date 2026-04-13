@@ -1,0 +1,3 @@
+[submodule "web/src/component"]
+	path = web/src/component
+	url = https://github.com/KnoyanMitsu/AceUI-React.git
