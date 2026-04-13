@@ -1,8 +1,6 @@
-import React from "react";
-import AceUICard from "@/component/card/AceUICard";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
-import { Droplets, CloudRain, Cloud, Bell } from "lucide-react";
 import AceUICardWithTitle from "@/component/card/AceUICardWithTitle";
+import { Bell, Cloud, CloudRain, Droplets } from "lucide-react";
 function Dashboard() {
   return (
     <>
