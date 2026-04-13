@@ -12,17 +12,19 @@ function index() {
         listMenu={[
           {
             title: "Dashboard",
-            link: "/",
+            link: "/dashboard/",
           },
           {
             title: "History",
-            link: "/history",
+            link: "/dashboard/history",
           },
         ]}
         account={true}
         accountName={data?.user?.fullname}
         accountImage={`https://ui-avatars.com/api/?name=${data?.user?.fullname}`}
         accountRole="Admin"
+        header="Dashboard"
+
       >
         <Dashboard />
       </AceUITemplateWithSidebar>
