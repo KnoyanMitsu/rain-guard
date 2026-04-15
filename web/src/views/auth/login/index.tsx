@@ -46,16 +46,19 @@ const TampilanLogin = () => {
     <>
       <AceUITemplateTwoGrid>
         {/* Ini akan menjadi kolom kiri */}
-        <div className="">
+        <div className="hidden lg:block"> {/* Tambahan: Sembunyikan gambar/deskripsi kiri di HP agar login fokus ke form */}
           <AceUIAppname appname="Rain Guard" description="Loremipsum" />
         </div>
+        
         {/* Ini akan menjadi kolom kanan */}
-        <div className="flex items-center justify-center">
-          <div className="min-h-screen w-screen bg-blue-50 flex items-center justify-center p-4">
+        <div className="flex items-center justify-center w-full">
+          {/* Ubah w-screen menjadi w-full agar tidak melebar keluar kontainer */}
+          <div className="min-h-screen w-full bg-blue-50 flex items-center justify-center p-4">
             <AceUICard>
               {/* Header */}
               <div className="text-center mb-8 mt-8">
-                <h1 className="text-3xl font-extrabold text-black">
+                {/* Ukuran font dibuat responsif: text-2xl di HP, text-3xl di layar besar */}
+                <h1 className="text-2xl md:text-3xl font-extrabold text-black">
                   Dashboard
                 </h1>
               </div>
