@@ -1,62 +1,28 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
 import AceUICardTable from "@/component/card/AceUICardTable";
-import AceUICardWithTitle from "@/component/card/AceUICardWithTitle";
 import { Bell, Cloud, CloudRain, Droplets } from "lucide-react";
 
-const tbody = [
-  {
-    lokasi: "Sungai Ciliwung",
-    tinggi_air: "85 cm",
-    curah_hujan: "12.5 mm/jam",
-    status: "Waspada",
-    update_terakhir: "5 menit lalu",
-  },
-  {
-    lokasi: "Sungai Cisadane",
-    tinggi_air: "45 cm",
-    curah_hujan: "5.2 mm/jam",
-    status: "Aman",
-    update_terakhir: "8 menit lalu",
-  },
-  {
-    lokasi: "Bendungan Katulampa",
-    tinggi_air: "120 cm",
-    curah_hujan: "25.8 mm/jam",
-    status: "Bahaya",
-    update_terakhir: "2 menit lalu",
-  },
-  {
-    lokasi: "Kali Pesanggrahan",
-    tinggi_air: "62 cm",
-    curah_hujan: "8.3 mm/jam",
-    status: "Aman",
-    update_terakhir: "10 menit lalu",
-  },
-];
+export type Tbody = {
+  [key: string]: string;
+};
 
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+export type Thead = {
+  title: string;
+};
 
-// Data dummy disesuaikan dengan range skala 20 - 400
-const dummyData = [
-  { time: "00:00", tinggiAir: 50 },
-  { time: "04:00", tinggiAir: 80 },
-  { time: "08:00", tinggiAir: 150 },
-  { time: "12:00", tinggiAir: 320 },
-  { time: "16:00", tinggiAir: 380 },
-  { time: "20:00", tinggiAir: 250 },
-  { time: "24:00", tinggiAir: 120 },
-];
+export type GraphData = {
+  time: string;
+  tinggiAir: number;
+};
 
-function Dashboard() {
+type Data = {
+  thead: Thead[];
+  tbody: Tbody[];
+  graph: GraphData[];
+};
+
+function Dashboard(data: Data) {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -92,7 +58,7 @@ function Dashboard() {
       {/* Bagian Grafik */}
       <div className="grid grid-cols-1 gap-4">
         <AceUICardGraphs
-          data={dummyData}
+          data={data.graph}
           start={20}
           end={400}
           dataKey="tinggiAir"
@@ -109,7 +75,7 @@ function Dashboard() {
             { title: "Status" },
             { title: "Update Terakhir" },
           ]}
-          tbody={tbody}
+          tbody={data.tbody}
         />
       </div>
     </>
