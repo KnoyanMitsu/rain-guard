@@ -7,13 +7,15 @@
 }
 
 .card {
-  width: 350px;
+  width: 100%;           /* Ubah menjadi 100% agar fleksibel mengikuti layar HP */
+  max-width: 350px;      /* Batasi lebar maksimal 350px untuk layar besar */
   padding: 35px;
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   text-align: center;
   animation: fadeIn 0.4s ease-in-out;
+  box-sizing: border-box; /* Tambahkan ini agar padding tidak menambah total lebar */
 }
 
 .title {
