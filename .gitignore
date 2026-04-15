@@ -2,22 +2,23 @@
 
 # dependencies
 /node_modules
-web/node_modules
+*/node_modules
 /.pnp
-/web/.pnp
+/*/.pnp
 .pnp.js
-/web/dev
+
 # testing
 coverage
-web/coverage
+*/coverage
 
 # next.js
-/web/.next/
-/web/out/
+*/.next/
+*/out/
+*/dev/
 
 # production
-/web/build
-/web/.env
+*/build
+*/.env
 # misc
 .DS_Store
 *.pem

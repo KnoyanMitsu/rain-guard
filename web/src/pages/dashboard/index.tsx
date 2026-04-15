@@ -1,13 +1,21 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import Dashboard from "@/views/dashboard/Dashboard";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 function index() {
+   const handleLogout = async () => {
+        const res = await signOut({
+          redirect: true,
+          callbackUrl: "/auth/login",
+        });
+    };
+  
   const {data}:any = useSession();
   console.log(data);
   return (
     <>
       <AceUITemplateWithSidebar
+        logoutfunc={handleLogout}
         appname="Rain Guard"
         listMenu={[
           {
