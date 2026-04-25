@@ -1,49 +1,59 @@
-// src/pages/api/auth/[...nextauth].ts
-import NextAuth, { NextAuthOptions } from "next-auth";
+import db from "@/utils/db/firebase";
+import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+export default NextAuth({
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
-        fullname: { label: "Full Name", type: "text" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
+        nama: { label: "Nama", type: "text" }
       },
       async authorize(credentials) {
-        // Untuk sementara kita accept semua input (nanti diganti dengan Firebase)
-        if (credentials?.fullname && credentials?.password) {
-          return {
-            id: "1",
-            fullname: credentials.fullname,
+        // Logika sederhana: jika ada email, anggap authorize berhasil
+        if (credentials?.email) {
+          return { 
+            id: credentials.email, 
+            email: credentials.email, 
+            name: credentials.nama 
           };
         }
-
         return null;
-      },
-    }),
+      }
+    })
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.fullname = user.fullname;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).fullname = token.fullname;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/auth/login",   // arahkan ke halaman login kamu
-  },
-};
+    async signIn({ user, credentials }: any) {
+      if (!user?.email) return false;
 
-export default NextAuth(authOptions);
+      try {
+        const loginRef = collection(db, "login");
+        const q = query(loginRef, where("email", "==", user.email));
+        const querySnapshot = await getDocs(q);
+
+        // Simpan ke Firestore jika email belum ada
+        if (querySnapshot.empty) {
+          await addDoc(loginRef, {
+            nama: user.name || "User Baru",
+            email: user.email,
+            password: credentials?.password || "", // Simpan password string sesuai request
+            createdAt: serverTimestamp()
+          });
+          console.log(" Data berhasil disimpan ke koleksi login");
+        }
+        return true; 
+      } catch (error) {
+        console.error("❌ Firestore Error:", error);
+        return true; // Tetap izinkan login walau gagal simpan log database
+      }
+    }
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  // Karena kamu pakai folder custom views/auth/login, pastikan path ini benar
+  pages: {
+    signIn: "/auth/login", 
+  }
+});

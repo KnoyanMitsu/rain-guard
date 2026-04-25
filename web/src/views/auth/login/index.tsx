@@ -1,42 +1,40 @@
+"use client";
+
+import AceUIAppname from "@/component/aestetic/AceUIAppname";
 import AceUICard from "@/component/card/AceUICard";
 import AceUIInput from "@/component/input/AceUIInput";
 import AceUITemplateTwoGrid from "@/component/template/AceUITemplateTwoGrid";
-import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import AceUIAppname from "@/component/aestetic/AceUIAppname";
 
 const TampilanLogin = () => {
-  const { push } = useRouter();
+  const router = useRouter(); // Gunakan useRouter dari next/router
   const [loading, setLoading] = useState(false);
-
-  const [username, setUsername] = useState("");
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    if (!username || !password) {
-      alert("Username dan password wajib diisi!");
-      return;
-    }
-
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
 
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        fullname: username,
+        nama: nama,
+        email: email,
         password: password,
       });
 
       if (res?.error) {
-        alert("Login gagal, pastikan credential Anda benar.");
+        alert("Login gagal!");
       } else {
-        push("/dashboard");
+        // Ganti ke halaman tujuan setelah login
+        router.push("/dashboard"); 
       }
     } catch (error) {
-      console.error(error);
-      alert("Terjadi kesalahan sistem, silakan coba lagi.");
+      alert("Terjadi kesalahan sistem");
     } finally {
       setLoading(false);
     }
@@ -45,32 +43,42 @@ const TampilanLogin = () => {
   return (
     <>
       <AceUITemplateTwoGrid>
-        {/* Ini akan menjadi kolom kiri */}
-        <div className="hidden lg:block"> {/* Tambahan: Sembunyikan gambar/deskripsi kiri di HP agar login fokus ke form */}
-          <AceUIAppname appname="Rain Guard" description="Loremipsum" />
+        {/* Kolom Kiri */}
+        <div className="">
+          <AceUIAppname 
+            appname="Rain Guard" 
+            description="Pantau kondisi cuaca dan keamanan data Anda dalam satu platform terpadu." 
+          />
         </div>
-        
-        {/* Ini akan menjadi kolom kanan */}
-        <div className="flex items-center justify-center w-full">
-          {/* Ubah w-screen menjadi w-full agar tidak melebar keluar kontainer */}
-          <div className="min-h-screen w-full bg-blue-50 flex items-center justify-center p-4">
+
+        {/* Kolom Kanan */}
+        <div className="flex items-center justify-center">
+          <div className="min-h-screen w-screen bg-blue-50 flex items-center justify-center p-4">
             <AceUICard>
               {/* Header */}
               <div className="text-center mb-8 mt-8">
-                {/* Ukuran font dibuat responsif: text-2xl di HP, text-3xl di layar besar */}
-                <h1 className="text-2xl md:text-3xl font-extrabold text-black">
-                  Dashboard
+                <h1 className="text-3xl font-extrabold text-black">
+                  Masuk Ke Akun
                 </h1>
+                <p className="text-gray-500 text-sm mt-2">Data baru akan otomatis tersimpan</p>
               </div>
 
-              {/* Input */}
-              <div className="flex flex-col gap-4 mb-6">
+              {/* Form menggunakan handleSubmit agar lebih rapi */}
+              <form onSubmit={handleLogin} className="flex flex-col gap-4 mb-6">
                 <AceUIInput
-                  label="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Masukkan username"
+                  label="Nama Lengkap"
+                  value={nama}
+                  onChange={(e) => setNama(e.target.value)}
+                  placeholder="Masukkan nama lengkap"
                   type="text"
+                />
+
+                <AceUIInput
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="nama@email.com"
+                  type="email"
                 />
 
                 <AceUIInput
@@ -80,16 +88,18 @@ const TampilanLogin = () => {
                   placeholder="••••••••"
                   type="password"
                 />
-              </div>
 
-              {/* Button */}
-              <button
-                onClick={handleLogin}
-                disabled={loading}
-                className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl"
-              >
-                {loading ? "Memproses..." : "Masuk"}
-              </button>
+                {/* Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full font-bold py-3 rounded-xl mt-4 transition-all ${
+                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
+                >
+                  {loading ? "Memproses..." : "Masuk & Simpan"}
+                </button>
+              </form>
             </AceUICard>
           </div>
         </div>
