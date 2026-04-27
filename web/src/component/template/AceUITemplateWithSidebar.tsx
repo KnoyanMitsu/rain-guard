@@ -52,7 +52,7 @@ function AceUITemplateWithSidebar({
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
                         isActive
                           ? "bg-secondary text-primary shadow-md shadow-primary/20"
-                          : "text-text/70 hover:bg-secondary hover:text-primary"
+                          : "text-text/70 hover:bg-secondary hover:text-background"
                       }`}
                     >
                       {item.title}
@@ -141,7 +141,7 @@ function AceUITemplateWithSidebar({
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
                         isActive
                           ? "bg-secondary text-primary shadow-md shadow-primary/20"
-                          : "text-text/70 hover:bg-secondary hover:text-primary"
+                          : "text-text/70 hover:bg-secondary hover:text-background"
                       }`}
                     >
                       {item.title}
@@ -206,7 +206,7 @@ function AceUITemplateWithSidebar({
               <h1 className="font-bold text-2xl">{header}</h1>
             </div>
           </div>
-          <div className="bg-secondary/30 rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
+          <div className="bg-secondary/10 rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
             <div className="flex justify-between items-center mb-4">
               <h1 className="hidden md:block text-3xl font-bold">{header}</h1>
             </div>

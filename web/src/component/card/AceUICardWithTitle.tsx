@@ -15,7 +15,7 @@ function AceUICardWithTitle({ children, title }: AceUICardWithTitleProps) {
             {title}
           </h1>
         </div>
-        <hr className="mb-2 border-secondary" />
+        <hr className="mb-2 border-secondary/20" />
         <div>{children}</div>
       </AceUICard>
     </>

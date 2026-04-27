@@ -2,6 +2,7 @@
 
 import AceUIAppname from "@/component/aestetic/AceUIAppname";
 import AceUICard from "@/component/card/AceUICard";
+import AceUIButton from "@/component/input/AceUIButton";
 import AceUIInput from "@/component/input/AceUIInput";
 import AceUITemplateTwoGrid from "@/component/template/AceUITemplateTwoGrid";
 import { signIn } from "next-auth/react";
@@ -31,7 +32,7 @@ const TampilanLogin = () => {
         alert("Login gagal!");
       } else {
         // Ganti ke halaman tujuan setelah login
-        router.push("/dashboard"); 
+        router.push("/dashboard");
       }
     } catch (error) {
       alert("Terjadi kesalahan sistem");
@@ -45,22 +46,24 @@ const TampilanLogin = () => {
       <AceUITemplateTwoGrid>
         {/* Kolom Kiri */}
         <div className="">
-          <AceUIAppname 
-            appname="Rain Guard" 
-            description="Pantau kondisi cuaca dan keamanan data Anda dalam satu platform terpadu." 
+          <AceUIAppname
+            appname="Rain Guard"
+            description="Pantau kondisi cuaca dan keamanan data Anda dalam satu platform terpadu."
           />
         </div>
 
         {/* Kolom Kanan */}
         <div className="flex items-center justify-center">
-          <div className="min-h-screen w-screen bg-blue-50 flex items-center justify-center p-4">
+          <div className="min-h-screen w-screen bg-primary/20 flex items-center justify-center p-4">
             <AceUICard>
               {/* Header */}
               <div className="text-center mb-8 mt-8">
                 <h1 className="text-3xl font-extrabold text-black">
                   Masuk Ke Akun
                 </h1>
-                <p className="text-gray-500 text-sm mt-2">Data baru akan otomatis tersimpan</p>
+                <p className="text-gray-500 text-sm mt-2">
+                  Data baru akan otomatis tersimpan
+                </p>
               </div>
 
               {/* Form menggunakan handleSubmit agar lebih rapi */}
@@ -87,19 +90,12 @@ const TampilanLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   type="password"
-                  
                 />
 
                 {/* Button */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full font-bold py-3 rounded-xl mt-4 transition-all ${
-                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
-                  }`}
-                >
+                <AceUIButton disable={loading} types="submit">
                   {loading ? "Memproses..." : "Masuk & Simpan"}
-                </button>
+                </AceUIButton>
               </form>
             </AceUICard>
           </div>

@@ -24,7 +24,7 @@ function AceUICardTable({ thead, tbody, title }: Props) {
             <thead className="bg-secondary text-primary">
               <tr>
                 {thead.map((item, index) => (
-                  <th key={index} className="px-4 py-3 font-medium">
+                  <th key={index} className="px-4 py-3 font-medium text-background">
                     {item.title}
                   </th>
                 ))}
