@@ -11,11 +11,11 @@ function AceUICardWithTitle({ children, title }: AceUICardWithTitleProps) {
     <>
       <AceUICard>
         <div>
-          <h1 className="text-xl font-bold mb-2 text-text dark:text-background">
+          <h1 className="text-xl font-bold mb-2 text-text">
             {title}
           </h1>
         </div>
-        <hr className="mb-2 border-secondary dark:border-accent" />
+        <hr className="mb-2 border-secondary" />
         <div>{children}</div>
       </AceUICard>
     </>

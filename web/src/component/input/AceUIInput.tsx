@@ -23,7 +23,7 @@ function AceUIInput({
       <input
         value={value}
         onChange={onChange}
-        className="w-full mt-1 border-2 border-secondary dark:border-accent bg-background text-text focus:outline-none focus:border-primary p-3 rounded-xl transition-colors"
+        className="w-full mt-1 border-2 border-secondary bg-background text-text focus:outline-none focus:border-primary p-3 rounded-xl transition-colors"
         type={type}
         placeholder={placeholder}
       />

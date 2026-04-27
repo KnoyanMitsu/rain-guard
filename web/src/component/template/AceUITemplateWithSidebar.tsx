@@ -37,7 +37,7 @@ function AceUITemplateWithSidebar({
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   return (
     <>
-      <div className="md:grid grid-cols-5 h-screen bg-background text-text dark:bg-text dark:text-background">
+      <div className="md:grid grid-cols-5 h-screen bg-background text-text">
         {/* Desktop */}
         <div className="hidden md:flex col-span-1 p-6 flex-col gap-6">
           <h1 className="text-3xl font-bold mb-10">{appname}</h1>
@@ -51,8 +51,8 @@ function AceUITemplateWithSidebar({
                       href={item.link}
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
                         isActive
-                          ? "bg-secondary text-primary dark:bg-accent dark:text-background shadow-md shadow-primary/20"
-                          : "text-text/70 dark:text-background/70 hover:bg-secondary hover:text-primary dark:hover:bg-accent dark:hover:text-background"
+                          ? "bg-secondary text-primary shadow-md shadow-primary/20"
+                          : "text-text/70 hover:bg-secondary hover:text-primary"
                       }`}
                     >
                       {item.title}
@@ -67,10 +67,10 @@ function AceUITemplateWithSidebar({
           <div className="container mx-auto mt-auto">
             {account && (
               <div
-                className={`relative ${isProfilePopupOpen ? "p-2 absolute rounded-b-2xl mb-2 bg-background dark:bg-text border border-secondary dark:border-accent shadow-[0_8px_30px_rgb(0,0,0,0.12)]" : ""}`}
+                className={`relative ${isProfilePopupOpen ? "p-2 absolute rounded-b-2xl mb-2 bg-background border border-secondary shadow-[0_8px_30px_rgb(0,0,0,0.12)]" : ""}`}
               >
                 <div
-                  className="flex items-center gap-2 cursor-pointer p-2 -ml-2 rounded-xl hover:bg-secondary dark:hover:bg-accent transition-colors"
+                  className="flex items-center gap-2 cursor-pointer p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors"
                   onClick={() => setIsProfilePopupOpen(!isProfilePopupOpen)}
                 >
                   <img
@@ -80,13 +80,13 @@ function AceUITemplateWithSidebar({
                   />
                   <div>
                     <h2 className="text-lg font-medium">{accountName}</h2>
-                    <p className="text-sm text-text/70 dark:text-background/70">
+                    <p className="text-sm text-text/70">
                       {accountRole}
                     </p>
                   </div>
                 </div>
                 {isProfilePopupOpen && (
-                  <div className="absolute bottom-full left-0 w-full bg-background dark:bg-text border border-secondary dark:border-accent shadow-t-[0_8px_30px_rgb(0,0,0,0.12)] rounded-t-xl p-2 z-50">
+                  <div className="absolute bottom-full left-0 w-full bg-background border border-secondary shadow-t-[0_8px_30px_rgb(0,0,0,0.12)] rounded-t-xl p-2 z-50">
                     <button
                       onClick={() => {
                         if (logoutfunc) {
@@ -96,7 +96,7 @@ function AceUITemplateWithSidebar({
                         }
                         setIsProfilePopupOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-red-500 font-medium hover:bg-secondary dark:hover:bg-accent rounded-lg transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2 text-red-500 font-medium hover:bg-secondary rounded-lg transition-colors flex items-center justify-between"
                     >
                       <div className="flex gap-2">
                         <LogOut></LogOut>
@@ -117,14 +117,14 @@ function AceUITemplateWithSidebar({
           }`}
         />
         <div
-          className={`fixed top-0 left-0 h-full w-64 bg-background dark:bg-text shadow-2xl p-6 flex flex-col gap-6 transition-transform duration-300 ease-in-out md:hidden z-50 ${
+          className={`fixed top-0 left-0 h-full w-64 bg-background shadow-2xl p-6 flex flex-col gap-6 transition-transform duration-300 ease-in-out md:hidden z-50 ${
             isOpen ? "translate-x-0" : "-translate-x-full "
           }`}
         >
           <div className="flex justify-between items-center mb-10">
             <button
               onClick={() => setIsOpen(false)}
-              className="p-2 bg-secondary dark:bg-accent rounded-full hover:bg-primary hover:text-background transition-colors"
+              className="p-2 bg-secondary rounded-full hover:bg-primary hover:text-background transition-colors"
             >
               <ArrowRight className="rotate-180" />
             </button>
@@ -140,8 +140,8 @@ function AceUITemplateWithSidebar({
                       onClick={() => setIsOpen(false)}
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
                         isActive
-                          ? "bg-secondary text-primary dark:bg-accent dark:text-background shadow-md shadow-primary/20"
-                          : "text-text/70 dark:text-background/70 hover:bg-secondary hover:text-primary dark:hover:bg-accent dark:hover:text-background"
+                          ? "bg-secondary text-primary shadow-md shadow-primary/20"
+                          : "text-text/70 hover:bg-secondary hover:text-primary"
                       }`}
                     >
                       {item.title}
@@ -159,7 +159,7 @@ function AceUITemplateWithSidebar({
                 className={`relative ${isProfilePopupOpen ? "p-2 absolute bg-white600 rounded-b-2xl border-gray-100 mb-2 bg-white border shadow-[0_8px_30px_rgb(0,0,0,0.12)]" : ""}`}
               >
                 <div
-                  className="flex items-center gap-2 cursor-pointer p-2 -ml-2 rounded-xl hover:bg-secondary dark:hover:bg-accent transition-colors"
+                  className="flex items-center gap-2 cursor-pointer p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors"
                   onClick={() => setIsProfilePopupOpen(!isProfilePopupOpen)}
                 >
                   <img
@@ -169,19 +169,19 @@ function AceUITemplateWithSidebar({
                   />
                   <div>
                     <h2 className="text-lg font-medium">{accountName}</h2>
-                    <p className="text-sm text-text/70 dark:text-background/70">
+                    <p className="text-sm text-text/70">
                       {accountRole}
                     </p>
                   </div>
                 </div>
                 {isProfilePopupOpen && (
-                  <div className="absolute bottom-full left-0 w-full bg-background dark:bg-text border border-secondary dark:border-accent rounded-t-xl p-2 z-50">
+                  <div className="absolute bottom-full left-0 w-full bg-background border border-secondary rounded-t-xl p-2 z-50">
                     <button
                       onClick={() => {
                         logoutfunc();
                         setIsProfilePopupOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-red-500 font-medium hover:bg-secondary dark:hover:bg-accent rounded-lg transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-2 text-red-500 font-medium hover:bg-secondary rounded-lg transition-colors flex items-center justify-between"
                     >
                       <div className="flex gap-2">
                         <LogOut></LogOut>
@@ -198,7 +198,7 @@ function AceUITemplateWithSidebar({
           <div className="p-1 md:hidden">
             <div className="flex gap-2 items-center p-2">
               <button
-                className="p-2 rounded-lg hover:bg-secondary hover:text-primary dark:hover:bg-accent dark:hover:text-background"
+                className="p-2 rounded-lg hover:bg-secondary hover:text-primary"
                 onClick={() => setIsOpen(!isOpen)}
               >
                 <Menu />
@@ -206,7 +206,7 @@ function AceUITemplateWithSidebar({
               <h1 className="font-bold text-2xl">{header}</h1>
             </div>
           </div>
-          <div className="bg-secondary/30 dark:bg-text/50 rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
+          <div className="bg-secondary/30 rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
             <div className="flex justify-between items-center mb-4">
               <h1 className="hidden md:block text-3xl font-bold">{header}</h1>
             </div>

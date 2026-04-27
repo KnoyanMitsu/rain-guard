@@ -41,14 +41,14 @@ function AceUICardStatus({
           )}
           {color === "primary" && (
             <div
-              className={`rounded-md bg-secondary text-primary dark:bg-text dark:text-accent p-2 w-fit mb-4`}
+              className={`rounded-md bg-secondary text-primary p-2 w-fit mb-4`}
             >
               {icon}
             </div>
           )}
           {color === "secondary" && (
             <div
-              className={`rounded-md bg-background text-secondary dark:bg-text dark:text-background p-2 w-fit mb-4`}
+              className={`rounded-md bg-background text-secondary p-2 w-fit mb-4`}
             >
               {icon}
             </div>
@@ -62,15 +62,15 @@ function AceUICardStatus({
           )}
           {/* text */}
           <div>
-            <h2 className="text-xl font-medium text-text/70 dark:text-background/70 mb-1">
+            <h2 className="text-xl font-medium text-text/70 mb-1">
               {title}
             </h2>
             <div className="flex items-baseline gap-1">
-              <p className="text-3xl font-bold text-text dark:text-background">
+              <p className="text-3xl font-bold text-text">
                 {value}
               </p>
               {unit && (
-                <span className="text-md text-text/80 dark:text-background/80">
+                <span className="text-md text-text/80">
                   {unit}
                 </span>
               )}
@@ -83,11 +83,11 @@ function AceUICardStatus({
               defaultChecked={false}
               id={switchId}
               type="checkbox"
-              className="peer appearance-none w-11 h-6 bg-secondary dark:bg-text rounded-full checked:bg-primary dark:checked:bg-accent cursor-pointer transition-colors duration-300"
+              className="peer appearance-none w-11 h-6 bg-secondary rounded-full checked:bg-primary cursor-pointer transition-colors duration-300"
             />
             <label
               htmlFor={switchId}
-              className="absolute top-0.5 left-0.5 w-5 h-5 bg-background rounded-full border border-secondary shadow-sm transition-transform duration-300 peer-checked:translate-x-5 peer-checked:border-primary dark:peer-checked:border-accent cursor-pointer"
+              className="absolute top-0.5 left-0.5 w-5 h-5 bg-background rounded-full border border-secondary shadow-sm transition-transform duration-300 peer-checked:translate-x-5 peer-checked:border-primary cursor-pointer"
             ></label>
           </div>
         )}

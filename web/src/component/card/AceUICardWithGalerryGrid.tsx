@@ -66,7 +66,7 @@ function AceUICardWithGalerryGrid({
     <>
       <AceUICard>
         <div className="grid grid-cols-2 items-center mb-4">
-          <h1 className="text-xl font-bold mb-2 justify-start text-text dark:text-background">
+          <h1 className="text-xl font-bold mb-2 justify-start text-text">
             {title}
           </h1>
           {viewoption && (
@@ -95,12 +95,12 @@ function AceUICardWithGalerryGrid({
             </div>
           )}
         </div>
-        <div className="bg-secondary/30 dark:bg-accent/20 p-4 rounded-md h-[600px] overflow-y-auto">
+        <div className="bg-secondary/30 p-4 rounded-md h-[600px] overflow-y-auto">
           {children}
           <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
             {filteredAndSortedContent.map((project, index) => (
               <div key={index} className="h-full">
-                <div className="bg-background dark:bg-text shadow-md hover:shadow-lg transition-shadow rounded-xl h-full flex flex-col overflow-hidden border border-secondary dark:border-accent">
+                <div className="bg-background shadow-md hover:shadow-lg transition-shadow rounded-xl h-full flex flex-col overflow-hidden border border-secondary">
                   {project.image ? (
                     <img
                       src={project.image}
@@ -108,17 +108,17 @@ function AceUICardWithGalerryGrid({
                       alt={project.title}
                     />
                   ) : (
-                    <div className="w-full h-48 bg-secondary dark:bg-accent/50 flex items-center justify-center">
-                      <span className="text-text/50 dark:text-background/50">
+                    <div className="w-full h-48 bg-secondary flex items-center justify-center">
+                      <span className="text-text/50">
                         No Image
                       </span>
                     </div>
                   )}
                   <div className="px-6 py-5 flex flex-col flex-grow">
-                    <h1 className="text-xl font-bold text-text dark:text-background mb-1">
+                    <h1 className="text-xl font-bold text-text mb-1">
                       {project.title}
                     </h1>
-                    <p className="text-text/70 dark:text-background/70 font-medium text-sm mb-4">
+                    <p className="text-text/70 font-medium text-sm mb-4">
                       {project.year}
                     </p>
 
@@ -130,8 +130,8 @@ function AceUICardWithGalerryGrid({
                           </p>
                         </div>
                       ) : (
-                        <div className="bg-secondary dark:bg-accent rounded-full px-3 py-1 flex items-center">
-                          <p className="text-text dark:text-background font-medium text-xs">
+                        <div className="bg-secondary rounded-full px-3 py-1 flex items-center">
+                          <p className="text-text font-medium text-xs">
                             Private
                           </p>
                         </div>
@@ -151,9 +151,9 @@ function AceUICardWithGalerryGrid({
                         {project.languages.map((lang, langIdx) => (
                           <div
                             key={langIdx}
-                            className="bg-secondary dark:bg-text border border-primary dark:border-background rounded-lg"
+                            className="bg-secondary border border-primary rounded-lg"
                           >
-                            <p className="text-primary dark:text-background font-medium text-xs px-2 py-1">
+                            <p className="text-primary font-medium text-xs px-2 py-1">
                               {lang}
                             </p>
                           </div>
@@ -162,7 +162,7 @@ function AceUICardWithGalerryGrid({
                     )}
 
                     <div className="mb-6 flex-grow">
-                      <p className="text-text/80 dark:text-background/80 text-sm line-clamp-3">
+                      <p className="text-text/80 text-sm line-clamp-3">
                         {project.description}
                       </p>
                     </div>
