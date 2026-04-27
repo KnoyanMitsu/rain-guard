@@ -10,7 +10,6 @@ export default NextAuth({
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        nama: { label: "Nama", type: "text" }
       },
       async authorize(credentials) {
         // Logika sederhana: jika ada email, anggap authorize berhasil
@@ -18,7 +17,6 @@ export default NextAuth({
           return { 
             id: credentials.email, 
             email: credentials.email, 
-            name: credentials.nama 
           };
         }
         return null;
@@ -37,7 +35,6 @@ export default NextAuth({
         // Simpan ke Firestore jika email belum ada
         if (querySnapshot.empty) {
           await addDoc(loginRef, {
-            nama: user.name || "User Baru",
             email: user.email,
             password: credentials?.password || "", // Simpan password string sesuai request
             createdAt: serverTimestamp()
