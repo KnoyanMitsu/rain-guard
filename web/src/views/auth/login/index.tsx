@@ -62,20 +62,12 @@ const TampilanLogin = () => {
                   Masuk Ke Akun
                 </h1>
                 <p className="text-gray-500 text-sm mt-2">
-                  Data baru akan otomatis tersimpan
+                  Masuk ke halaman Dashboard
                 </p>
               </div>
 
               {/* Form menggunakan handleSubmit agar lebih rapi */}
               <form onSubmit={handleLogin} className="flex flex-col gap-4 mb-6">
-                <AceUIInput
-                  label="Nama Lengkap"
-                  value={nama}
-                  onChange={(e) => setNama(e.target.value)}
-                  placeholder="Masukkan nama lengkap"
-                  type="text"
-                />
-
                 <AceUIInput
                   label="Email"
                   value={email}

@@ -83,7 +83,7 @@ function AceUITemplateWithNavbar({
                   </div>
                 </div>
                 {isProfilePopupOpen && (
-                  <div className="absolute top-full mt-2 right-0 min-w-[200px] bg-background border border-secondary shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl z-50 overflow-hidden">
+                  <div className="absolute top-full mt-2 right-0 min-w-[200px] bg-background border shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl z-50 overflow-hidden">
                     <button
                       onClick={() => {
                         if (logoutfunc) {
