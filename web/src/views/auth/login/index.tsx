@@ -87,6 +87,7 @@ const TampilanLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   type="password"
+                  
                 />
 
                 {/* Button */}

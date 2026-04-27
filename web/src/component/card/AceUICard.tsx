@@ -8,7 +8,7 @@ type AceUICardProps = {
 function AceUICard({ children, className }: AceUICardProps) {
   return (
     <div
-      className={`rounded-xl p-4 shadow-sm bg-background text-text dark:bg-text dark:text-background ${className}`}
+      className={`rounded-xl p-4 shadow-sm bg-background text-text ${className}`}
     >
       {children}
     </div>
