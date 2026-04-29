@@ -2,11 +2,11 @@
 @config "../../tailwind.config.js";
 
 @theme {
-  --color-text: #07090b;
-  --color-background: #f8fafc;
-  --color-primary: #4e97ca;
-  --color-secondary: #7ebde8;
-  --color-accent: #45aaf0;
+  --color-text: #14191a;
+  --color-background: #eff4f6;
+  --color-primary: #2e606b;
+  --color-secondary: #81c8d9;
+  --color-accent: #2395af;
 
   /* --color-text: #0f1010;
   --color-background: #f5f7f6;

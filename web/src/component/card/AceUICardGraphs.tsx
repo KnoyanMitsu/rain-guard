@@ -42,8 +42,8 @@ function AceUICardGraphs({
             >
               <defs>
                 <linearGradient id="colorAir" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2f27ce" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#2f27ce" stopOpacity={0} />
+                  <stop offset="5%" stopColor="var(--color-secondary)" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="var(--color-secondary)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -77,7 +77,7 @@ function AceUICardGraphs({
                 type="monotone"
                 dataKey={dataKey}
                 name={titlelegend}
-                stroke="#2f27ce"
+                stroke="var(--color-secondary)"
                 fillOpacity={1}
                 fill="url(#colorAir)"
               />
