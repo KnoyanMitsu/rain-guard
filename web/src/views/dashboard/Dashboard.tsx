@@ -1,7 +1,9 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
 import AceUICardTable from "@/component/card/AceUICardTable";
+import AceUIButton from "@/component/input/AceUIButton";
 import { Bell, Cloud, CloudRain, Droplets } from "lucide-react";
+import saveJson from "@/pages/dashboard/saveCSV";
 
 export type Tbody = {
   [key: string]: string;
@@ -70,12 +72,15 @@ function Dashboard(data: Data) {
           title="History dalam 30 hari"
           thead={[
             { title: "Lokasi" },
-            { title: "Tinggi Air" },
-            { title: "Curah Hujan" },
+            { title: "Tinggi Air (cm)" },
+            { title: "Curah Hujan (mm/jam)" },
             { title: "Status" },
             { title: "Update Terakhir" },
           ]}
           tbody={data.tbody}
+          buttonSave
+          buttonTitle="Save as CSV"
+          onClick={() => saveJson({ data: data.tbody, fileName: "history.csv" })}
         />
       </div>
     </>

@@ -1,0 +1,212 @@
+[
+  {
+    "lokasi": "Sungai Ciliwung",
+    "tinggi_air": 85,
+    "curah_hujan": 12,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-01"
+  },
+  {
+    "lokasi": "Sungai Cisadane",
+    "tinggi_air": 45,
+    "curah_hujan": 5,
+    "status": "Aman",
+    "update_terakhir": "2026-05-02"
+  },
+  {
+    "lokasi": "Bendungan Katulampa",
+    "tinggi_air": 120,
+    "curah_hujan": 25,
+    "status": "Bahaya",
+    "update_terakhir": "2026-05-03"
+  },
+  {
+    "lokasi": "Kali Pesanggrahan",
+    "tinggi_air": 62,
+    "curah_hujan": 8,
+    "status": "Aman",
+    "update_terakhir": "2026-05-04"
+  },
+  {
+    "lokasi": "Pintu Air Manggarai",
+    "tinggi_air": 750,
+    "curah_hujan": 15,
+    "status": "Siaga 3",
+    "update_terakhir": "2026-05-05"
+  },
+  {
+    "lokasi": "Sungai Bengawan Solo",
+    "tinggi_air": 510,
+    "curah_hujan": 30,
+    "status": "Bahaya",
+    "update_terakhir": "2026-05-06"
+  },
+  {
+    "lokasi": "Kali Sunter",
+    "tinggi_air": 140,
+    "curah_hujan": 4,
+    "status": "Aman",
+    "update_terakhir": "2026-05-07"
+  },
+  {
+    "lokasi": "Sungai Brantas",
+    "tinggi_air": 230,
+    "curah_hujan": 10,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-08"
+  },
+  {
+    "lokasi": "Pintu Air Karet",
+    "tinggi_air": 420,
+    "curah_hujan": 0,
+    "status": "Aman",
+    "update_terakhir": "2026-05-09"
+  },
+  {
+    "lokasi": "Sungai Mahakam",
+    "tinggi_air": 380,
+    "curah_hujan": 20,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-10"
+  },
+  {
+    "lokasi": "Kali Grogol",
+    "tinggi_air": 110,
+    "curah_hujan": 2,
+    "status": "Aman",
+    "update_terakhir": "2026-05-11"
+  },
+  {
+    "lokasi": "Sungai Musi",
+    "tinggi_air": 290,
+    "curah_hujan": 18,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-12"
+  },
+  {
+    "lokasi": "Pintu Air Pulogadung",
+    "tinggi_air": 550,
+    "curah_hujan": 35,
+    "status": "Bahaya",
+    "update_terakhir": "2026-05-13"
+  },
+  {
+    "lokasi": "Kali Angke",
+    "tinggi_air": 180,
+    "curah_hujan": 9,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-14"
+  },
+  {
+    "lokasi": "Sungai Kapuas",
+    "tinggi_air": 415,
+    "curah_hujan": 11,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-15"
+  },
+  {
+    "lokasi": "Waduk Pluit",
+    "tinggi_air": -150,
+    "curah_hujan": 2,
+    "status": "Aman",
+    "update_terakhir": "2026-05-16"
+  },
+  {
+    "lokasi": "Sungai Barito",
+    "tinggi_air": 620,
+    "curah_hujan": 42,
+    "status": "Bahaya",
+    "update_terakhir": "2026-05-17"
+  },
+  {
+    "lokasi": "Kali Bekasi",
+    "tinggi_air": 340,
+    "curah_hujan": 14,
+    "status": "Siaga 2",
+    "update_terakhir": "2026-05-18"
+  },
+  {
+    "lokasi": "Sungai Serayu",
+    "tinggi_air": 190,
+    "curah_hujan": 5,
+    "status": "Aman",
+    "update_terakhir": "2026-05-19"
+  },
+  {
+    "lokasi": "Situ Gintung",
+    "tinggi_air": 95,
+    "curah_hujan": 1,
+    "status": "Aman",
+    "update_terakhir": "2026-05-20"
+  },
+  {
+    "lokasi": "Sungai Opak",
+    "tinggi_air": 210,
+    "curah_hujan": 22,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-21"
+  },
+  {
+    "lokasi": "Kali Mookervart",
+    "tinggi_air": 135,
+    "curah_hujan": 8,
+    "status": "Aman",
+    "update_terakhir": "2026-05-22"
+  },
+  {
+    "lokasi": "Sungai Progo",
+    "tinggi_air": 275,
+    "curah_hujan": 16,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-23"
+  },
+  {
+    "lokasi": "Pintu Air Marina",
+    "tinggi_air": 195,
+    "curah_hujan": 0,
+    "status": "Aman",
+    "update_terakhir": "2026-05-24"
+  },
+  {
+    "lokasi": "Sungai Saddang",
+    "tinggi_air": 480,
+    "curah_hujan": 38,
+    "status": "Bahaya",
+    "update_terakhir": "2026-05-25"
+  },
+  {
+    "lokasi": "Kali Sekretaris",
+    "tinggi_air": 215,
+    "curah_hujan": 13,
+    "status": "Siaga 3",
+    "update_terakhir": "2026-05-26"
+  },
+  {
+    "lokasi": "Sungai Comal",
+    "tinggi_air": 160,
+    "curah_hujan": 7,
+    "status": "Aman",
+    "update_terakhir": "2026-05-27"
+  },
+  {
+    "lokasi": "Waduk Riario",
+    "tinggi_air": 50,
+    "curah_hujan": 3,
+    "status": "Aman",
+    "update_terakhir": "2026-05-28"
+  },
+  {
+    "lokasi": "Sungai Citanduy",
+    "tinggi_air": 320,
+    "curah_hujan": 19,
+    "status": "Waspada",
+    "update_terakhir": "2026-05-29"
+  },
+  {
+    "lokasi": "Kali Baru",
+    "tinggi_air": 105,
+    "curah_hujan": 6,
+    "status": "Aman",
+    "update_terakhir": "2026-05-30"
+  }
+]

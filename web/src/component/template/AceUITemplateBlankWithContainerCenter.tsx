@@ -6,7 +6,7 @@ type Props = {
 
 function AceUITemplateBlankWithContainerCenter({ children }: Props) {
   return (
-    <div className="flex items-center justify-center h-screen bg-background text-text">
+    <div className="flex items-center justify-center h-screen bg-secondary/20 text-text">
       <div className="w-full container">{children}</div>
     </div>
   );

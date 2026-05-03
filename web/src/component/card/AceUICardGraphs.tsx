@@ -59,7 +59,7 @@ function AceUICardGraphs({
                 dy={10}
               />
               <YAxis
-                domain={[start, end]} // <-- INI KUNCINYA: Mengatur batas bawah 20 dan atas 400
+                domain={[start, end]}
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12, fill: "#050315", opacity: 0.7 }}
