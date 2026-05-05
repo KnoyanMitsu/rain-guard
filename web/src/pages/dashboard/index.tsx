@@ -1,7 +1,7 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
+import history from '@/data/history.json';
 import Dashboard from "@/views/dashboard/Dashboard";
 import { signOut, useSession } from "next-auth/react";
-import history from '@/data/history.json'
 
 function index() {
   const handleLogout = async () => {
@@ -25,7 +25,7 @@ function index() {
           },
           {
             title: "History",
-            link: "/dashboard/history",
+            link: "/history",
           },
         ]}
         account={true}
@@ -35,7 +35,13 @@ function index() {
         header="Dashboard"
       >
         <Dashboard
-          tbody={history}
+          tbody={history.map((item) => ({
+            lokasi: item.lokasi,
+            tinggi_air: item.tinggi_air.toString(),
+            curah_hujan: item.curah_hujan.toString(),
+            status: item.status,
+            update_terakhir: item.update_terakhir,
+          }))}
           thead={[
             { title: "Lokasi" },
             { title: "Tinggi Air" },
