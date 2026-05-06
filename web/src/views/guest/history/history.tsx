@@ -45,66 +45,61 @@ function History({ tbody, thead }: HistoryProps) {
         </p>
       </div>
 
-      {/* SUMMARY */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-          <p className="text-xs text-gray-500 mb-1">Total Lokasi</p>
-          <p className="text-xl font-semibold">{tbody.length}</p>
-        </div>
+     {/* SUMMARY */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+  <div className="bg-green-50 rounded-lg p-3 border border-green-100">
+    <p className="text-xs text-gray-500 mb-1">Total Data</p>
+    <p className="text-xl font-semibold">{tbody.length}</p>
+  </div>
 
-        <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-          <p className="text-xs text-green-600 mb-1">Aman</p>
-          <p className="text-xl font-semibold text-green-700">
-            {tbody.filter(r => r.status === "Aman").length}
-          </p>
-        </div>
+  <div className="bg-green-50 rounded-lg p-3 border border-green-100">
+    <p className="text-xs text-green-600 mb-1">Aman</p>
+    <p className="text-xl font-semibold text-green-700">
+      {/* Menggunakan toLowerCase agar pasti cocok dengan data dari getStatus */}
+      {tbody.filter(r => r.status.toLowerCase() === "aman").length}
+    </p>
+  </div>
 
-        <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-100">
-          <p className="text-xs text-yellow-600 mb-1">Siaga</p>
-          <p className="text-xl font-semibold text-yellow-700">
-            {tbody.filter(r => r.status === "Siaga").length}
-          </p>
-        </div>
+  <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-100">
+    <p className="text-xs text-yellow-600 mb-1">Siaga</p>
+    <p className="text-xl font-semibold text-yellow-700">
+      {tbody.filter(r => r.status.toLowerCase() === "siaga").length}
+    </p>
+  </div>
 
-        <div className="bg-red-50 rounded-lg p-3 border border-red-100">
-          <p className="text-xs text-red-600 mb-1">Bahaya</p>
-          <p className="text-xl font-semibold text-red-700">
-            {tbody.filter(r => r.status === "Bahaya").length}
-          </p>
-        </div>
-      </div>
+  <div className="bg-red-50 rounded-lg p-3 border border-red-100">
+    <p className="text-xs text-red-600 mb-1">Bahaya</p>
+    <p className="text-xl font-semibold text-red-700">
+      {tbody.filter(r => r.status.toLowerCase() === "bahaya").length}
+    </p>
+  </div>
+</div>
 
-       {/* TABLE */}
-      <div className="bg-[#e6f4f7] rounded-2xl overflow-hidden border border-[#b6dbe3]">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="bg-[#6fb3c1] text-white">
-              {thead.map((h, i) => (
-                <th key={i} className="text-left px-5 py-4 font-semibold">
-                  {h.title}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody>
-            {currentData.map((row, i) => (
-              <tr
-                key={i}
-                className="border-b border-[#b6dbe3] last:border-0 hover:bg-[#d7eef3]"
-              >
-                <td className="px-5 py-4">{row.lokasi}</td>
-                <td className="px-5 py-4">{row.tinggi_air}</td>
-                <td className="px-5 py-4">{row.curah_hujan}</td>
-                <td className="px-5 py-4">
-                  <StatusBadge status={row.status} />
-                </td>
-                <td className="px-5 py-4">{row.update_terakhir}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+{/* TABLE - Tambahkan handling jika data kosong */}
+<div className="bg-[#e6f4f7] rounded-2xl overflow-hidden border border-[#b6dbe3]">
+  <table className="w-full border-collapse text-sm">
+    {/* ... thread tetap sama ... */}
+    <tbody>
+      {currentData.length > 0 ? (
+        currentData.map((row, i) => (
+          <tr key={i} className="...">
+            <td className="px-5 py-4">{row.lokasi}</td>
+            <td className="px-5 py-4">{row.tinggi_air}</td>
+            <td className="px-5 py-4">{row.curah_hujan}</td>
+            <td className="px-5 py-4"><StatusBadge status={row.status} /></td>
+            <td className="px-5 py-4">{row.update_terakhir}</td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan={thead.length} className="text-center py-10 text-gray-500 italic">
+            Belum ada data riwayat.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
 
       {/* PAGINATION */}
       <div className="flex justify-end mt-5 gap-2">
