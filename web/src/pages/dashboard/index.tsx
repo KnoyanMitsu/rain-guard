@@ -29,8 +29,8 @@ function index() {
           },
         ]}
         account={true}
-        accountName={data?.user?.fullname}
-        accountImage={`https://ui-avatars.com/api/?name=${data?.user?.fullname}`}
+        accountName={data?.user?.fullname || "Admin"}
+        accountImage={`https://ui-avatars.com/api/?name=${data?.user?.fullname || "Admin"}`}
         accountRole="Admin"
         header="Dashboard"
       >
