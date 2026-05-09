@@ -4,8 +4,14 @@ import AceUICardTable from "@/component/card/AceUICardTable";
 import saveJson from "@/pages/dashboard/saveCSV";
 import { Bell, Cloud, CloudRain, Droplets } from "lucide-react";
 
+// Definisikan tipe data sesuai dengan payload WebSocket (distance: double, rain: int64)
 export type Tbody = {
-  [key: string]: string;
+  distance?: number | string;
+  rain?: number | string;
+  status_rain?: string;
+  buzzer?: string;
+  update_terakhir?: string;
+  [key: string]: any; 
 };
 
 export type Thead = {
@@ -24,58 +30,67 @@ type Data = {
 };
 
 function Dashboard(data: Data) {
+  // Mengambil data terbaru dari WebSocket untuk ditampilkan di Card
+  const latestData: Tbody = data.tbody[0] || {};
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Card Distance - Menangani tipe double */}
         <AceUICardStatus
-          title="Tinggi Air Rata-rata"
-          value="150" // Disesuaikan angkanya
+          title="Distance"
+          value={
+            typeof latestData.distance === 'number' 
+              ? latestData.distance.toFixed(2) 
+              : (latestData.distance?.toString().replace(" cm", "") || "0")
+          }
           icon={<Droplets />}
-          color="green"
+          color="primary"
           unit="cm"
         />
+
+        {/* Card Rain Sensor - Menangani tipe int64 */}
         <AceUICardStatus
-          title="Curah Hujan"
-          color="yellow"
+          title="Rain Sensor"
+          value={latestData.rain?.toString() || "0"}
           icon={<Cloud />}
-          value="12"
-          unit="mm/jam"
+          color="yellow"
+          unit="raw"
         />
+
+        {/* Card Status Hujan - Warna Dinamis */}
         <AceUICardStatus
           title="Status Hujan"
-          color="red"
+          value={latestData.status_rain || "-"}
           icon={<CloudRain />}
-          value="Ya"
+          color={latestData.status_rain === "Ya" ? "red" : "green"}
         />
+
+        {/* Card Buzzer - Warna Dinamis */}
         <AceUICardStatus
-          title="Status Sirine"
-          color="green"
+          title="Buzzer"
+          value={latestData.buzzer || "-"}
           icon={<Bell />}
-          value="Tidak"
+          color={latestData.buzzer === "Aktif" ? "red" : "green"}
           toggle={true}
         />
       </div>
 
-      {/* Bagian Grafik */}
       <div className="grid grid-cols-1 gap-4">
+        {/* Grafik Real-time */}
         <AceUICardGraphs
           data={data.graph}
-          start={20}
-          end={400}
+          start={0}
+          end={500}
           dataKey="tinggiAir"
-          titlelegend="Tinggi Air (cm)"
-          title="Grafik Ketinggian Air (24 Jam)"
+          titlelegend="Distance (cm)"
+          title="Grafik Monitoring Jarak Air (Real-time)"
         />
 
+        {/* Tabel History Real-time */}
         <AceUICardTable
-          title="History dalam 30 hari"
-          thead={[
-            { title: "Lokasi" },
-            { title: "Tinggi Air (cm)" },
-            { title: "Curah Hujan (mm/jam)" },
-            { title: "Status" },
-            { title: "Update Terakhir" },
-          ]}
+          title="History Pengamatan"
+          thead={data.thead}
           tbody={data.tbody}
           buttonSave
           buttonTitle="Save as CSV"

@@ -1,83 +1,66 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
-import db from "@/utils/db/firebase";
 import Dashboard from "@/views/dashboard/Dashboard";
-import { collection, limit, onSnapshot, orderBy, query, Timestamp } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-function Index() {
+function index() {
   const { data: session }: any = useSession();
-  const [dataDashboard, setDataDashboard] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
-  // 1. Fungsi Logout
-  const handleLogout = async () => {
-    await signOut({
-      redirect: true,
-      callbackUrl: "/auth/login",
-    });
-  };
-
-  // 2. Helper untuk menentukan status (Sama dengan History)
-  const getStatus = (tinggi: number): string => {
-    if (tinggi >= 300) return "Bahaya";
-    if (tinggi >= 100) return "Siaga";
-    return "Aman";
-  };
-
-  // 3. Effect untuk Fetch Realtime Data (Sinkron dengan Logika History)
   useEffect(() => {
-    console.log("🔄 Inisialisasi listener Dashboard...");
+    // Pastikan variabel environment menggunakan prefix NEXT_PUBLIC_
+    // Gabungkan base URL dengan path /ws/getIot sesuai instruksi Anda
+    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
+    const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
+    
+    let socket: WebSocket;
 
-    // Listen ke Devices untuk mendapatkan mapping lokasi
-    const unsubDevices = onSnapshot(collection(db, "devices"), (deviceSnapshot) => {
-      const map: Record<string, any> = {};
-      deviceSnapshot.forEach((doc) => {
-        map[doc.id] = doc.data();
-      });
+    function connect() {
+      socket = new WebSocket(wsUrl);
 
-      // Listen ke History dengan limit 10 (untuk Dashboard)
-      const q = query(
-        collection(db, "history"),
-        orderBy("last_seen", "desc"),
-        limit(10)
-      );
+      socket.onopen = () => {
+        console.log("✅ WebSocket Connected to: " + wsUrl);
+      };
 
-      const unsubHistory = onSnapshot(q, (historySnapshot) => {
-        const result = historySnapshot.docs.map((doc) => {
-          const item = doc.data();
-          const deviceData = map[item.device_id] || {};
-          
-          // Format waktu (disamakan dengan format tabel: jam:menit)
-          let timeString = "Baru saja";
-          if (item.last_seen instanceof Timestamp) {
-            const date = item.last_seen.toDate();
-            timeString = date.toLocaleTimeString("id-ID", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-          }
+      socket.onmessage = (event) => {
+  // Jika ada data masuk, log ini PASTI muncul di Console
+  console.log("📩 Pesan Mentah:", event.data); 
 
-          return {
-            id: doc.id,
-            lokasi: item.lokasi || deviceData.lokasi || "Lokasi tidak ditemukan",
-            tinggi_air_raw: Number(item.tinggi_air || 0), // Simpan angka murni untuk grafik
-            tinggi_air: `${item.tinggi_air || 0} cm`,
-            curah_hujan: `${item.curah_hujan || 0} mm`,
-            status: getStatus(Number(item.tinggi_air || 0)),
-            update_terakhir: timeString,
-          };
-        });
+  try {
+    const data = JSON.parse(event.data);
+    const enrichedData = {
+      distance: data.distance ?? 0,
+      rain: data.rain ?? 0,
+      status_rain: data.status_rain ?? "-",
+      buzzer: data.buzzer ?? "Non Aktif",
+      update_terakhir: new Date().toLocaleTimeString(),
+    };
+    setRealtimeData((prev) => [enrichedData, ...prev].slice(0, 20));
+  } catch (err) {
+    console.error("❌ Gagal baca JSON:", err);
+  }
+};
 
-        setDataDashboard(result);
-        setLoading(false);
-      });
+      socket.onerror = (error) => {
+        console.error("⚠️ WebSocket Error:", error);
+      };
 
-      return () => unsubHistory();
-    });
+      socket.onclose = () => {
+        console.log("🔌 WebSocket Disconnected. Reconnecting in 5s...");
+        setTimeout(connect, 5000); // Mencoba hubungkan kembali
+      };
+    }
 
-    return () => unsubDevices();
+    connect();
+
+    return () => {
+      if (socket) socket.close();
+    };
   }, []);
+
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/auth/login" });
+  };
 
   return (
     <AceUITemplateWithSidebar
@@ -93,34 +76,22 @@ function Index() {
       accountRole="Admin"
       header="Dashboard"
     >
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500 animate-pulse">Memuat data terbaru...</p>
-        </div>
-      ) : (
-        <Dashboard
-          thead={[
-            { title: "Lokasi" },
-            { title: "Tinggi Air" },
-            { title: "Curah Hujan" },
-            { title: "Status" },
-            { title: "Update Terakhir" },
-          ]}
-          tbody={dataDashboard.map(item => ({
-            lokasi: item.lokasi,
-            tinggi_air: item.tinggi_air,
-            curah_hujan: item.curah_hujan,
-            status: item.status,
-            update_terakhir: item.update_terakhir
-          }))}
-          graph={[...dataDashboard].reverse().map((item) => ({
-            time: item.update_terakhir,
-            tinggiAir: item.tinggi_air_raw,
-          }))}
-        />
-      )}
+      <Dashboard
+        tbody={realtimeData}
+        thead={[
+          { title: "Distance (cm)" },
+          { title: "Rain Value" },
+          { title: "Status Hujan" },
+          { title: "Status Buzzer" },
+          { title: "Waktu" },
+        ]}
+        graph={realtimeData.map((item) => ({
+          time: item.update_terakhir,
+          tinggiAir: Number(item.distance),
+        })).reverse()} 
+      />
     </AceUITemplateWithSidebar>
   );
 }
 
-export default Index;
+export default index;
