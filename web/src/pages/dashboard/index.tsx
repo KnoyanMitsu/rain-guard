@@ -19,7 +19,7 @@ function index() {
     const q = query(
       collection(db, "history"),
       orderBy("timestamp", "desc"),
-      limit(5) 
+      limit(10) 
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
