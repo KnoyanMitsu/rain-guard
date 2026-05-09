@@ -1,9 +1,12 @@
 import Dashboard from '@/views/guest/dashboard/Dashboard'
-import React from 'react'
 
 function index() {
+  const thead = [] as any
+  const tbody = [] as any
+  const graph = {} as any
+
   return (
-    <Dashboard/>
+    <Dashboard thead={thead} tbody={tbody} graph={graph} />
   )
 }
 
