@@ -67,22 +67,22 @@ function index() {
       logoutfunc={handleLogout}
       appname="Rain Guard"
       listMenu={[
-        { title: "Dashboard", link: "/dashboard/" },
-        { title: "History", link: "/history" },
+        { title: "Dasbor", link: "/dashboard/" },
+        { title: "Riwayat", link: "/history" },
       ]}
       account={true}
       accountName={session?.user?.fullname || "Admin"}
       accountImage={`https://ui-avatars.com/api/?name=${session?.user?.fullname || "Admin"}`}
       accountRole="Admin"
-      header="Dashboard"
+      header="Dasbor"
     >
       <Dashboard
         tbody={realtimeData}
         thead={[
-          { title: "Distance (cm)" },
-          { title: "Rain Value" },
+          { title: "Tinggi Air (cm)" },
+          { title: "Nilai Sensor Hujan" },
           { title: "Status Hujan" },
-          { title: "Status Buzzer" },
+          { title: "Status Alarm" },
           { title: "Waktu" },
         ]}
         graph={realtimeData.map((item) => ({

@@ -51,7 +51,7 @@ const Dashboard = ({ thead, tbody, graph }: DashboardProps) => {
                     <StatusBadge status={row.status_rain} type="hujan" />
                   </td>
                   <td className="px-6 py-4">
-                    <StatusBadge status={row.buzzer} type="buzzer" />
+                    <StatusBadge status={row.buzzer} type="alarm" />
                   </td>
                 </tr>
               ))}
@@ -64,12 +64,12 @@ const Dashboard = ({ thead, tbody, graph }: DashboardProps) => {
 };
 
 // Komponen Badge tetap sama
-function StatusBadge({ status, type }: { status: string; type: 'hujan' | 'buzzer' }) {
+function StatusBadge({ status, type }: { status: string; type: 'hujan' | 'alarm' }) {
   let style = "bg-gray-100 text-gray-700";
 
   if (type === 'hujan') {
     style = status === "Ya" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700";
-  } else if (type === 'buzzer') {
+  } else if (type === 'alarm') {
     style = status === "Aktif" ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700";
   }
 

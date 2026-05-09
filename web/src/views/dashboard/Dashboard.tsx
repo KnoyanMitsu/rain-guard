@@ -38,7 +38,7 @@ function Dashboard(data: Data) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Card Distance - Menangani tipe double */}
         <AceUICardStatus
-          title="Distance"
+          title="Tinggi Air"
           value={
             typeof latestData.distance === 'number' 
               ? latestData.distance.toFixed(2) 
@@ -51,7 +51,7 @@ function Dashboard(data: Data) {
 
         {/* Card Rain Sensor - Menangani tipe int64 */}
         <AceUICardStatus
-          title="Rain Sensor"
+          title="Nilai Sensor Hujan"
           value={latestData.rain?.toString() || "0"}
           icon={<Cloud />}
           color="yellow"
@@ -68,7 +68,7 @@ function Dashboard(data: Data) {
 
         {/* Card Buzzer - Warna Dinamis */}
         <AceUICardStatus
-          title="Buzzer"
+          title="Status Alarm"
           value={latestData.buzzer || "-"}
           icon={<Bell />}
           color={latestData.buzzer === "Aktif" ? "red" : "green"}
@@ -83,17 +83,17 @@ function Dashboard(data: Data) {
           start={0}
           end={500}
           dataKey="tinggiAir"
-          titlelegend="Distance (cm)"
-          title="Grafik Monitoring Jarak Air (Real-time)"
+          titlelegend="Tinggi Air (cm)"
+          title="Grafik Monitoring Tinggi Air (Real-time)"
         />
 
         {/* Tabel History Real-time */}
         <AceUICardTable
-          title="History Pengamatan"
+          title="Riwayat Pengamatan"
           thead={data.thead}
           tbody={data.tbody}
           buttonSave
-          buttonTitle="Save as CSV"
+          buttonTitle="Unduh CSV"
           onClick={() => saveJson({ data: data.tbody, fileName: "history.csv" })}
         />
       </div>

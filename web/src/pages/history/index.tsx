@@ -63,7 +63,7 @@ function HistoryPage() {
         };
       });
 
-      console.log("📊 Data History berhasil di-mapping:", result.length, "item");
+      console.log("📊 Data Riwayat berhasil di-mapping:", result.length, "item");
       setDataHistory(result);
       setLoading(false);
     });
@@ -79,29 +79,29 @@ function HistoryPage() {
       logoutfunc={handleLogout}
       appname="Rain Guard"
       listMenu={[
-        { title: "Dashboard", link: "/dashboard/" },
-        { title: "History", link: "/history" },
+        { title: "Dasbor", link: "/dashboard/" },
+        { title: "Riwayat", link: "/history" },
       ]}
       account={true}
       accountName={session?.user?.fullname || "Admin"}
       accountImage={`https://ui-avatars.com/api/?name=${session?.user?.fullname || "Admin"}`}
       accountRole="Admin"
-      header="History"
+      header="Riwayat"
     >
       <div className="bg-gray-100 p-6 rounded-xl shadow-sm">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">History dalam 30 hari</h2>
+          <h2 className="text-xl font-bold text-gray-800">Riwayat dalam 30 hari</h2>
           <button className="px-4 py-2 bg-white border border-cyan-700 text-cyan-700 rounded-lg hover:bg-cyan-50 transition-colors">
-            Save as CSV
+            Unduh CSV
           </button>
         </div>
       <History
         tbody={dataHistory}
         thead={[
           { title: "Lokasi" },
-          { title: "Tinggi Air" },
+          { title: "Tinggi Air (cm)" },
           { title: "Curah Hujan" },
-          { title: "Status" },
+          { title: "Status Alarm" },
           { title: "Update Terakhir" },
         ]}
       />
