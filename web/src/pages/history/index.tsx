@@ -1,7 +1,7 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
 import History from "@/views/guest/history/history";
-import { collection, onSnapshot, query, Timestamp } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -34,8 +34,8 @@ function HistoryPage() {
     setDeviceMap(map);
     console.log("📍 Device Map diperbarui:", Object.keys(map).length, "perangkat");
 
-    // 2. Listen ke History HANYA SETELAH deviceMap terisi (atau berjalan bersamaan)
-    const q = query(collection(db, "history"));
+    // 2. Listen ke History (Ditambah orderBy agar data terbaru di atas)
+    const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
     const unsubHistory = onSnapshot(q, (historySnapshot) => {
       if (historySnapshot.empty) {
         console.warn("⚠️ Firestore mengembalikan koleksi history kosong.");
@@ -46,19 +46,21 @@ function HistoryPage() {
 
       const result = historySnapshot.docs.map((doc) => {
         const item = doc.data();
-        // Mengambil data device dari map yang baru saja diupdate
         const deviceData = map[item.device_id] || {};
         
-        const lastSeen = item.last_seen instanceof Timestamp 
-          ? item.last_seen.toDate() 
+        // Mengubah format angka milidetik (timestamp) dari Firebase jadi format tanggal Indo
+        const lastSeen = item.timestamp 
+          ? new Date(item.timestamp) 
           : new Date();
 
         return {
           id: doc.id,
-          lokasi: item.lokasi || deviceData.lokasi || "Lokasi tidak ditemukan",
-          tinggi_air: `${item.tinggi_air || 0} cm`,
-          curah_hujan: `${item.curah_hujan || 0} mm`,
-          status: getStatus(Number(item.tinggi_air || 0)),
+          lokasi: item.lokasi || deviceData.lokasi || "Sensor Pusat",
+          // Sesuaikan variabel dengan database (distance & rain)
+          tinggi_air: `${item.distance || 0} cm`,
+          curah_hujan: `${item.rain || 0} mm`,
+          // Logika status: Kalau dari alat ngirim "Ya" berarti Bahaya, sisanya hitung dari getStatus
+          status: item.status_rain === "Ya" ? "Bahaya" : getStatus(Number(item.distance || 0)),
           update_terakhir: lastSeen.toLocaleString("id-ID"),
         };
       });
@@ -72,12 +74,12 @@ function HistoryPage() {
   });
 
   return () => unsubDevices();
-}, []); // Kosongkan dependency agar listener tidak duplikat
+}, []);
 
   return (
     <AceUITemplateWithSidebar
       logoutfunc={handleLogout}
-      appname="Rain Guard"
+      appname="RainGuard"
       listMenu={[
         { title: "Dasbor", link: "/dashboard/" },
         { title: "Riwayat", link: "/history" },
