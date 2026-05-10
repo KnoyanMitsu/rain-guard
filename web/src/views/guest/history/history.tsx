@@ -122,23 +122,44 @@ function History({ tbody, thead }: HistoryProps) {
           Sebelumnya
         </button>
 
-        {/* NUMBER */}
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-          <button
-            key={n}
-            onClick={() => setCurrentPage(n)}
-            className={`
-              px-4 py-2 rounded-lg border border-[#7fb8c6]
-              ${
-                n === currentPage
-                  ? "bg-[#dff1f5] text-[#2c6e7d] font-semibold"
-                  : "text-[#2c6e7d] hover:bg-[#e6f4f7]"
-              }
-            `}
-          >
-            {n}
-          </button>
-        ))}
+        {/* NUMBERS */}
+        {(() => {
+          const maxVisible = 5;
+          let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+          let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+          if (endPage - startPage + 1 < maxVisible) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+          }
+
+          const pages = [];
+          for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+          }
+
+          return (
+            <>
+              {startPage > 1 && <span className="px-2 text-gray-500 self-end mb-2">...</span>}
+              {pages.map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setCurrentPage(n)}
+                  className={`
+                    px-4 py-2 rounded-lg border border-[#7fb8c6]
+                    ${
+                      n === currentPage
+                        ? "bg-[#dff1f5] text-[#2c6e7d] font-semibold"
+                        : "text-[#2c6e7d] hover:bg-[#e6f4f7]"
+                    }
+                  `}
+                >
+                  {n}
+                </button>
+              ))}
+              {endPage < totalPages && <span className="px-2 text-gray-500 self-end mb-2">...</span>}
+            </>
+          );
+        })()}
 
         {/* NEXT */}
         <button

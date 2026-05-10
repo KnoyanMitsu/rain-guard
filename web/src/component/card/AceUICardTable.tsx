@@ -168,19 +168,41 @@ function AceUICardTable({
           >
             Sebelumnya
           </AceUIButton>
-          {Array.from({ length: totalPages }).map((_, index) => {
-            const pageNum = index + 1;
+          {(() => {
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage + 1 < maxVisible) {
+              startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            const pages = [];
+            for (let i = startPage; i <= endPage; i++) {
+              pages.push(i);
+            }
+
             return (
-              <AceUIButton
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                types="button"
-                disable={currentPage === pageNum}
-              >
-                {pageNum}
-              </AceUIButton>
+              <>
+                {startPage > 1 && (
+                  <span className="flex items-end justify-center px-1 text-text/50">...</span>
+                )}
+                {pages.map((pageNum) => (
+                  <AceUIButton
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    types="button"
+                    disable={currentPage === pageNum}
+                  >
+                    {pageNum}
+                  </AceUIButton>
+                ))}
+                {endPage < totalPages && (
+                  <span className="flex items-end justify-center px-1 text-text/50">...</span>
+                )}
+              </>
             );
-          })}
+          })()}
           <AceUIButton
             onClick={nextPage}
             types="button"
