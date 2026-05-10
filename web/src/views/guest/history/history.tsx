@@ -119,7 +119,7 @@ function History({ tbody, thead }: HistoryProps) {
               : "text-[#2c6e7d] hover:bg-[#e6f4f7]"}
           `}
         >
-          Prev
+          Sebelumnya
         </button>
 
         {/* NUMBER */}
@@ -150,7 +150,7 @@ function History({ tbody, thead }: HistoryProps) {
               : "text-[#2c6e7d] hover:bg-[#e6f4f7]"}
           `}
         >
-          Next
+          Selanjutnya
         </button>
 
       </div>

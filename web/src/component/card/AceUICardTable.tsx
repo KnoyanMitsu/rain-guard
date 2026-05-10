@@ -166,7 +166,7 @@ function AceUICardTable({
             types="button"
             disable={isDisablePrev}
           >
-            Prev
+            Sebelumnya
           </AceUIButton>
           {Array.from({ length: totalPages }).map((_, index) => {
             const pageNum = index + 1;
@@ -186,7 +186,7 @@ function AceUICardTable({
             types="button"
             disable={isDisableNext}
           >
-            Next
+            Selanjutnya
           </AceUIButton>
         </div>
       </AceUICardWithTitle>

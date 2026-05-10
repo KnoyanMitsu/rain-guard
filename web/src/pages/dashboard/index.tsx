@@ -2,60 +2,50 @@ import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSide
 import Dashboard from "@/views/dashboard/Dashboard";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import db from "@/utils/db/firebase";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+
+function getStatus(tinggiAir: number) {
+  if (tinggiAir <= 100) return "Aman";
+  if (tinggiAir <= 200) return "Siaga";
+  return "Bahaya";
+}
 
 function index() {
   const { data: session }: any = useSession();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
   useEffect(() => {
-    // Pastikan variabel environment menggunakan prefix NEXT_PUBLIC_
-    // Gabungkan base URL dengan path /ws/getIot sesuai instruksi Anda
-    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
-    const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
-    
-    let socket: WebSocket;
+    const q = query(
+      collection(db, "history"),
+      orderBy("timestamp", "desc"),
+      limit(10) 
+    );
 
-    function connect() {
-      socket = new WebSocket(wsUrl);
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      console.log("✅ Jumlah data dari Firebase:", snapshot.docs.length); 
+      
+      const data = snapshot.docs.map((doc) => {
+        const item = doc.data();
+        
+        const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
 
-      socket.onopen = () => {
-        console.log("✅ WebSocket Connected to: " + wsUrl);
-      };
+        return {
+          id: doc.id,
+          tinggi_air: `${item.distance || 0} cm`,
+          curah_hujan: `${item.rain || 0} mm`,    
+          // Jika status_rain "Ya" anggap Bahaya, jika tidak anggap Aman (Bisa disesuaikan)
+          status: item.status_rain === "Ya" ? "Bahaya" : "Aman", 
+          update_terakhir: lastSeen.toLocaleString("id-ID"),
+        };
+      });
+      
+      setRealtimeData(data);
+    }, (error) => {
+      console.error("❌ Gagal mengambil data Firebase:", error);
+    });
 
-      socket.onmessage = (event) => {
-  // Jika ada data masuk, log ini PASTI muncul di Console
-  console.log("📩 Pesan Mentah:", event.data); 
-
-  try {
-    const data = JSON.parse(event.data);
-    const enrichedData = {
-      distance: data.distance ?? 0,
-      rain: data.rain ?? 0,
-      status_rain: data.status_rain ?? "-",
-      buzzer: data.buzzer ?? "Non Aktif",
-      update_terakhir: new Date().toLocaleTimeString(),
-    };
-    setRealtimeData((prev) => [enrichedData, ...prev].slice(0, 20));
-  } catch (err) {
-    console.error("❌ Gagal baca JSON:", err);
-  }
-};
-
-      socket.onerror = (error) => {
-        console.error("⚠️ WebSocket Error:", error);
-      };
-
-      socket.onclose = () => {
-        console.log("🔌 WebSocket Disconnected. Reconnecting in 5s...");
-        setTimeout(connect, 5000); // Mencoba hubungkan kembali
-      };
-    }
-
-    connect();
-
-    return () => {
-      if (socket) socket.close();
-    };
+    return () => unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -65,29 +55,30 @@ function index() {
   return (
     <AceUITemplateWithSidebar
       logoutfunc={handleLogout}
-      appname="Rain Guard"
+      appname="RainGuard"
       listMenu={[
-        { title: "Dashboard", link: "/dashboard/" },
-        { title: "History", link: "/history" },
+        { title: "Dasbor", link: "/dashboard/" },
+        { title: "Riwayat", link: "/history" },
       ]}
       account={true}
       accountName={session?.user?.fullname || "Admin"}
       accountImage={`https://ui-avatars.com/api/?name=${session?.user?.fullname || "Admin"}`}
       accountRole="Admin"
-      header="Dashboard"
+      header="Dasbor"
     >
       <Dashboard
         tbody={realtimeData}
         thead={[
-          { title: "Distance (cm)" },
-          { title: "Rain Value" },
-          { title: "Status Hujan" },
-          { title: "Status Buzzer" },
-          { title: "Waktu" },
+          { title: "Tinggi Air" },
+          { title: "Curah Hujan" },
+          { title: "Status Alarm" },
+          { title: "Update Terakhir" },
         ]}
         graph={realtimeData.map((item) => ({
-          time: item.update_terakhir,
-          tinggiAir: Number(item.distance),
+          // Mengambil jam saja untuk grafik agar sumbu X tidak terlalu penuh
+          time: item.update_terakhir.split(",")[1] || item.update_terakhir, 
+          // Parse string "15 cm" kembali jadi angka murni 15 untuk grafik
+          tinggiAir: parseFloat(item.tinggi_air), 
         })).reverse()} 
       />
     </AceUITemplateWithSidebar>

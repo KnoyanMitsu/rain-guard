@@ -1,14 +1,12 @@
-// src/views/guest/dashboard/Dashboard.tsx
+// src/views/guest/dashboard/Dashboard.tsx (atau src/views/dashboard/Dashboard.tsx)
 
 interface DashboardProps {
   thead: { title: string }[];
   tbody: {
-    // Berdasarkan gambar: distance = double, rain = int64
-    // Dalam TypeScript, keduanya direpresentasikan sebagai 'number'
-    distance: number;    
-    rain: number;        
-    status_rain: string; 
-    buzzer: string;      
+    tinggi_air: string;
+    curah_hujan: string;
+    status: string;
+    update_terakhir: string;
   }[];
   graph: {
     time: string;
@@ -21,10 +19,10 @@ const Dashboard = ({ thead, tbody, graph }: DashboardProps) => {
     <div className="space-y-6">
       {/* Bagian Grafik */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-bold mb-4">Tren Ketinggian Air (Distance)</h3>
+        <h3 className="text-lg font-bold mb-4">Tren Ketinggian Air</h3>
         <div className="h-64 w-full bg-gray-50 flex items-center justify-center rounded-lg border border-dashed border-gray-300">
            {/* Render grafik menggunakan data dari props 'graph' */}
-           <p className="text-gray-400 text-sm">Grafik Monitoring Real-time</p>
+           <p className="text-gray-400 text-sm">Grafik Monitoring Ketinggian Air</p>
         </div>
       </div>
 
@@ -42,16 +40,24 @@ const Dashboard = ({ thead, tbody, graph }: DashboardProps) => {
             <tbody className="divide-y divide-gray-100">
               {tbody.map((row, i) => (
                 <tr key={i} className="hover:bg-gray-50 transition-colors">
-                  {/* .toFixed(2) opsional untuk merapikan tampilan double/float */}
+                  {/* Tinggi Air */}
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    {typeof row.distance === 'number' ? row.distance.toFixed(2) : row.distance} cm
+                    {row.tinggi_air}
                   </td>
-                  <td className="px-6 py-4">{row.rain}</td>
-                  <td className="px-6 py-4">
-                    <StatusBadge status={row.status_rain} type="hujan" />
+                  
+                  {/* Curah Hujan */}
+                  <td className="px-6 py-4 text-gray-600">
+                    {row.curah_hujan}
                   </td>
+                  
+                  {/* Status (Menggunakan badge) */}
                   <td className="px-6 py-4">
-                    <StatusBadge status={row.buzzer} type="buzzer" />
+                    <StatusBadge status={row.status} />
+                  </td>
+                  
+                  {/* Pembaruan Waktu Terakhir */}
+                  <td className="px-6 py-4 text-gray-500">
+                    {row.update_terakhir}
                   </td>
                 </tr>
               ))}
@@ -63,14 +69,16 @@ const Dashboard = ({ thead, tbody, graph }: DashboardProps) => {
   );
 };
 
-// Komponen Badge tetap sama
-function StatusBadge({ status, type }: { status: string; type: 'hujan' | 'buzzer' }) {
+// Komponen Badge yang sudah disesuaikan untuk status "Aman", "Siaga", "Bahaya"
+function StatusBadge({ status }: { status: string }) {
   let style = "bg-gray-100 text-gray-700";
 
-  if (type === 'hujan') {
-    style = status === "Ya" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700";
-  } else if (type === 'buzzer') {
-    style = status === "Aktif" ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700";
+  if (status === "Aman") {
+    style = "bg-green-100 text-green-800";
+  } else if (status === "Siaga") {
+    style = "bg-yellow-100 text-yellow-800";
+  } else if (status === "Bahaya") {
+    style = "bg-red-100 text-red-800";
   }
 
   return (
