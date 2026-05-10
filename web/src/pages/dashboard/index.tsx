@@ -11,10 +11,14 @@ function getStatus(tinggiAir: number) {
   return "Bahaya";
 }
 
-function index() {
+function Index() {
   const { data: session }: any = useSession();
-  const [realtimeData, setRealtimeData] = useState<any[]>([]);
+  
+  // State terpisah untuk Firebase (Tabel & Grafik) dan WebSocket (4 Kartu Status)
+  const [firebaseData, setFirebaseData] = useState<any[]>([]);
+  const [wsData, setWsData] = useState<any>(null);
 
+  // 1. useEffect untuk FIREBASE (Data Riwayat)
   useEffect(() => {
     const q = query(
       collection(db, "history"),
@@ -27,25 +31,73 @@ function index() {
       
       const data = snapshot.docs.map((doc) => {
         const item = doc.data();
-        
         const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
 
         return {
           id: doc.id,
           tinggi_air: `${item.distance || 0} cm`,
           curah_hujan: `${item.rain || 0} mm`,    
-          // Jika status_rain "Ya" anggap Bahaya, jika tidak anggap Aman (Bisa disesuaikan)
+          // Menyimpan nilai original untuk grafik/kebutuhan lain
+          distance: item.distance || 0,
+          rain: item.rain || 0,
           status: item.status_rain === "Ya" ? "Bahaya" : "Aman", 
           update_terakhir: lastSeen.toLocaleString("id-ID"),
         };
       });
       
-      setRealtimeData(data);
+      setFirebaseData(data);
     }, (error) => {
       console.error("❌ Gagal mengambil data Firebase:", error);
     });
 
     return () => unsubscribe();
+  }, []);
+
+  // 2. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
+  useEffect(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
+    const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
+    
+    let socket: WebSocket;
+
+    function connect() {
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log("✅ WebSocket Connected to: " + wsUrl);
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          // Set state wsData hanya dengan data terbaru
+          setWsData({
+            distance: data.distance ?? 0,
+            rain: data.rain ?? 0,
+            status_rain: data.status_rain ?? "-",
+            buzzer: data.buzzer ?? "Non Aktif",
+            update_terakhir: new Date().toLocaleTimeString("id-ID"),
+          });
+        } catch (err) {
+          console.error("❌ Gagal baca JSON WebSocket:", err);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error("⚠️ WebSocket Error:", error);
+      };
+
+      socket.onclose = () => {
+        console.log("🔌 WebSocket Disconnected. Reconnecting in 5s...");
+        setTimeout(connect, 5000);
+      };
+    }
+
+    connect();
+
+    return () => {
+      if (socket) socket.close();
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -67,22 +119,24 @@ function index() {
       header="Dasbor"
     >
       <Dashboard
-        tbody={realtimeData}
+        // Lempar data WebSocket khusus ke props latestWsData
+        latestWsData={wsData} 
+        // Lempar data Firebase ke tabel dan grafik
+        tbody={firebaseData}
         thead={[
           { title: "Tinggi Air" },
           { title: "Curah Hujan" },
           { title: "Status Alarm" },
           { title: "Update Terakhir" },
         ]}
-        graph={realtimeData.map((item) => ({
-          // Mengambil jam saja untuk grafik agar sumbu X tidak terlalu penuh
-          time: item.update_terakhir.split(",")[1] || item.update_terakhir, 
-          // Parse string "15 cm" kembali jadi angka murni 15 untuk grafik
-          tinggiAir: parseFloat(item.tinggi_air), 
+        graph={firebaseData.map((item) => ({
+          time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir, 
+          // Menggunakan nilai distance murni yang sudah kita mapping di Firebase map atas
+          tinggiAir: typeof item.distance === 'number' ? item.distance : parseFloat(item.tinggi_air), 
         })).reverse()} 
       />
     </AceUITemplateWithSidebar>
   );
 }
 
-export default index;
+export default Index;

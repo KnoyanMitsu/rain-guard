@@ -27,6 +27,7 @@ type Data = {
   thead: Thead[];
   tbody: Tbody[];
   graph: GraphData[];
+  latestWsData?: Tbody; // Menambahkan properti khusus untuk menerima data realtime dari WebSocket
 };
 
 function Dashboard(data: Data) {
@@ -36,7 +37,9 @@ function Dashboard(data: Data) {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = data.tbody.slice(startIndex, startIndex + itemsPerPage);
 
-  const latestData: Tbody = data.tbody[0] || {};
+  // Memprioritaskan data dari WebSocket untuk 4 kartu status di atas
+  // Jika latestWsData kosong/belum masuk, akan *fallback* menggunakan index 0 dari tbody
+  const latestData: Tbody = data.latestWsData || data.tbody[0] || {};
 
   return (
     <div className="flex flex-col gap-6">
