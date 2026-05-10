@@ -1,20 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import Dashboard from "@/views/dashboard/Dashboard";
 
-// Mock saveCSV
-jest.mock("@/pages/dashboard/saveCSV", () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
-
 describe("Dashboard View", () => {
   const defaultProps = {
     thead: [
-      { title: "Distance (cm)" },
-      { title: "Rain Value" },
-      { title: "Status Hujan" },
-      { title: "Status Buzzer" },
-      { title: "Waktu" },
+      { title: "Tinggi Air" },
+      { title: "Curah Hujan" },
+      { title: "Status Alarm" },
+      { title: "Update Terakhir" },
     ],
     tbody: [
       {
@@ -40,10 +33,10 @@ describe("Dashboard View", () => {
 
   it("renders status cards", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Distance")).toBeInTheDocument();
-    expect(screen.getByText("Rain Sensor")).toBeInTheDocument();
-    expect(screen.getByText("Status Hujan")).toBeInTheDocument();
-    expect(screen.getByText("Buzzer")).toBeInTheDocument();
+    expect(screen.getAllByText("Tinggi Air")[0]).toBeInTheDocument();
+    expect(screen.getByText("Nilai Sensor Hujan")).toBeInTheDocument();
+    expect(screen.getAllByText("Status Hujan")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("Status Alarm")[0]).toBeInTheDocument();
   });
 
   it("displays latest distance value with 2 decimal places", () => {
@@ -58,28 +51,29 @@ describe("Dashboard View", () => {
 
   it("displays correct rain status", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Ya")).toBeInTheDocument();
+    // "Ya" appears in status card and also in status badge as "Bahaya"
+    expect(screen.getAllByText("Ya")[0]).toBeInTheDocument();
   });
 
-  it("displays correct buzzer status", () => {
+  it("displays correct buzzer/alarm status", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Aktif")).toBeInTheDocument();
+    expect(screen.getAllByText("Aktif")[0]).toBeInTheDocument();
   });
 
   it("renders graph component", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Grafik Monitoring Jarak Air (Real-time)")).toBeInTheDocument();
+    expect(screen.getByText("Grafik Monitoring Tinggi Air (Real-time)")).toBeInTheDocument();
   });
 
   it("renders history table", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("History Pengamatan")).toBeInTheDocument();
+    expect(screen.getByText("Riwayat Pengamatan")).toBeInTheDocument();
   });
 
   it("handles empty tbody", () => {
     render(<Dashboard thead={defaultProps.thead} tbody={[]} graph={[]} />);
-    expect(screen.getByText("Distance")).toBeInTheDocument();
-    expect(screen.getByText("0")).toBeInTheDocument(); // fallback value
+    expect(screen.getAllByText("Tinggi Air")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("0")[0]).toBeInTheDocument(); // fallback value
   });
 
   it("handles string distance values", () => {
@@ -88,6 +82,12 @@ describe("Dashboard View", () => {
       tbody: [{ distance: "25 cm", rain: 100, status_rain: "Ya", buzzer: "Aktif", update_terakhir: "10:00" }],
     };
     render(<Dashboard {...propsWithStringDistance} />);
-    expect(screen.getByText("25")).toBeInTheDocument();
+    expect(screen.getAllByText("25")[0]).toBeInTheDocument();
+  });
+
+  it("renders pagination buttons", () => {
+    render(<Dashboard {...defaultProps} />);
+    expect(screen.getByText("Sebelumnya")).toBeInTheDocument();
+    expect(screen.getByText("Selanjutnya")).toBeInTheDocument();
   });
 });

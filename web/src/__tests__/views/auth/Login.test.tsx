@@ -4,8 +4,8 @@ import { useRouter } from "next/router";
 
 // Re-mock signIn and useRouter with specific behavior for this test
 jest.mock("next-auth/react", () => ({
-  ...jest.requireActual("next-auth/react"),
   signIn: jest.fn(),
+  signOut: jest.fn(),
   useSession: jest.fn(() => ({ data: null, status: "unauthenticated" })),
   SessionProvider: ({ children }: any) => children,
 }));

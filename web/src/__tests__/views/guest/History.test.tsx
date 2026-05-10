@@ -61,14 +61,14 @@ describe("History View", () => {
 
   it("navigates to next page", () => {
     render(<History {...defaultProps} />);
-    fireEvent.click(screen.getByText("Next"));
+    fireEvent.click(screen.getByText("Selanjutnya"));
     expect(screen.getByText("Sungai Solo")).toBeInTheDocument();
     expect(screen.queryByText("Sungai Ciliwung")).not.toBeInTheDocument();
   });
 
   it("disables Prev on first page", () => {
     render(<History {...defaultProps} />);
-    const prevButton = screen.getByText("Prev");
+    const prevButton = screen.getByText("Sebelumnya");
     expect(prevButton).toBeDisabled();
   });
 

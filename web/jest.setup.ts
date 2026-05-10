@@ -1,4 +1,8 @@
 import "@testing-library/jest-dom";
+import React from "react";
+
+// Helper: creates a React element without JSX syntax (avoids SWC parse error in .ts files)
+const h = React.createElement;
 
 // Mock next/router
 jest.mock("next/router", () => ({
@@ -20,7 +24,7 @@ jest.mock("next/router", () => ({
 // Mock next/link
 jest.mock("next/link", () => {
   return ({ children, href, ...rest }: any) => {
-    return <a href={href} {...rest}>{children}</a>;
+    return h("a", { href, ...rest }, children);
   };
 });
 
@@ -45,17 +49,15 @@ jest.mock("recharts", () => {
   const OriginalModule = jest.requireActual("recharts");
   return {
     ...OriginalModule,
-    ResponsiveContainer: ({ children }: any) => (
-      <div data-testid="responsive-container">{children}</div>
-    ),
-    AreaChart: ({ children }: any) => (
-      <div data-testid="area-chart">{children}</div>
-    ),
-    Area: () => <div data-testid="area" />,
-    XAxis: () => <div data-testid="x-axis" />,
-    YAxis: () => <div data-testid="y-axis" />,
-    CartesianGrid: () => <div data-testid="cartesian-grid" />,
-    Tooltip: () => <div data-testid="tooltip" />,
+    ResponsiveContainer: ({ children }: any) =>
+      h("div", { "data-testid": "responsive-container" }, children),
+    AreaChart: ({ children }: any) =>
+      h("div", { "data-testid": "area-chart" }, children),
+    Area: () => h("div", { "data-testid": "area" }),
+    XAxis: () => h("div", { "data-testid": "x-axis" }),
+    YAxis: () => h("div", { "data-testid": "y-axis" }),
+    CartesianGrid: () => h("div", { "data-testid": "cartesian-grid" }),
+    Tooltip: () => h("div", { "data-testid": "tooltip" }),
   };
 });
 
@@ -68,14 +70,14 @@ jest.mock("@json2csv/plainjs", () => ({
 
 // Mock lucide-react icons
 jest.mock("lucide-react", () => ({
-  Bell: (props: any) => <svg data-testid="icon-bell" {...props} />,
-  Cloud: (props: any) => <svg data-testid="icon-cloud" {...props} />,
-  CloudRain: (props: any) => <svg data-testid="icon-cloud-rain" {...props} />,
-  Droplets: (props: any) => <svg data-testid="icon-droplets" {...props} />,
-  ArrowRight: (props: any) => <svg data-testid="icon-arrow-right" {...props} />,
-  Menu: (props: any) => <svg data-testid="icon-menu" {...props} />,
-  LogOut: (props: any) => <svg data-testid="icon-logout" {...props} />,
-  ChevronDown: (props: any) => <svg data-testid="icon-chevron-down" {...props} />,
+  Bell: (props: any) => h("svg", { "data-testid": "icon-bell", ...props }),
+  Cloud: (props: any) => h("svg", { "data-testid": "icon-cloud", ...props }),
+  CloudRain: (props: any) => h("svg", { "data-testid": "icon-cloud-rain", ...props }),
+  Droplets: (props: any) => h("svg", { "data-testid": "icon-droplets", ...props }),
+  ArrowRight: (props: any) => h("svg", { "data-testid": "icon-arrow-right", ...props }),
+  Menu: (props: any) => h("svg", { "data-testid": "icon-menu", ...props }),
+  LogOut: (props: any) => h("svg", { "data-testid": "icon-logout", ...props }),
+  ChevronDown: (props: any) => h("svg", { "data-testid": "icon-chevron-down", ...props }),
 }));
 
 // Mock firebase

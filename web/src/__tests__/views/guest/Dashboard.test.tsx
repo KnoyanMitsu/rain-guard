@@ -4,53 +4,53 @@ import Dashboard from "@/views/guest/dashboard/Dashboard";
 describe("Guest Dashboard View", () => {
   const defaultProps = {
     thead: [
-      { title: "Distance (cm)" },
-      { title: "Rain Value" },
-      { title: "Status Hujan" },
-      { title: "Status Buzzer" },
+      { title: "Tinggi Air" },
+      { title: "Curah Hujan" },
+      { title: "Status" },
+      { title: "Update Terakhir" },
     ],
     tbody: [
-      { distance: 25.5, rain: 100, status_rain: "Ya", buzzer: "Aktif" },
-      { distance: 30.0, rain: 50, status_rain: "Tidak", buzzer: "Non Aktif" },
+      { tinggi_air: "85 cm", curah_hujan: "12 mm", status: "Aman", update_terakhir: "2026-05-01" },
+      { tinggi_air: "120 cm", curah_hujan: "25 mm", status: "Bahaya", update_terakhir: "2026-05-02" },
     ],
     graph: [
-      { time: "10:00", tinggiAir: 25.5 },
-      { time: "10:05", tinggiAir: 30.0 },
+      { time: "10:00", tinggiAir: 85 },
+      { time: "10:05", tinggiAir: 120 },
     ],
   };
 
   it("renders the graph section title", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Tren Ketinggian Air (Distance)")).toBeInTheDocument();
+    expect(screen.getByText("Tren Ketinggian Air")).toBeInTheDocument();
   });
 
   it("renders table headers", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Distance (cm)")).toBeInTheDocument();
-    expect(screen.getByText("Rain Value")).toBeInTheDocument();
-    expect(screen.getByText("Status Hujan")).toBeInTheDocument();
-    expect(screen.getByText("Status Buzzer")).toBeInTheDocument();
+    expect(screen.getByText("Tinggi Air")).toBeInTheDocument();
+    expect(screen.getByText("Curah Hujan")).toBeInTheDocument();
+    expect(screen.getByText("Status")).toBeInTheDocument();
+    expect(screen.getByText("Update Terakhir")).toBeInTheDocument();
   });
 
-  it("renders distance with toFixed(2) for number values", () => {
+  it("renders table row data", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText(/25\.50/)).toBeInTheDocument();
+    expect(screen.getByText("85 cm")).toBeInTheDocument();
+    expect(screen.getByText("12 mm")).toBeInTheDocument();
   });
 
-  it("renders rain status badges", () => {
+  it("renders status badges", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Ya")).toBeInTheDocument();
-    expect(screen.getByText("Tidak")).toBeInTheDocument();
+    expect(screen.getByText("Aman")).toBeInTheDocument();
+    expect(screen.getByText("Bahaya")).toBeInTheDocument();
   });
 
-  it("renders buzzer status badges", () => {
+  it("renders graph placeholder text", () => {
     render(<Dashboard {...defaultProps} />);
-    expect(screen.getByText("Aktif")).toBeInTheDocument();
-    expect(screen.getByText("Non Aktif")).toBeInTheDocument();
+    expect(screen.getByText("Grafik Monitoring Ketinggian Air")).toBeInTheDocument();
   });
 
   it("renders with empty tbody", () => {
     render(<Dashboard thead={defaultProps.thead} tbody={[]} graph={[]} />);
-    expect(screen.getByText("Tren Ketinggian Air (Distance)")).toBeInTheDocument();
+    expect(screen.getByText("Tren Ketinggian Air")).toBeInTheDocument();
   });
 });
