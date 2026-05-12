@@ -1,7 +1,7 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
 import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
-import { Bell, Cloud, CloudRain, Droplets } from "lucide-react";
+import { Bell, ChevronDown, Cloud, CloudRain, Droplets } from "lucide-react";
 import { useState } from "react";
 
 export type Tbody = {
@@ -41,8 +41,18 @@ function formatDistance(value: number | string | undefined) {
   return numericValue.toFixed(2);
 }
 
+function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
+  const maxPoints = Math.ceil((durationMinutes * 60) / 10); // 10 detik per titik
+  // Jika data lebih sedikit dari yang dibutuhkan, tampilkan semua data
+  if (graphData.length <= maxPoints) {
+    return graphData;
+  }
+  return graphData.slice(-maxPoints);
+}
+
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [graphDuration, setGraphDuration] = useState(60); // Default: 1 hour
   const itemsPerPage = 5;
   const totalPages = Math.ceil(data.tbody.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -52,6 +62,7 @@ function Dashboard(data: Data) {
   // Jika latestWsData kosong/belum masuk, akan *fallback* menggunakan index 0 dari tbody
   const latestData: Tbody = data.latestWsData || data.tbody[0] || {};
   const isBuzzerActive = latestData.buzzer?.trim().toLowerCase() === "aktif";
+  const filteredGraphData = getFilteredGraphData(data.graph, graphDuration);
 
   return (
     <div className="flex flex-col gap-6">
@@ -97,13 +108,30 @@ function Dashboard(data: Data) {
 
       {/* SECTION: GRAFIK */}
       <div className="w-full">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-gray-800">Grafik Monitoring Tinggi Air (Real-time)</h3>
+          <div className="relative">
+            <select
+              value={graphDuration}
+              onChange={(e) => setGraphDuration(Number(e.target.value))}
+              className="min-w-45 appearance-none rounded-xl border border-[#7fb8c6] bg-[#f8fcfd] px-4 py-2 pr-11 text-sm font-medium text-[#2c6e7d] shadow-sm outline-none transition-all hover:border-[#6fb3c1] focus:border-[#6fb3c1] focus:ring-2 focus:ring-[#dff1f5]"
+            >
+              <option value={10}>Last 10 minutes</option>
+              <option value={30}>Last 30 minutes</option>
+              <option value={60}>Last 1 hour</option>
+              <option value={240}>Last 4 hours</option>
+              <option value={1440}>Last 24 hours</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#2c6e7d]" />
+          </div>
+        </div>
         <AceUICardGraphs
-          data={data.graph}
+          data={filteredGraphData}
           start={0}
-          end={100}
+          end={25}
           dataKey="tinggiAir"
           titlelegend="Tinggi Air (cm)"
-          title="Grafik Monitoring Tinggi Air (Real-time)"
+          title=""
         />
       </div>
 

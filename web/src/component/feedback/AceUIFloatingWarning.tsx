@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 type AceUIFloatingWarningProps = {
   show: boolean;
   title: string;
@@ -5,10 +7,25 @@ type AceUIFloatingWarningProps = {
 };
 
 function AceUIFloatingWarning({ show, title, message }: AceUIFloatingWarningProps) {
-  if (!show) return null;
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (show) {
+      setIsVisible(true);
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 3000); // 30 detik = 30000 ms
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+    }
+  }, [show]);
+
+  if (!isVisible) return null;
 
   return (
-    <div className="fixed top-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2">
+    <div className="fixed top-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 animate-fade-in">
       <div
         role="alert"
         className="flex items-start gap-3 rounded-2xl border border-red-300 bg-red-600 px-4 py-3 text-white shadow-[0_18px_45px_rgba(220,38,38,0.35)]"
