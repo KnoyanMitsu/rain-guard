@@ -47,8 +47,8 @@ function Dashboard(data: Data) {
     <div className="flex flex-col gap-6">
       <AceUIFloatingWarning
         show={isBuzzerActive}
-        title="Peringatan Buzzer Aktif"
-        message="Status alarm sedang aktif. Banner ini akan tetap tampil sampai buzzer kembali non-aktif."
+        title="Peringatan: STATUS BAHAYA!"
+        message="Status alarm sedang aktif. (Banner ini akan tetap tampil sampai alarm kembali non-aktif)"
       />
 
       {/* SECTION: CARD STATUS */}
