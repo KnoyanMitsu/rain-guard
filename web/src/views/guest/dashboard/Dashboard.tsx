@@ -23,6 +23,16 @@ interface DashboardProps {
   }[];
 }
 
+function formatDistance(value: number | string | undefined) {
+  const numericValue = Number(String(value ?? 0).replace(" cm", ""));
+
+  if (Number.isNaN(numericValue)) {
+    return "0.00";
+  }
+
+  return numericValue.toFixed(2);
+}
+
 const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
   const isBuzzerActive = websocketData.buzzer?.trim().toLowerCase() === "aktif";
 
@@ -37,7 +47,7 @@ const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AceUICardStatus
           title="Tinggi Air"
-          value={websocketData.distance.toString()}
+          value={formatDistance(websocketData.distance)}
           icon={<Droplets />}
           color="primary"
           unit="cm"

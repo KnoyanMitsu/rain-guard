@@ -15,9 +15,9 @@ function HistoryPage() {
     await signOut({ redirect: true, callbackUrl: "/auth/login" });
   };
 
-  const getStatus = (tinggi: number): string => {
-    if (tinggi >= 300) return "Bahaya";
-    if (tinggi >= 100) return "Siaga";
+  const getStatus = (distance: number): string => {
+    if (distance > 10) return "Bahaya";
+    if (distance >= 5) return "Waspada";
     return "Aman";
   };
 
@@ -57,10 +57,10 @@ function HistoryPage() {
           id: doc.id,
           lokasi: item.lokasi || deviceData.lokasi || "Sensor Pusat",
           // Sesuaikan variabel dengan database (distance & rain)
-          tinggi_air: `${item.distance || 0} cm`,
+          tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
           curah_hujan: `${item.rain || 0} mm`,
-          // Logika status: Kalau dari alat ngirim "Ya" berarti Bahaya, sisanya hitung dari getStatus
-          status: item.status_rain === "Ya" ? "Bahaya" : getStatus(Number(item.distance || 0)),
+          // Logika status mengikuti distance
+          status: getStatus(Number(item.distance || 0)),
           update_terakhir: lastSeen.toLocaleString("id-ID"),
         };
       });

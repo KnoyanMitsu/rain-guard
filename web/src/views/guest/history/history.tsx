@@ -17,10 +17,10 @@ interface HistoryProps {
 
 function getStatusClass(status: string) {
   switch (status.toLowerCase()) {
-    case "aman": return "badge-success";
-    case "siaga": return "badge-warning";
-    case "bahaya": return "badge-danger";
-    default: return "badge-secondary";
+    case "aman": return "bg-green-100 text-green-800";
+    case "waspada": return "bg-yellow-100 text-yellow-800";
+    case "bahaya": return "bg-red-100 text-red-800";
+    default: return "bg-gray-100 text-gray-700";
   }
 }
 
@@ -60,9 +60,9 @@ function History({ tbody, thead }: HistoryProps) {
         </div>
 
         <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-100">
-          <p className="text-xs text-yellow-600 mb-1">Siaga</p>
+          <p className="text-xs text-yellow-600 mb-1">Waspada</p>
           <p className="text-xl font-semibold text-yellow-700">
-            {tbody.filter(r => r.status === "Siaga").length}
+            {tbody.filter(r => r.status === "Waspada").length}
           </p>
         </div>
 
@@ -181,13 +181,8 @@ function History({ tbody, thead }: HistoryProps) {
 
 
 function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    Aman: "bg-green-100 text-green-800",
-    Siaga: "bg-yellow-100 text-yellow-800",
-    Bahaya: "bg-red-100 text-red-800",
-  };
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${styles[status] ?? "bg-gray-100 text-gray-700"}`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusClass(status)}`}>
       <span className="w-1.5 h-1.5 rounded-full bg-current" />
       {status}
     </span>

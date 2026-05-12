@@ -31,6 +31,16 @@ type Data = {
   latestWsData?: Tbody; // Menambahkan properti khusus untuk menerima data realtime dari WebSocket
 };
 
+function formatDistance(value: number | string | undefined) {
+  const numericValue = Number(String(value ?? 0).replace(" cm", ""));
+
+  if (Number.isNaN(numericValue)) {
+    return "0";
+  }
+
+  return numericValue.toFixed(2);
+}
+
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -55,11 +65,7 @@ function Dashboard(data: Data) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AceUICardStatus
           title="Tinggi Air"
-          value={
-            typeof latestData.distance === 'number' 
-              ? latestData.distance.toFixed(2) 
-              : (latestData.distance?.toString().replace(" cm", "") || "0")
-          }
+          value={formatDistance(latestData.distance)}
           icon={<Droplets />}
           color="primary"
           unit="cm"
@@ -118,17 +124,32 @@ function Dashboard(data: Data) {
             </thead>
             <tbody>
               {currentData.map((row, i) => (
+                (() => {
+                  const distanceValue = Number(
+                    String(row.distance ?? row.tinggi_air ?? 0).replace(" cm", "")
+                  );
+
+                  const statusValue =
+                    distanceValue > 10
+                      ? "Bahaya"
+                      : distanceValue >= 5
+                        ? "Waspada"
+                        : "Aman";
+
+                  return (
                 <tr
                   key={i}
                   className="border-b border-[#b6dbe3] last:border-0 hover:bg-[#d7eef3] transition-colors"
                 >
-                  <td className="px-5 py-4 font-medium">{row.tinggi_air || row.distance}</td>
+                  <td className="px-5 py-4 font-medium">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
                   <td className="px-5 py-4">{row.curah_hujan || row.rain}</td>
                   <td className="px-5 py-4">
-                    <StatusBadge status={row.status || (row.status_rain === "Ya" ? "Bahaya" : "Aman")} />
+                    <StatusBadge status={statusValue} />
                   </td>
                   <td className="px-5 py-4 text-gray-600">{row.update_terakhir}</td>
                 </tr>
+                  );
+                })()
               ))}
             </tbody>
           </table>
@@ -194,7 +215,7 @@ function Dashboard(data: Data) {
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     Aman: "bg-green-100 text-green-800",
-    Siaga: "bg-yellow-100 text-yellow-800",
+    Waspada: "bg-yellow-100 text-yellow-800",
     Bahaya: "bg-red-100 text-red-800",
   };
   return (
