@@ -1,5 +1,6 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
+import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
 import { Bell, Cloud, CloudRain, Droplets } from "lucide-react";
 
 interface DashboardProps {
@@ -23,8 +24,15 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
+  const isBuzzerActive = websocketData.buzzer?.trim().toLowerCase() === "aktif";
+
   return (
     <div className="flex flex-col gap-6">
+      <AceUIFloatingWarning
+        show={isBuzzerActive}
+        title="Peringatan Buzzer Aktif"
+        message="Status alarm sedang aktif. Banner ini akan tetap tampil sampai buzzer kembali non-aktif."
+      />
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AceUICardStatus
@@ -54,7 +62,7 @@ const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
           title="Status Alarm"
           value={websocketData.buzzer}
           icon={<Bell />}
-          color={websocketData.buzzer === "Aktif" ? "red" : "green"}
+          color={isBuzzerActive ? "red" : "green"}
           toggle={true}
         />
       </div>
@@ -63,7 +71,7 @@ const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
         <AceUICardGraphs
           data={graph}
           start={0}
-          end={500}
+          end={100}
           dataKey="tinggiAir"
           titlelegend="Tinggi Air (cm)"
           title="Grafik Monitoring Tinggi Air (Real-time)"
