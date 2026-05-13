@@ -35,6 +35,8 @@ function AceUITemplateWithSidebar({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+  const profileNameClass = "max-w-[10rem] truncate text-lg font-semibold leading-tight text-text";
+  const profileRoleClass = "text-sm text-text/70 leading-tight";
   return (
     <>
       <div className="md:grid grid-cols-5 h-screen bg-background text-text">
@@ -78,11 +80,9 @@ function AceUITemplateWithSidebar({
                     alt={accountName}
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <div>
-                    <h2 className="text-lg font-medium">{accountName}</h2>
-                    <p className="text-sm text-text/70">
-                      {accountRole}
-                    </p>
+                  <div className="min-w-0">
+                    <h2 className={profileNameClass}>{accountName}</h2>
+                    <p className={profileRoleClass}>{accountRole}</p>
                   </div>
                 </div>
                 {isProfilePopupOpen && (
@@ -167,11 +167,9 @@ function AceUITemplateWithSidebar({
                     alt={accountName}
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <div>
-                    <h2 className="text-lg font-medium">{accountName}</h2>
-                    <p className="text-sm text-text/70">
-                      {accountRole}
-                    </p>
+                  <div className="min-w-0">
+                    <h2 className={profileNameClass}>{accountName}</h2>
+                    <p className={profileRoleClass}>{accountRole}</p>
                   </div>
                 </div>
                 {isProfilePopupOpen && (
