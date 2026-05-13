@@ -86,7 +86,7 @@ const TampilanLogin = () => {
 
                 {/* Button */}
                 <AceUIButton disable={loading} types="submit">
-                  {loading ? "Memproses..." : "Masuk & Simpan"}
+                  {loading ? "Memproses..." : "Masuk"}
                 </AceUIButton>
               </form>
             </AceUICard>
