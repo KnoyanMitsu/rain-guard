@@ -53,7 +53,7 @@ function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
   const [graphDuration, setGraphDuration] = useState(60); // Default: 1 hour
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(data.tbody.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = data.tbody.slice(startIndex, startIndex + itemsPerPage);
@@ -127,7 +127,7 @@ function Dashboard(data: Data) {
         <AceUICardGraphs
           data={filteredGraphData}
           start={0}
-          end={25}
+          end={10}
           dataKey="tinggiAir"
           titlelegend="Tinggi Air (cm)"
           title=""
@@ -183,7 +183,7 @@ function Dashboard(data: Data) {
         </div>
 
         {/* PAGINATION BUTTONS */}
-        <div className="flex justify-end mt-5 gap-2">
+        {/* <div className="flex justify-end mt-5 gap-2">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
@@ -233,7 +233,7 @@ function Dashboard(data: Data) {
           >
             Selanjutnya
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
