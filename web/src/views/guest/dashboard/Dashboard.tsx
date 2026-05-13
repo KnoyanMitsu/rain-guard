@@ -85,7 +85,6 @@ const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
           value={websocketData.buzzer}
           icon={<Bell />}
           color={isBuzzerActive ? "red" : "green"}
-          toggle={true}
         />
       </div>
 

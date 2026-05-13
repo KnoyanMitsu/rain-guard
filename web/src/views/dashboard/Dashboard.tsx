@@ -102,7 +102,6 @@ function Dashboard(data: Data) {
           value={latestData.buzzer || "-"}
           icon={<Bell />}
           color={isBuzzerActive ? "red" : "green"}
-          toggle={true}
         />
       </div>
 
