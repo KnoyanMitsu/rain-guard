@@ -12,7 +12,6 @@ import { useState } from "react";
 const TampilanLogin = () => {
   const router = useRouter(); // Gunakan useRouter dari next/router
   const [loading, setLoading] = useState(false);
-  const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,7 +22,6 @@ const TampilanLogin = () => {
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        nama: nama,
         email: email,
         password: password,
       });

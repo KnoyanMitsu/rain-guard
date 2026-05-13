@@ -13,6 +13,8 @@ function getStatus(tinggiAir: number) {
 
 function Index() {
   const { data: session }: any = useSession();
+  const displayName =
+    session?.user?.name || session?.user?.fullname || session?.user?.nama || "Admin";
   
   // State terpisah untuk Firebase (Tabel & Grafik) dan WebSocket (4 Kartu Status)
   const [firebaseData, setFirebaseData] = useState<any[]>([]);
@@ -113,8 +115,8 @@ function Index() {
         { title: "Riwayat", link: "/history" },
       ]}
       account={true}
-      accountName={session?.user?.fullname || "Admin"}
-      accountImage={`https://ui-avatars.com/api/?name=${session?.user?.fullname || "Admin"}`}
+      accountName={displayName}
+      accountImage={`https://ui-avatars.com/api/?name=${displayName}`}
       accountRole="Admin"
       header="Dasbor"
     >
