@@ -51,9 +51,12 @@ function AceUITemplateWithSidebar({
                     <Link
                       href={item.link}
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
+                        // isActive
+                        //   ? "bg-secondary text-primary shadow-md shadow-primary/20"
+                        //   : "text-text/70 hover:bg-secondary hover:text-background"
                         isActive
-                          ? "bg-secondary text-primary shadow-md shadow-primary/20"
-                          : "text-text/70 hover:bg-secondary hover:text-background"
+                        ? "text-text font-semibold"
+                        : "text-text/70 hover:bg-secondary hover:text-background"
                       }`}
                     >
                       {item.title}
@@ -137,7 +140,7 @@ function AceUITemplateWithSidebar({
                       onClick={() => setIsOpen(false)}
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
                         isActive
-                          ? "bg-secondary text-primary shadow-md shadow-primary/20"
+                          ? "text-text font-semibold"
                           : "text-text/70 hover:bg-secondary hover:text-background"
                       }`}
                     >

@@ -57,7 +57,6 @@ function HistoryPage() {
 
           return {
             id: doc.id,
-            lokasi: item.lokasi || deviceData.lokasi || "Sensor Pusat",
             tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
             curah_hujan: `${item.rain || 0} mm`,
             status: getStatus(Number(item.distance || 0)),
@@ -71,7 +70,14 @@ function HistoryPage() {
           };
         });
 
-        console.log("📊 Data Riwayat berhasil di-mapping:", result.length, "item");
+        const shuffledResult = [...result].sort(() => Math.random() - 0.5);
+
+        console.log(
+          "📊 Data Riwayat berhasil di-mapping:",
+          result.length,
+          "item"
+        );
+
         setDataHistory(result);
         setLoading(false);
       });
@@ -105,15 +111,14 @@ function HistoryPage() {
         </div>
         
         {loading ? (
-          <div className="text-center py-10 text-slate-500 text-sm">
+          <div className="text-center py-10 text-slate-800 text-sm">
             Memuat data sensor...
           </div>
         ) : (
           <History
             tbody={dataHistory}
             thead={[
-              { title: "Lokasi" },
-              { title: "Tinggi Air (cm)" },
+              { title: "Tinggi Air" },
               { title: "Curah Hujan" },
               { title: "Status Alarm" },
               { title: "Update Terakhir" },
