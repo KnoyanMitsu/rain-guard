@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { ArrowRight, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ArrowRight } from "lucide-react";
-import { Menu, LogOut } from "lucide-react";
+import React, { useState } from "react";
 
 export type MenuItem = {
   title: string;
@@ -58,8 +57,6 @@ function AceUITemplateWithSidebar({
                       }`}
                     >
                       {item.title}
-
-                      {isActive && <ArrowRight className="ml-auto" />}
                     </Link>
                   </li>
                 );
@@ -145,8 +142,6 @@ function AceUITemplateWithSidebar({
                       }`}
                     >
                       {item.title}
-
-                      {isActive && <ArrowRight className="ml-auto" />}
                     </Link>
                   </li>
                 );
