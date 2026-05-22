@@ -1,9 +1,9 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
+import db from "@/utils/db/firebase";
 import Dashboard from "@/views/dashboard/Dashboard";
+import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import db from "@/utils/db/firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
 function getStatus(tinggiAir: number) {
   if (tinggiAir <= 100) return "Aman";
@@ -131,11 +131,16 @@ function Index() {
           { title: "Status Alarm" },
           { title: "Update Terakhir" },
         ]}
-        graph={firebaseData.map((item) => ({
-          time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir, 
-          // Menggunakan nilai distance murni yang sudah kita mapping di Firebase map atas
-          tinggiAir: typeof item.distance === 'number' ? item.distance : parseFloat(item.tinggi_air), 
-        })).reverse()} 
+        graph={firebaseData
+        .filter((item) => item.distance >= 0) // hanya data >= 0
+        .map((item) => ({
+          time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir,
+          tinggiAir:
+            typeof item.distance === "number"
+              ? item.distance
+              : parseFloat(item.tinggi_air),
+        }))
+        .reverse()}
       />
     </AceUITemplateWithSidebar>
   );
