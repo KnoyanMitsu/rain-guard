@@ -1,7 +1,7 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
 import History from "@/views/guest/history/history";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -24,59 +24,63 @@ function HistoryPage() {
   };
 
   useEffect(() => {
-  console.log("🔄 Inisialisasi listener Firebase...");
+    console.log("🔄 Inisialisasi listener Firebase...");
 
-  // 1. Listen ke Devices secara real-time
-  const unsubDevices = onSnapshot(collection(db, "devices"), (deviceSnapshot) => {
-    const map: Record<string, any> = {};
-    deviceSnapshot.forEach((doc) => {
-      map[doc.id] = doc.data();
-    });
-    
-    setDeviceMap(map);
-    console.log("📍 Device Map diperbarui:", Object.keys(map).length, "perangkat");
+    // 1. Listen ke Devices secara real-time
+    const unsubDevices = onSnapshot(collection(db, "devices"), (deviceSnapshot) => {
+      const map: Record<string, any> = {};
+      deviceSnapshot.forEach((doc) => {
+        map[doc.id] = doc.data();
+      });
+      
+      setDeviceMap(map);
+      console.log("📍 Device Map diperbarui:", Object.keys(map).length, "perangkat");
 
-    // 2. Listen ke History (Ditambah orderBy agar data terbaru di atas)
-    const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
-    const unsubHistory = onSnapshot(q, (historySnapshot) => {
-      if (historySnapshot.empty) {
-        console.warn("⚠️ Firestore mengembalikan koleksi history kosong.");
-        setDataHistory([]);
+      // 2. Listen ke History (Ditambah orderBy agar data terbaru di atas)
+      const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
+      const unsubHistory = onSnapshot(q, (historySnapshot) => {
+        if (historySnapshot.empty) {
+          console.warn("⚠️ Firestore mengembalikan koleksi history kosong.");
+          setDataHistory([]);
+          setLoading(false);
+          return;
+        }
+
+        const result = historySnapshot.docs.map((doc) => {
+          const item = doc.data();
+          const deviceData = map[item.device_id] || {};
+          
+          // Mengubah format angka milidetik (timestamp) dari Firebase jadi format tanggal Indo
+          const lastSeen = item.timestamp 
+            ? new Date(item.timestamp) 
+            : new Date();
+
+          return {
+            id: doc.id,
+            lokasi: item.lokasi || deviceData.lokasi || "Sensor Pusat",
+            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+            curah_hujan: `${item.rain || 0} mm`,
+            status: getStatus(Number(item.distance || 0)),
+            
+            /**
+             * PERBAIKAN DI SINI:
+             * Tetap gunakan format ISO standar (YYYY-MM-DD HH:mm:ss) agar fungsi new Date() 
+             * pada internal filter komponen History bisa melakukan parsing objek Date dengan valid.
+             */
+            update_terakhir: lastSeen.toISOString(), 
+          };
+        });
+
+        console.log("📊 Data Riwayat berhasil di-mapping:", result.length, "item");
+        setDataHistory(result);
         setLoading(false);
-        return;
-      }
-
-      const result = historySnapshot.docs.map((doc) => {
-        const item = doc.data();
-        const deviceData = map[item.device_id] || {};
-        
-        // Mengubah format angka milidetik (timestamp) dari Firebase jadi format tanggal Indo
-        const lastSeen = item.timestamp 
-          ? new Date(item.timestamp) 
-          : new Date();
-
-        return {
-          id: doc.id,
-          lokasi: item.lokasi || deviceData.lokasi || "Sensor Pusat",
-          // Sesuaikan variabel dengan database (distance & rain)
-          tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
-          curah_hujan: `${item.rain || 0} mm`,
-          // Logika status mengikuti distance
-          status: getStatus(Number(item.distance || 0)),
-          update_terakhir: lastSeen.toLocaleString("id-ID"),
-        };
       });
 
-      console.log("📊 Data Riwayat berhasil di-mapping:", result.length, "item");
-      setDataHistory(result);
-      setLoading(false);
+      return () => unsubHistory();
     });
 
-    return () => unsubHistory();
-  });
-
-  return () => unsubDevices();
-}, []);
+    return () => unsubDevices();
+  }, []);
 
   return (
     <AceUITemplateWithSidebar
@@ -99,16 +103,23 @@ function HistoryPage() {
             Unduh CSV
           </button>
         </div>
-      <History
-        tbody={dataHistory}
-        thead={[
-          { title: "Lokasi" },
-          { title: "Tinggi Air (cm)" },
-          { title: "Curah Hujan" },
-          { title: "Status Alarm" },
-          { title: "Update Terakhir" },
-        ]}
-      />
+        
+        {loading ? (
+          <div className="text-center py-10 text-slate-500 text-sm">
+            Memuat data sensor...
+          </div>
+        ) : (
+          <History
+            tbody={dataHistory}
+            thead={[
+              { title: "Lokasi" },
+              { title: "Tinggi Air (cm)" },
+              { title: "Curah Hujan" },
+              { title: "Status Alarm" },
+              { title: "Update Terakhir" },
+            ]}
+          />
+        )}
       </div>
     </AceUITemplateWithSidebar>
   );

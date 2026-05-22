@@ -1,11 +1,15 @@
 "use client";
 
 // views/history/history.tsx
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import AnalysisPanel, { ANALYSIS_META } from "./AnalysisPanel";
 
+// Impor React Datepicker dan stylenya
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Types
+// Types & Statics
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface HistoryItem {
@@ -20,10 +24,6 @@ interface HistoryProps {
   tbody: HistoryItem[];
   thead: { title: string }[];
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Analysis list (urutan sesuai requirement)
-// ─────────────────────────────────────────────────────────────────────────────
 
 const ANALYSIS_LIST = [
   "Tren Ketinggian Air",
@@ -76,20 +76,35 @@ function History({ tbody, thead }: HistoryProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
+  
+  // Mengubah state tanggal menjadi objek Date asli agar sinkron dengan DatePicker
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const itemsPerPage = 5;
+  const itemsPerPage = 20;
 
-  const totalPages = Math.ceil(tbody.length / itemsPerPage);
+  // Filter data berdasarkan objek tanggal
+  const filteredData = selectedDate
+    ? tbody.filter((item) => {
+        const itemDate = new Date(item.update_terakhir);
+        
+        // Samakan format YYYY-MM-DD
+        const itemFormatted = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, "0")}-${String(itemDate.getDate()).padStart(2, "0")}`;
+        const filterFormatted = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+
+        return itemFormatted === filterFormatted;
+      })
+    : tbody;
+
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = tbody.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     }
@@ -102,8 +117,11 @@ function History({ tbody, thead }: HistoryProps) {
     setDropdownOpen(false);
   };
 
-  const handleClosePanel = () => setSelectedAnalysis(null);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDate]);
 
+  const handleClosePanel = () => setSelectedAnalysis(null);
   const activeMeta = selectedAnalysis ? ANALYSIS_META[selectedAnalysis] : null;
 
   return (
@@ -131,7 +149,6 @@ function History({ tbody, thead }: HistoryProps) {
                   : "bg-white text-[#2c6e7d] border-[#7fb8c6] hover:bg-[#f0f9fb]"
               }`}
           >
-            {/* Chart icon */}
             <svg
               className="w-4 h-4 flex-shrink-0"
               fill="none"
@@ -145,30 +162,18 @@ function History({ tbody, thead }: HistoryProps) {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-
-            <span>
-              {selectedAnalysis ? selectedAnalysis : "Analisis"}
-            </span>
-
-            {/* Chevron */}
+            <span>{selectedAnalysis ? selectedAnalysis : "Analisis"}</span>
             <svg
-              className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
-                dropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
               viewBox="0 0 24 24"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
-          {/* ── Dropdown menu ──────────────────────────────────── */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 z-50 w-64 rounded-2xl shadow-xl border border-slate-200 bg-white overflow-hidden">
               <div className="px-3 py-2 border-b border-slate-100 bg-slate-50">
@@ -176,7 +181,6 @@ function History({ tbody, thead }: HistoryProps) {
                   Pilih Analisis
                 </p>
               </div>
-
               <div className="py-1 max-h-80 overflow-y-auto">
                 {ANALYSIS_LIST.map((name) => {
                   const meta = ANALYSIS_META[name];
@@ -186,20 +190,11 @@ function History({ tbody, thead }: HistoryProps) {
                       key={name}
                       onClick={() => handleSelectAnalysis(name)}
                       className={`w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
-                        ${
-                          isActive
-                            ? "bg-[#e8f7fa] text-[#2c6e7d] font-medium"
-                            : "text-slate-700 hover:bg-slate-50"
-                        }`}
+                        ${isActive ? "bg-[#e8f7fa] text-[#2c6e7d] font-medium" : "text-slate-700 hover:bg-slate-50"}`}
                     >
-                      {/* Color dot */}
                       <span
                         className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{
-                          backgroundColor: isActive
-                            ? meta.colorAccent
-                            : "#cbd5e1",
-                        }}
+                        style={{ backgroundColor: isActive ? meta.colorAccent : "#cbd5e1" }}
                       />
                       <span className="leading-tight">{name}</span>
                       {isActive && (
@@ -210,19 +205,13 @@ function History({ tbody, thead }: HistoryProps) {
                           strokeWidth={2.5}
                           viewBox="0 0 24 24"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </button>
                   );
                 })}
               </div>
-
-              {/* Clear button */}
               {selectedAnalysis && (
                 <div className="border-t border-slate-100 px-3 py-2">
                   <button
@@ -245,23 +234,20 @@ function History({ tbody, thead }: HistoryProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm">
           <p className="text-xs text-slate-400 mb-1">Total Lokasi</p>
-          <p className="text-xl font-semibold text-slate-800">{tbody.length}</p>
+          <p className="text-xl font-semibold text-slate-800">{filteredData.length}</p>
         </div>
-
         <div className="bg-green-50 rounded-xl p-3.5 border border-green-100 shadow-sm">
           <p className="text-xs text-green-600 mb-1">Aman</p>
           <p className="text-xl font-semibold text-green-700">
-            {tbody.filter((r) => r.status === "Aman").length}
+            {filteredData.filter((r) => r.status === "Aman").length}
           </p>
         </div>
-
         <div className="bg-yellow-50 rounded-xl p-3.5 border border-yellow-100 shadow-sm">
           <p className="text-xs text-yellow-600 mb-1">Waspada</p>
           <p className="text-xl font-semibold text-yellow-700">
             {tbody.filter((r) => r.status === "Waspada").length}
           </p>
         </div>
-
         <div className="bg-red-50 rounded-xl p-3.5 border border-red-100 shadow-sm">
           <p className="text-xs text-red-600 mb-1">Bahaya</p>
           <p className="text-xl font-semibold text-red-700">
@@ -270,21 +256,50 @@ function History({ tbody, thead }: HistoryProps) {
         </div>
       </div>
 
+      {/* ── KUSTOM DROPDOWN FILTER PERIODE/HARI (Sesuai Gambar) ── */}
+      <div className="flex flex-col space-y-1.5 max-w-[240px]">
+        <label className="text-sm font-semibold text-slate-700">Period</label>
+        
+        {/* Pembungkus Utama Input dan Icon */}
+        <div className="relative custom-datepicker-container w-full">
+          
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date: Date | null) => setSelectedDate(date)}
+            placeholderText="Show all"
+            dateFormat="yyyy-MM-dd"
+            isClearable={!!selectedDate}
+            // Ditambahkan pr-10 agar teks tanggal tidak menabrak icon panah di kanan
+            className="w-full pl-4 pr-20 py-2.5 text-sm text-slate-500 bg-white border border-slate-200 rounded-xl shadow-sm cursor-pointer transition-colors focus:outline-none focus:border-slate-300 hover:bg-slate-50 select-none"
+          />
+          
+          {/* Icon Chevron Sekarang Masuk ke Dalam Kolom (Hanya muncul jika belum ada tanggal yang dipilih) */}
+          {!selectedDate && (
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg 
+                className="w-4 h-4 transition-colors group-hover:text-slate-600" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth={2} 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          )}
+          
+        </div>
+      </div>
+
       {/* ── ANALYSIS PANEL (conditional) ────────────────────────── */}
       {selectedAnalysis && (
-        <AnalysisPanel
-          selectedAnalysis={selectedAnalysis}
-          onClose={handleClosePanel}
-        />
+        <AnalysisPanel selectedAnalysis={selectedAnalysis} onClose={handleClosePanel} />
       )}
 
       {/* ── SENSOR TABLE ────────────────────────────────────────── */}
       <div>
-        {/* Table header label */}
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-slate-600">
-            Data Sensor Terbaru
-          </h3>
+          <h3 className="text-sm font-semibold text-slate-600">Data Sensor Terbaru</h3>
           {activeMeta && (
             <span
               className="text-xs px-2.5 py-1 rounded-full font-medium border"
@@ -304,19 +319,14 @@ function History({ tbody, thead }: HistoryProps) {
             <thead>
               <tr className="bg-[#6fb3c1] text-white">
                 {thead.map((h, i) => (
-                  <th key={i} className="text-left px-5 py-4 font-semibold">
-                    {h.title}
-                  </th>
+                  <th key={i} className="text-left px-5 py-4 font-semibold">{h.title}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {currentData.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={thead.length}
-                    className="text-center py-10 text-slate-400 text-sm"
-                  >
+                  <td colSpan={thead.length} className="text-center py-10 text-slate-400 text-sm">
                     Tidak ada data tersedia.
                   </td>
                 </tr>
@@ -326,23 +336,15 @@ function History({ tbody, thead }: HistoryProps) {
                     key={i}
                     className="border-b border-[#b6dbe3] last:border-0 hover:bg-[#d7eef3] transition-colors"
                   >
-                    <td className="px-5 py-4 font-medium text-slate-700">
-                      {row.lokasi}
-                    </td>
-                    <td className="px-5 py-4 text-slate-600">
-                      {row.tinggi_air}
-                    </td>
-                    <td className="px-5 py-4 text-slate-600">
-                      {row.curah_hujan}
-                    </td>
-                    <td className="px-5 py-4">
-                      <StatusBadge status={row.status} />
-                    </td>
+                    <td className="px-5 py-4 font-medium text-slate-700">{row.lokasi}</td>
+                    <td className="px-5 py-4 text-slate-600">{row.tinggi_air}</td>
+                    <td className="px-5 py-4 text-slate-600">{row.curah_hujan}</td>
+                    <td className="px-5 py-4"><StatusBadge status={row.status} /></td>
                     <td className="px-5 py-4 text-slate-500 text-xs">
-                      {row.update_terakhir}
-                    </td>
-                  </tr>
-                ))
+                    {new Date(row.update_terakhir).toLocaleString("id-ID")}
+                  </td>
+                </tr>
+            ))
               )}
             </tbody>
           </table>
@@ -355,11 +357,7 @@ function History({ tbody, thead }: HistoryProps) {
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg border border-[#7fb8c6] text-sm transition-colors
-                ${
-                  currentPage === 1
-                    ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                    : "text-[#2c6e7d] hover:bg-[#e6f4f7]"
-                }`}
+                ${currentPage === 1 ? "text-gray-400 bg-gray-100 cursor-not-allowed" : "text-[#2c6e7d] hover:bg-[#e6f4f7]"}`}
             >
               Sebelumnya
             </button>
@@ -368,49 +366,34 @@ function History({ tbody, thead }: HistoryProps) {
               const maxVisible = 5;
               let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
               let end = Math.min(totalPages, start + maxVisible - 1);
-              if (end - start + 1 < maxVisible)
-                start = Math.max(1, end - maxVisible + 1);
+              if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
 
               const pages: number[] = [];
               for (let i = start; i <= end; i++) pages.push(i);
 
               return (
                 <>
-                  {start > 1 && (
-                    <span className="px-2 text-gray-400 self-center">…</span>
-                  )}
+                  {start > 1 && <span className="px-2 text-gray-400 self-center">…</span>}
                   {pages.map((n) => (
                     <button
                       key={n}
                       onClick={() => setCurrentPage(n)}
                       className={`px-4 py-2 rounded-lg border border-[#7fb8c6] text-sm transition-colors
-                        ${
-                          n === currentPage
-                            ? "bg-[#dff1f5] text-[#2c6e7d] font-semibold"
-                            : "text-[#2c6e7d] hover:bg-[#e6f4f7]"
-                        }`}
+                        ${n === currentPage ? "bg-[#dff1f5] text-[#2c6e7d] font-semibold" : "text-[#2c6e7d] hover:bg-[#e6f4f7]"}`}
                     >
                       {n}
                     </button>
                   ))}
-                  {end < totalPages && (
-                    <span className="px-2 text-gray-400 self-center">…</span>
-                  )}
+                  {end < totalPages && <span className="px-2 text-gray-400 self-center">…</span>}
                 </>
               );
             })()}
 
             <button
-              onClick={() =>
-                setCurrentPage((p) => Math.min(p + 1, totalPages))
-              }
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg border border-[#7fb8c6] text-sm transition-colors
-                ${
-                  currentPage === totalPages
-                    ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                    : "text-[#2c6e7d] hover:bg-[#e6f4f7]"
-                }`}
+                ${currentPage === totalPages ? "text-gray-400 bg-gray-100 cursor-not-allowed" : "text-[#2c6e7d] hover:bg-[#e6f4f7]"}`}
             >
               Selanjutnya
             </button>

@@ -27,7 +27,7 @@ const TampilanLogin = () => {
       });
 
       if (res?.error) {
-        alert("Login gagal!");
+        alert("Login gagal. Akses hanya diperuntukkan bagi admin.");
       } else {
         // Ganti ke halaman tujuan setelah login
         router.push("/dashboard");
