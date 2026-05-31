@@ -141,16 +141,26 @@ function Dashboard(data: Data) {
       <div className={`${panelClass} p-6`}>
         <h2 className="text-xl font-bold text-text mb-4">Riwayat Pengamatan</h2>
         <div className="overflow-x-auto rounded-2xl border border-secondary bg-background/60">
-          <table className="w-full min-w-180 border-collapse text-sm">
+          <table className="w-full border-collapse text-sm">
             <thead className="bg-secondary/20 text-text">
-              <tr>
-                {data.thead.map((h, i) => (
-                  <th key={i} className="text-left px-5 py-4 font-semibold uppercase tracking-wider text-xs">
-                    {h.title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+  <tr>
+    {data.thead.map((h, i) => (
+      <th
+                  key={i}
+                  className="
+                  text-left
+                  px-5 py-4
+                  font-semibold
+                  uppercase
+                  tracking-wider
+                  text-xs
+                "
+                >
+                  {h.title}
+                </th>
+    ))}
+  </tr>
+</thead>
             <tbody>
               {currentData.map((row, i) => {
                 const distanceValue = Number(
@@ -165,20 +175,21 @@ function Dashboard(data: Data) {
                       : "Aman";
 
                 return (
-                  <tr
-                    key={i}
-                    className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors"
-                  >
-                    <td className="px-5 py-4 font-medium text-text">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
-                    <td className="px-5 py-4 text-text/80">{row.curah_hujan || row.rain}</td>
-                    <td className="px-5 py-4">
-                      <StatusBadge status={statusValue} />
-                    </td>
-                    <td className="px-5 py-4 text-text/70">{row.update_terakhir}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
+      <tr
+        key={i}
+        className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors"
+      >
+        {/* Tambahkan font-bold dan text-black di bawah ini */}
+        <td className="px-5 py-4 font-semibold text-black">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
+        <td className="px-5 py-4 font-semibold text-black">{row.curah_hujan || row.rain}</td>
+        <td className="px-5 py-4">
+          <StatusBadge status={statusValue} />
+        </td>
+        <td className="px-5 py-4 font-semibold text-black">{row.update_terakhir}</td>
+      </tr>
+    );
+  })}
+</tbody>
           </table>
         </div>
 
