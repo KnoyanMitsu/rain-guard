@@ -1,8 +1,17 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
 import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
-import { Bell, ChevronDown, Cloud, CloudRain, Droplets } from "lucide-react";
-import { useState } from "react";
+import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+
+type BackupStatus = "idle" | "loading" | "success" | "error";
+
+type BackupInfo = {
+  fileName?: string;
+  hdfsPath?: string;
+  recordCount?: number;
+  error?: string;
+};
 
 export type Tbody = {
   lokasi?: string;
@@ -12,7 +21,7 @@ export type Tbody = {
   buzzer?: string;
   status?: string; // Untuk badge warna
   update_terakhir?: string;
-  [key: string]: any; 
+  [key: string]: any;
 };
 
 export type Thead = {
@@ -53,6 +62,39 @@ function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
   const [graphDuration, setGraphDuration] = useState(60); // Default: 1 hour
+  const [backupStatus, setBackupStatus] = useState<BackupStatus>("idle");
+  const [backupInfo, setBackupInfo] = useState<BackupInfo>({});
+
+  useEffect(() => {
+    if (backupStatus === "success" || backupStatus === "error") {
+      const timer = setTimeout(() => setBackupStatus("idle"), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [backupStatus]);
+
+  async function handleBackup() {
+    setBackupStatus("loading");
+    setBackupInfo({});
+    try {
+      const res = await fetch("/api/backup-hadoop", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setBackupStatus("success");
+        setBackupInfo({
+          fileName: json.fileName,
+          hdfsPath: json.hdfsPath,
+          recordCount: json.recordCount,
+        });
+      } else {
+        setBackupStatus("error");
+        setBackupInfo({ error: json.message });
+      }
+    } catch (err: any) {
+      setBackupStatus("error");
+      setBackupInfo({ error: err.message || "Gagal menghubungi server" });
+    }
+  }
+
   const itemsPerPage = 10;
   const totalPages = Math.ceil(data.tbody.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -69,6 +111,53 @@ function Dashboard(data: Data) {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* TOAST NOTIFIKASI BACKUP */}
+      {backupStatus !== "idle" && (
+        <div
+          className={`fixed top-4 right-4 z-50 w-80 rounded-2xl border px-4 py-4 shadow-xl transition-all
+            ${backupStatus === "loading" ? "border-blue-200 bg-blue-50 text-blue-900" : ""}
+            ${backupStatus === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : ""}
+            ${backupStatus === "error" ? "border-rose-200 bg-rose-50 text-rose-900" : ""}`}
+        >
+          <div className="flex items-start gap-3">
+            {backupStatus === "loading" && (
+              <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-blue-600" />
+            )}
+            {backupStatus === "success" && (
+              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+            )}
+            {backupStatus === "error" && (
+              <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+            )}
+            <div className="min-w-0 flex-1">
+              {backupStatus === "loading" && (
+                <p className="text-sm font-semibold">Sedang melakukan backup...</p>
+              )}
+              {backupStatus === "success" && (
+                <>
+                  <p className="text-sm font-semibold">Backup berhasil!</p>
+                  <p className="mt-1 break-all text-xs text-emerald-700">
+                    File: {backupInfo.fileName}
+                  </p>
+                  <p className="break-all text-xs text-emerald-600">
+                    HDFS: {backupInfo.hdfsPath}
+                  </p>
+                  <p className="text-xs text-emerald-600">
+                    {backupInfo.recordCount} record tersimpan
+                  </p>
+                </>
+              )}
+              {backupStatus === "error" && (
+                <>
+                  <p className="text-sm font-semibold">Backup gagal</p>
+                  <p className="mt-1 text-xs text-rose-700">{backupInfo.error}</p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <AceUIFloatingWarning
         show={isBuzzerActive}
         title="Peringatan: STATUS BAHAYA!"
@@ -137,17 +226,50 @@ function Dashboard(data: Data) {
         />
       </div>
 
+      {/* SECTION: HADOOP BACKUP */}
+      <div className={`${panelClass} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+            <Database className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-text">Backup ke Hadoop HDFS</h3>
+            <p className="mt-0.5 text-xs text-text/60">
+              Simpan seluruh data sensor ke penyimpanan HDFS lokal (
+              <span className="font-mono">hdfs://localhost/rain-guard</span>)
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleBackup}
+          disabled={backupStatus === "loading"}
+          className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {backupStatus === "loading" ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Sedang backup...
+            </>
+          ) : (
+            <>
+              <Database className="h-4 w-4" />
+              Backup ke Hadoop
+            </>
+          )}
+        </button>
+      </div>
+
       {/* SECTION: CUSTOM TABLE (SAMA DENGAN HISTORY) */}
       <div className={`${panelClass} p-6`}>
         <h2 className="text-xl font-bold text-text mb-4">Riwayat Pengamatan</h2>
         <div className="overflow-x-auto rounded-2xl border border-secondary bg-background/60">
           <table className="w-full border-collapse text-sm">
             <thead className="bg-secondary/20 text-text">
-  <tr>
-    {data.thead.map((h, i) => (
-      <th
-                  key={i}
-                  className="
+              <tr>
+                {data.thead.map((h, i) => (
+                  <th
+                    key={i}
+                    className="
                   text-left
                   px-5 py-4
                   font-semibold
@@ -155,12 +277,12 @@ function Dashboard(data: Data) {
                   tracking-wider
                   text-xs
                 "
-                >
-                  {h.title}
-                </th>
-    ))}
-  </tr>
-</thead>
+                  >
+                    {h.title}
+                  </th>
+                ))}
+              </tr>
+            </thead>
             <tbody>
               {currentData.map((row, i) => {
                 const distanceValue = Number(
@@ -175,21 +297,21 @@ function Dashboard(data: Data) {
                       : "Aman";
 
                 return (
-      <tr
-        key={i}
-        className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors"
-      >
-        {/* Tambahkan font-bold dan text-black di bawah ini */}
-        <td className="px-5 py-4 font-semibold text-black">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
-        <td className="px-5 py-4 font-semibold text-black">{row.curah_hujan || row.rain}</td>
-        <td className="px-5 py-4">
-          <StatusBadge status={statusValue} />
-        </td>
-        <td className="px-5 py-4 font-semibold text-black">{row.update_terakhir}</td>
-      </tr>
-    );
-  })}
-</tbody>
+                  <tr
+                    key={i}
+                    className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors"
+                  >
+                    {/* Tambahkan font-bold dan text-black di bawah ini */}
+                    <td className="px-5 py-4 font-semibold text-black">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
+                    <td className="px-5 py-4 font-semibold text-black">{row.curah_hujan || row.rain}</td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={statusValue} />
+                    </td>
+                    <td className="px-5 py-4 font-semibold text-black">{row.update_terakhir}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
 
