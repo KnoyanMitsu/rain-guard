@@ -234,10 +234,7 @@ function Dashboard(data: Data) {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text">Backup ke Hadoop HDFS</h3>
-            <p className="mt-0.5 text-xs text-text/60">
-              Simpan seluruh data sensor ke penyimpanan HDFS lokal (
-              <span className="font-mono">hdfs://localhost/rain-guard</span>)
-            </p>
+            
           </div>
         </div>
         <button

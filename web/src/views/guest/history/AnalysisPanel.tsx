@@ -1,5 +1,4 @@
 "use client";
-import { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -23,67 +22,13 @@ import {
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface SensorReading {
+export interface SensorReading {
   time: string;
   hour: number;
   water_level: number;
   rain_sensor: number;
   status: "Aman" | "Waspada" | "Bahaya";
   delta_water: number;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Mock data generator  (48 jam terakhir, per jam)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function generateData(): SensorReading[] {
-  const data: SensorReading[] = [];
-
-  for (let i = 47; i >= 0; i--) {
-    const d = new Date();
-    d.setMinutes(0, 0, 0);
-    d.setHours(d.getHours() - i);
-    const hour = d.getHours();
-
-    // Rain peaks in afternoon + morning
-    const rainBase =
-      hour >= 14 && hour <= 18
-        ? 72
-        : hour >= 6 && hour <= 9
-        ? 52
-        : 12;
-    const rain = Math.max(
-      0,
-      Math.min(100, rainBase + (Math.random() - 0.5) * 28)
-    );
-
-    // Water level lags ~2h behind rain
-    const prevRain = data[data.length - 2]?.rain_sensor ?? 20;
-    const wl = Math.max(
-      20,
-      Math.min(150, 50 + prevRain * 0.72 + (Math.random() - 0.5) * 12)
-    );
-    const prevWl = data[data.length - 1]?.water_level ?? wl;
-    const delta = Math.round((wl - prevWl) * 10) / 10;
-
-    const status: "Aman" | "Waspada" | "Bahaya" =
-      wl >= 120 ? "Bahaya" : wl >= 85 ? "Waspada" : "Aman";
-
-    data.push({
-      time: d.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
-      hour,
-      water_level: Math.round(wl),
-      rain_sensor: Math.round(rain),
-      status,
-      delta_water: delta,
-    });
-  }
-
-  return data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -232,7 +177,7 @@ function TrenIntensitasHujan({ data }: { data: SensorReading[] }) {
       <LineChart data={data} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
         <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-        <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} unit="%" />
+        <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
         <Tooltip
           contentStyle={tooltipStyle}
           formatter={(v: unknown) => [`${Number(v)}%`, "Intensitas Hujan"]}
@@ -443,6 +388,10 @@ function AnalisisKecepatanKenaikanAir({ data }: { data: SensorReading[] }) {
 function StatistikHarian({ data }: { data: SensorReading[] }) {
   const wl = data.map((d) => d.water_level);
   const rain = data.map((d) => d.rain_sensor);
+
+  if (wl.length === 0) {
+    return <p className="py-8 text-center text-sm text-slate-400">Tidak ada data untuk ditampilkan.</p>;
+  }
 
   const stats = [
     {
@@ -735,16 +684,41 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
 interface AnalysisPanelProps {
   selectedAnalysis: string;
   onClose: () => void;
+  data: SensorReading[];
 }
 
 export default function AnalysisPanel({
   selectedAnalysis,
   onClose,
+  data,
 }: AnalysisPanelProps) {
-  const data = useMemo(() => generateData(), []);
   const meta = ANALYSIS_META[selectedAnalysis];
 
   if (!meta) return null;
+
+  if (data.length === 0) {
+    return (
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
+        <div
+          className="flex items-start justify-between px-6 py-4 border-b border-slate-100"
+          style={{ borderLeftColor: meta.colorAccent, borderLeftWidth: 4 }}
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{meta.icon}</span>
+            <h3 className="text-base font-semibold text-slate-800">{selectedAnalysis}</h3>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-10 text-center text-sm text-slate-400">
+          Tidak ada data untuk rentang tanggal yang dipilih.
+        </div>
+      </div>
+    );
+  }
 
   const renderChart = () => {
     switch (selectedAnalysis) {

@@ -113,7 +113,8 @@ function Index() {
       listMenu={[
         { title: "Dasbor", link: "/dashboard/" },
         { title: "Riwayat", link: "/history" },
-        { title: "Analisis Data", link: "/analisis" }
+        { title: "Analisis Data", link: "/analisis" },
+        { title: "Hadoop Backup", link: "/hadoop" },
       ]}
       account={true}
       accountName={displayName}

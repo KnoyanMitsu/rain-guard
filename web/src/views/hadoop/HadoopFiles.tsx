@@ -125,9 +125,7 @@ export default function HadoopFiles() {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text">File Backup di HDFS</h3>
-            <p className="mt-0.5 text-xs text-text/60">
-              Lokasi: <span className="font-mono">hdfs://localhost/rain-guard</span>
-            </p>
+            
           </div>
         </div>
         <button
