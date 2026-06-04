@@ -95,7 +95,7 @@ const Dashboard = ({ websocketData, thead, tbody, graph }: DashboardProps) => {
             <select
               value={graphDuration}
               onChange={(e) => setGraphDuration(Number(e.target.value))}
-              className="min-w-45 appearance-none rounded-xl border border-[#7fb8c6] bg-[#f8fcfd] px-4 py-2 pr-11 text-sm font-medium text-[#2c6e7d] shadow-sm outline-none transition-all hover:border-[#6fb3c1] focus:border-[#6fb3c1] focus:ring-2 focus:ring-[#dff1f5]"
+              className="min-w-45 appearance-none rounded-xl border border-[#7fb8c6] bg-white px-4 py-2 pr-11 text-sm font-medium text-[#2c6e7d] shadow-sm outline-none transition-all hover:border-[#6fb3c1] focus:border-[#6fb3c1] focus:ring-2 focus:ring-[#dff1f5]"
             >
               <option value={10}>Last 10 minutes</option>
               <option value={30}>Last 30 minutes</option>

@@ -1,21 +1,21 @@
 "use client";
 import {
-  LineChart,
+  Area,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ComposedChart,
+  Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ComposedChart,
-  Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  ReferenceLine,
 } from "recharts";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -401,7 +401,7 @@ function StatistikHarian({ data }: { data: SensorReading[] }) {
       max: Math.max(...wl),
       avg: Math.round(wl.reduce((a, b) => a + b, 0) / wl.length),
       color: C_WATER,
-      bg: "#eff6ff",
+      bg: "white",
     },
     {
       label: "Intensitas Hujan",
@@ -410,7 +410,7 @@ function StatistikHarian({ data }: { data: SensorReading[] }) {
       max: Math.max(...rain),
       avg: Math.round(rain.reduce((a, b) => a + b, 0) / rain.length),
       color: C_RAIN,
-      bg: "#f0f9ff",
+      bg: "white",
     },
   ];
 
@@ -618,7 +618,7 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
   const combined = [...actualSlice, ...forecastPoints];
 
   return (
-    <div>
+    <div className="bg-white">
       <div className="flex flex-wrap items-center gap-4 mb-4 text-xs text-slate-500">
         <div className="flex items-center gap-1.5">
           <span className="w-8 h-0.5 bg-blue-500 inline-block rounded" />
@@ -713,7 +713,7 @@ export default function AnalysisPanel({
             </svg>
           </button>
         </div>
-        <div className="p-10 text-center text-sm text-slate-400">
+        <div className="p-10 text-center text-sm text-slate-400 bg-white">
           Tidak ada data untuk rentang tanggal yang dipilih.
         </div>
       </div>
@@ -785,7 +785,7 @@ export default function AnalysisPanel({
       </div>
 
       {/* ── Data info bar ────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-2 px-6 py-3 bg-slate-50 border-b border-slate-100">
+      <div className="flex flex-wrap items-center gap-2 px-6 py-3 bg-white border-b border-slate-100">
         <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">
           Data:
         </span>

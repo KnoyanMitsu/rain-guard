@@ -1,5 +1,3 @@
-import React from "react";
-import AceUICardWithTitle from "./AceUICardWithTitle";
 import {
   Area,
   AreaChart,
@@ -9,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import AceUICardWithTitle from "./AceUICardWithTitle";
 
 export type Data = {
   [key: string]: any;
@@ -21,6 +20,7 @@ type Props = {
   dataKey: string;
   titlelegend: string;
   title: string;
+  className?: string;
 };
 
 function AceUICardGraphs({
@@ -30,10 +30,11 @@ function AceUICardGraphs({
   dataKey,
   titlelegend,
   title,
+  className = "",
 }: Props) {
   return (
     <>
-      <AceUICardWithTitle title={title}>
+      <AceUICardWithTitle title={title} className={className}>
         <div className="w-full h-75 sm:h-100 mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart

@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale } from "react-datepicker";
 import { id } from "date-fns/locale/id";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import {
   Activity,
@@ -16,15 +15,6 @@ import {
   Siren,
 } from "lucide-react";
 
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 import exportCSV from "@/pages/dashboard/saveCSV";
 
@@ -120,35 +110,6 @@ function History({ tbody, thead }: HistoryProps) {
     return tbody;
   }, [tbody, filterMode, selectedDate, selectedMonth]);
 
-  // ───────────────── GRAFIK DATA ─────────────────
-
-  const graphData = useMemo(() => {
-    const sorted = [...filteredData].reverse();
-    if (filterMode === "bulanan" && selectedMonth) {
-      // Agregasi harian untuk tampilan bulanan
-      const byDay: Record<string, { sum: number; count: number }> = {};
-      sorted.forEach((item) => {
-        const d = new Date(item.update_terakhir);
-        const key = `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
-        if (!byDay[key]) byDay[key] = { sum: 0, count: 0 };
-        byDay[key].sum += parseFloat(item.tinggi_air) || 0;
-        byDay[key].count++;
-      });
-      return Object.entries(byDay).map(([label, v]) => ({
-        time: label,
-        tinggiAir: Math.round((v.sum / v.count) * 100) / 100,
-      }));
-    }
-    // Harian: setiap titik = satu record
-    return sorted.map((item) => {
-      const d = new Date(item.update_terakhir);
-      return {
-        time: d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
-        tinggiAir: parseFloat(item.tinggi_air) || 0,
-      };
-    });
-  }, [filteredData, filterMode, selectedMonth]);
-
   // ───────────────── PAGINATION ─────────────────
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -185,20 +146,19 @@ function History({ tbody, thead }: HistoryProps) {
     <div className="flex flex-col gap-6">
 
       {/* HEADER */}
-      <div className="relative z-20 rounded-3xl border border-secondary bg-background/80 backdrop-blur-sm p-6 shadow-sm">
+      <div className="relative z-20 rounded-3xl border bg-white border-secondary backdrop-blur-sm p-6 shadow-sm">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
-
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <Activity className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-text">Riwayat Monitoring</h2>
-                <p className="text-sm text-text/60">Monitoring realtime sensor banjir dan hujan</p>
-              </div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Riwayat Monitoring</h2>
+              <p className="text-sm text-gray-600">Monitoring realtime sensor banjir dan hujan</p>
             </div>
           </div>
+        </div>
 
           {/* FILTER CONTROLS */}
           <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
@@ -209,7 +169,7 @@ function History({ tbody, thead }: HistoryProps) {
               <div className="flex rounded-xl overflow-hidden border border-secondary">
                 <button
                   onClick={() => { setFilterMode("harian"); setSelectedMonth(null); }}
-                  className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-white" : "bg-background text-text hover:bg-secondary/20"}`}
+                  className={`px-4 py-3 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-white" : "bg-background text-text hover:bg-secondary/20"}`}
                 >
                   Harian
                 </button>
@@ -226,7 +186,7 @@ function History({ tbody, thead }: HistoryProps) {
             {filterMode === "harian" ? (
               <div className="flex flex-col gap-1.5 min-w-[220px]">
                 <label className="text-sm font-medium text-text">Pilih Tanggal</label>
-                <div className="relative z-50">
+                <div className="relative z-50 bg-primary/10 rounded-xl">
                   <DatePicker
                     locale="id"
                     selected={selectedDate}
@@ -281,7 +241,7 @@ function History({ tbody, thead }: HistoryProps) {
       {/* CARD STATUS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-5 shadow-sm">
+        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text/60">Total Aman</p>
@@ -295,7 +255,7 @@ function History({ tbody, thead }: HistoryProps) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-5 shadow-sm">
+        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text/60">Total Waspada</p>
@@ -309,7 +269,7 @@ function History({ tbody, thead }: HistoryProps) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-5 shadow-sm">
+        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text/60">Total Bahaya</p>
@@ -323,7 +283,7 @@ function History({ tbody, thead }: HistoryProps) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-5 shadow-sm">
+        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text/60">Total Data</p>
@@ -336,80 +296,24 @@ function History({ tbody, thead }: HistoryProps) {
         </div>
       </div>
 
-      {/* GRAFIK */}
-      {graphData.length > 0 && (
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-text mb-4">
-            Grafik Tinggi Air{filterMode === "bulanan" && selectedMonth ? ` — ${selectedMonth.toLocaleString("id-ID", { month: "long", year: "numeric" })}` : ""}
-          </h3>
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={graphData} margin={{ top: 8, right: 16, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="grad-riwayat" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.6} />
-                    <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0.03} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-secondary)" opacity={0.35} />
-                <XAxis
-                  dataKey="time"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.7 }}
-                  interval={filterMode === "bulanan" ? 1 : "preserveStartEnd"}
-                  dy={8}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.7 }}
-                  unit=" cm"
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "10px",
-                    border: "1px solid var(--color-secondary)",
-                    backgroundColor: "var(--color-background)",
-                    color: "var(--color-text)",
-                    fontSize: 12,
-                  }}
-                  formatter={(v: unknown) => [`${Number(v)} cm`, "Tinggi Air"]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="tinggiAir"
-                  name="Tinggi Air (cm)"
-                  stroke="var(--color-accent)"
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#grad-riwayat)"
-                  dot={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
-
       {/* TABLE */}
-      <div className="rounded-2xl border border-secondary bg-background/70 backdrop-blur-sm p-6 shadow-sm">
+      <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-6 shadow-sm">
         <div className="mb-5">
           <h3 className="text-xl font-bold text-text">Riwayat Pengamatan</h3>
           <p className="text-sm text-text/60 mt-1">Menampilkan {currentData.length} dari {filteredData.length} data sensor</p>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-secondary bg-background/60">
+        <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">
           <table className="w-full border-collapse text-sm">
             <thead className="bg-secondary/20 text-text">
-              <tr>
-                {thead.map((h, i) => (
-                  <th key={i} className="text-left px-5 py-4 font-semibold uppercase tracking-wider text-xs">
-                    {h.title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+            <tr>
+              {thead.map((h, i) => (
+                <th key={i} className="w-1/4 text-left px-5 py-4 font-semibold uppercase tracking-wider text-xs">
+                  {h.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
             <tbody>
               {currentData.length === 0 ? (
                 <tr>
@@ -420,14 +324,14 @@ function History({ tbody, thead }: HistoryProps) {
               ) : (
                 currentData.map((row, i) => (
                   <tr key={i} className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors">
-                    <td className="px-5 py-4 whitespace-nowrap text-text font-medium">{row.tinggi_air}</td>
-                    <td className="px-5 py-4 whitespace-nowrap text-text font-medium">{row.curah_hujan}</td>
-                    <td className="px-5 py-4 whitespace-nowrap w-[300px]">
+                    <td className="w-1/4 px-5 py-4 whitespace-nowrap text-text font-medium">{row.tinggi_air}</td>
+                    <td className="w-1/4 px-5 py-4 whitespace-nowrap text-text font-medium">{row.curah_hujan}</td>
+                    <td className="w-1/4 px-5 py-4 whitespace-nowrap">
                       <div className="flex justify-start">
                         <StatusBadge status={row.status} />
                       </div>
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-text font-medium">
+                    <td className="w-1/4 px-5 py-4 whitespace-nowrap text-text font-medium">
                       {new Date(row.update_terakhir).toLocaleString("id-ID")}
                     </td>
                   </tr>

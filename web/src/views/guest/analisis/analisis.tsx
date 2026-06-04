@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import AnalysisPanel, { ANALYSIS_META, SensorReading } from "@/views/guest/history/AnalysisPanel";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -109,11 +109,11 @@ function Analisis({ tbody, loading }: AnalisisProps) {
     <div className="flex flex-col gap-6">
 
       {/* HEADER */}
-      <div className="relative z-20 rounded-3xl border border-secondary bg-background/80 backdrop-blur-sm p-6 shadow-sm">
+      <div className="relative z-20 rounded-3xl border border-secondary bg-white backdrop-blur-sm p-6 shadow-sm">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
 
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-4 w-full ">
               <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
                 <Activity className="w-5 h-5 text-primary" />
               </div>
@@ -215,9 +215,8 @@ function Analisis({ tbody, loading }: AnalisisProps) {
         </div>
       </div>
 
-      {/* PROMPT PILIH ANALISIS */}
       {!selectedAnalysis && !loading && (
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-10 text-center">
+        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-10 text-center">
           <Activity className="mx-auto mb-3 h-10 w-10 text-text/20" />
           <p className="text-sm font-semibold text-text/50">Pilih jenis analisis dari dropdown di atas</p>
           <p className="mt-1 text-xs text-text/30">
@@ -227,9 +226,8 @@ function Analisis({ tbody, loading }: AnalisisProps) {
         </div>
       )}
 
-      {/* LOADING STATE */}
       {loading && (
-        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-10 text-center">
+        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-10 text-center">
           <p className="text-sm text-text/50">Memuat data sensor...</p>
         </div>
       )}

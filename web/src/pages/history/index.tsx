@@ -104,12 +104,8 @@ function HistoryPage() {
       accountRole="Admin"
       header="Riwayat"
     >
-      <div className="bg-gray-100 p-6 rounded-xl shadow-sm">
+      <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Riwayat dalam 30 hari</h2>
-          <button className="px-4 py-2 bg-white border border-cyan-700 text-cyan-700 rounded-lg hover:bg-cyan-50 transition-colors">
-            Unduh CSV
-          </button>
         </div>
         
         {loading ? (
