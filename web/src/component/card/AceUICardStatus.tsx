@@ -8,6 +8,7 @@ type AceUICardStatusProps = {
   color: "primary" | "secondary" | "accent" | "red" | "green" | "yellow";
   unit?: string;
   toggle?: boolean;
+  className?: string;
 };
 
 function AceUICardStatus({
@@ -17,11 +18,12 @@ function AceUICardStatus({
   color,
   unit,
   toggle,
+  className = "",
 }: AceUICardStatusProps) {
   const switchId = useId();
 
   return (
-    <AceUICard>
+    <AceUICard className={className}>
       <div className="grid grid-cols-2">
         <div>
           {/* icons */}

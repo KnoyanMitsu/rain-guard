@@ -17,6 +17,12 @@ describe("Guest Dashboard View", () => {
       { time: "10:00", tinggiAir: 85 },
       { time: "10:05", tinggiAir: 120 },
     ],
+    websocketData: {
+      distance: 85,
+      rain: 12,
+      status_rain: "Ya",
+      buzzer: "Aktif",
+    },
   };
 
   it("renders the graph section title", () => {
@@ -47,6 +53,24 @@ describe("Guest Dashboard View", () => {
   it("renders graph placeholder text", () => {
     render(<Dashboard {...defaultProps} />);
     expect(screen.getByText("Grafik Monitoring Ketinggian Air")).toBeInTheDocument();
+  });
+
+  it("shows a persistent warning banner while buzzer is active", () => {
+    render(<Dashboard {...defaultProps} />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Peringatan Buzzer Aktif");
+  });
+
+  it("hides the warning banner when buzzer is non-active", () => {
+    const inactiveProps = {
+      ...defaultProps,
+      websocketData: {
+        ...defaultProps.websocketData,
+        buzzer: "Non Aktif",
+      },
+    };
+
+    render(<Dashboard {...inactiveProps} />);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("renders with empty tbody", () => {

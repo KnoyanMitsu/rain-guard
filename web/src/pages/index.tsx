@@ -57,7 +57,7 @@ function index() {
     const q = query(
       collection(db, "history"),
       orderBy("timestamp", "desc"),
-      limit(10)
+      limit(360)
     );
 
     const unsubscribe = onSnapshot(
@@ -65,6 +65,7 @@ function index() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => {
           const item = doc.data();
+          const distanceValue = Number(item.distance || 0);
 
           const lastSeen = item.timestamp
             ? new Date(item.timestamp)
@@ -78,9 +79,11 @@ function index() {
             curah_hujan: `${item.rain || 0} mm`,
 
             status:
-              item.status_rain === "Ya"
+              distanceValue > 10
                 ? "Bahaya"
-                : "Aman",
+                : distanceValue >= 5
+                  ? "Waspada"
+                  : "Aman",
 
             update_terakhir:
               lastSeen.toLocaleString("id-ID"),

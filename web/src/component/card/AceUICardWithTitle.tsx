@@ -1,6 +1,6 @@
 import React from "react";
-import AceUICard from "./AceUICard";
 import AceUIButton from "../input/AceUIButton";
+import AceUICard from "./AceUICard";
 
 type AceUICardWithTitleProps = {
   children: React.ReactNode;
@@ -8,6 +8,7 @@ type AceUICardWithTitleProps = {
   button?: boolean;
   titleButton?: string
   onClick?: () => void
+  className?: string;
 };
 
 function AceUICardWithTitle({

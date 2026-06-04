@@ -29,12 +29,14 @@
     "next-auth": "^4.24.13",
     "postcss": "^8.5.8",
     "react": "19.2.4",
+    "react-datepicker": "^9.1.0",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
     "sass": "^1.99.0",
     "swr": "^2.4.1",
     "tailwindcss": "4.2.2",
-    "typescript": "6.0.2"
+    "typescript": "6.0.2",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -42,6 +44,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.2.14",
+    "@types/react-datepicker": "^6.2.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",

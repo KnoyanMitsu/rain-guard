@@ -1,7 +1,42 @@
 import db from "@/utils/db/firebase";
-import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+export async function validateFirebaseCredentials(
+  email?: string,
+  password?: string
+) {
+  if (!email || !password) {
+    return null;
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const loginRef = collection(db, "login");
+  const q = query(loginRef, where("email", "==", normalizedEmail));
+  const querySnapshot = await getDocs(q);
+
+  const matchedUser = querySnapshot.docs.find((doc) => {
+    const data = doc.data();
+    return data.password === password;
+  });
+
+  if (!matchedUser) {
+    return null;
+  }
+
+  const userData = matchedUser.data();
+  const displayName =
+    userData.fullname ?? userData.nama ?? userData.name ?? normalizedEmail.split("@")[0];
+
+  return {
+    id: matchedUser.id,
+    email: userData.email ?? normalizedEmail,
+    name: displayName,
+    fullname: displayName,
+    nama: displayName,
+  };
+}
 
 export default NextAuth({
   providers: [
@@ -12,45 +47,42 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Logika sederhana: jika ada email, anggap authorize berhasil
-        if (credentials?.email) {
-          return { 
-            id: credentials.email, 
-            email: credentials.email, 
-          };
+        try {
+          return await validateFirebaseCredentials(
+            credentials?.email,
+            credentials?.password
+          );
+        } catch (error) {
+          console.error("❌ Auth Error:", error);
+          return null;
         }
-        return null;
       }
-    })
+    }),
   ],
   callbacks: {
-    async signIn({ user, credentials }: any) {
-      if (!user?.email) return false;
-
-      try {
-        const loginRef = collection(db, "login");
-        const q = query(loginRef, where("email", "==", user.email));
-        const querySnapshot = await getDocs(q);
-
-        // Simpan ke Firestore jika email belum ada
-        if (querySnapshot.empty) {
-          await addDoc(loginRef, {
-            email: user.email,
-            password: credentials?.password || "", // Simpan password string sesuai request
-            createdAt: serverTimestamp()
-          });
-          console.log(" Data berhasil disimpan ke koleksi login");
-        }
-        return true; 
-      } catch (error) {
-        console.error("❌ Firestore Error:", error);
-        return true; // Tetap izinkan login walau gagal simpan log database
+    async jwt({ token, user }) {
+      if (user) {
+        token.name = user.name ?? token.name;
+        token.fullname = user.fullname ?? user.name ?? token.fullname;
+        token.nama = user.nama ?? user.name ?? token.nama;
       }
-    }
+
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.name = token.name ?? session.user.name ?? undefined;
+        session.user.fullname =
+          token.fullname ?? token.name ?? session.user.fullname ?? session.user.name;
+        session.user.nama =
+          token.nama ?? token.fullname ?? token.name ?? session.user.nama ?? session.user.fullname;
+      }
+
+      return session;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  // Karena kamu pakai folder custom views/auth/login, pastikan path ini benar
   pages: {
-    signIn: "/auth/login", 
-  }
+    signIn: "/auth/login",
+  },
 });

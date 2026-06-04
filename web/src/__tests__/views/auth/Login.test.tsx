@@ -41,7 +41,7 @@ describe("Login View (TampilanLogin)", () => {
 
   it("renders the submit button", () => {
     render(<TampilanLogin />);
-    expect(screen.getByText("Masuk & Simpan")).toBeInTheDocument();
+    expect(screen.getByText("Masuk")).toBeInTheDocument();
   });
 
   it("renders appname section", () => {
@@ -74,7 +74,7 @@ describe("Login View (TampilanLogin)", () => {
       target: { value: "pass123" },
     });
 
-    fireEvent.submit(screen.getByText("Masuk & Simpan").closest("form")!);
+    fireEvent.submit(screen.getByText("Masuk").closest("form")!);
 
     await waitFor(() => {
       expect(signIn).toHaveBeenCalledWith("credentials", {
@@ -93,7 +93,7 @@ describe("Login View (TampilanLogin)", () => {
     fireEvent.change(screen.getByPlaceholderText("nama@email.com"), {
       target: { value: "test@test.com" },
     });
-    fireEvent.submit(screen.getByText("Masuk & Simpan").closest("form")!);
+    fireEvent.submit(screen.getByText("Masuk").closest("form")!);
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/dashboard");
@@ -105,7 +105,7 @@ describe("Login View (TampilanLogin)", () => {
     const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
     render(<TampilanLogin />);
 
-    fireEvent.submit(screen.getByText("Masuk & Simpan").closest("form")!);
+    fireEvent.submit(screen.getByText("Masuk").closest("form")!);
 
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledWith("Login gagal!");

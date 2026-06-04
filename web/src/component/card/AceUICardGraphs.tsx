@@ -1,5 +1,3 @@
-import React from "react";
-import AceUICardWithTitle from "./AceUICardWithTitle";
 import {
   Area,
   AreaChart,
@@ -9,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import AceUICardWithTitle from "./AceUICardWithTitle";
 
 export type Data = {
   [key: string]: any;
@@ -21,6 +20,7 @@ type Props = {
   dataKey: string;
   titlelegend: string;
   title: string;
+  className?: string;
 };
 
 function AceUICardGraphs({
@@ -30,11 +30,12 @@ function AceUICardGraphs({
   dataKey,
   titlelegend,
   title,
+  className = "",
 }: Props) {
   return (
     <>
-      <AceUICardWithTitle title={title}>
-        <div className="w-full h-[300px] sm:h-[400px] mt-4">
+      <AceUICardWithTitle title={title} className={className}>
+        <div className="w-full h-75 sm:h-100 mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
@@ -42,44 +43,49 @@ function AceUICardGraphs({
             >
               <defs>
                 <linearGradient id="colorAir" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-secondary)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-secondary)" stopOpacity={0} />
+                  <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.7} />
+                  <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke="#dedcff"
+                stroke="var(--color-secondary)"
+                opacity={0.35}
               />
               <XAxis
                 dataKey="time"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "#050315", opacity: 0.7 }}
+                tick={{ fontSize: 12, fill: "var(--color-text)", opacity: 0.82 }}
                 dy={10}
               />
               <YAxis
                 domain={[start, end]}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "#050315", opacity: 0.7 }}
+                tick={{ fontSize: 12, fill: "var(--color-text)", opacity: 0.82 }}
               />
               <Tooltip
                 contentStyle={{
                   borderRadius: "8px",
-                  border: "1px solid #dedcff",
-                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  backgroundColor: "#fbfbfe",
-                  color: "#050315",
+                  border: "1px solid var(--color-secondary)",
+                  boxShadow: "0 10px 25px -5px rgb(0 0 0 / 0.35)",
+                  backgroundColor: "var(--color-background)",
+                  color: "var(--color-text)",
                 }}
+                labelStyle={{ color: "var(--color-text)", fontWeight: 700 }}
+                itemStyle={{ color: "var(--color-accent)" }}
               />
               <Area
                 type="monotone"
                 dataKey={dataKey}
                 name={titlelegend}
-                stroke="var(--color-secondary)"
+                stroke="var(--color-accent)"
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#colorAir)"
+                dot={false}
               />
             </AreaChart>
           </ResponsiveContainer>

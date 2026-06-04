@@ -1,9 +1,9 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
+import db from "@/utils/db/firebase";
 import Dashboard from "@/views/dashboard/Dashboard";
+import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import db from "@/utils/db/firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
 function getStatus(tinggiAir: number) {
   if (tinggiAir <= 100) return "Aman";
@@ -13,6 +13,8 @@ function getStatus(tinggiAir: number) {
 
 function Index() {
   const { data: session }: any = useSession();
+  const displayName =
+    session?.user?.name || session?.user?.fullname || session?.user?.nama || "Admin";
   
   // State terpisah untuk Firebase (Tabel & Grafik) dan WebSocket (4 Kartu Status)
   const [firebaseData, setFirebaseData] = useState<any[]>([]);
@@ -23,7 +25,7 @@ function Index() {
     const q = query(
       collection(db, "history"),
       orderBy("timestamp", "desc"),
-      limit(10) 
+      limit(360) 
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -111,10 +113,12 @@ function Index() {
       listMenu={[
         { title: "Dasbor", link: "/dashboard/" },
         { title: "Riwayat", link: "/history" },
+        { title: "Analisis Data", link: "/analisis" },
+        { title: "Hadoop Backup", link: "/hadoop" },
       ]}
       account={true}
-      accountName={session?.user?.fullname || "Admin"}
-      accountImage={`https://ui-avatars.com/api/?name=${session?.user?.fullname || "Admin"}`}
+      accountName={displayName}
+      accountImage={`https://ui-avatars.com/api/?name=${displayName}`}
       accountRole="Admin"
       header="Dasbor"
     >
@@ -129,11 +133,16 @@ function Index() {
           { title: "Status Alarm" },
           { title: "Update Terakhir" },
         ]}
-        graph={firebaseData.map((item) => ({
-          time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir, 
-          // Menggunakan nilai distance murni yang sudah kita mapping di Firebase map atas
-          tinggiAir: typeof item.distance === 'number' ? item.distance : parseFloat(item.tinggi_air), 
-        })).reverse()} 
+        graph={firebaseData
+        .filter((item) => item.distance >= 0) // hanya data >= 0
+        .map((item) => ({
+          time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir,
+          tinggiAir:
+            typeof item.distance === "number"
+              ? item.distance
+              : parseFloat(item.tinggi_air),
+        }))
+        .reverse()}
       />
     </AceUITemplateWithSidebar>
   );

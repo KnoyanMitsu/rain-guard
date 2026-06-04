@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { ArrowRight, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ArrowRight } from "lucide-react";
-import { Menu, LogOut } from "lucide-react";
+import React, { useState } from "react";
 
 export type MenuItem = {
   title: string;
@@ -35,6 +34,8 @@ function AceUITemplateWithSidebar({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+  const profileNameClass = "max-w-[10rem] truncate text-lg font-semibold leading-tight text-text";
+  const profileRoleClass = "text-sm text-text/70 leading-tight";
   return (
     <>
       <div className="md:grid grid-cols-5 h-screen bg-background text-text">
@@ -50,14 +51,15 @@ function AceUITemplateWithSidebar({
                     <Link
                       href={item.link}
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
+                        // isActive
+                        //   ? "bg-secondary text-primary shadow-md shadow-primary/20"
+                        //   : "text-text/70 hover:bg-secondary hover:text-background"
                         isActive
-                          ? "bg-secondary text-primary shadow-md shadow-primary/20"
-                          : "text-text/70 hover:bg-secondary hover:text-background"
+                        ? "text-text font-semibold"
+                        : "text-text/70 hover:bg-secondary hover:text-background"
                       }`}
                     >
                       {item.title}
-
-                      {isActive && <ArrowRight className="ml-auto" />}
                     </Link>
                   </li>
                 );
@@ -78,11 +80,9 @@ function AceUITemplateWithSidebar({
                     alt={accountName}
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <div>
-                    <h2 className="text-lg font-medium">{accountName}</h2>
-                    <p className="text-sm text-text/70">
-                      {accountRole}
-                    </p>
+                  <div className="min-w-0">
+                    <h2 className={profileNameClass}>{accountName}</h2>
+                    <p className={profileRoleClass}>{accountRole}</p>
                   </div>
                 </div>
                 {isProfilePopupOpen && (
@@ -140,13 +140,11 @@ function AceUITemplateWithSidebar({
                       onClick={() => setIsOpen(false)}
                       className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
                         isActive
-                          ? "bg-secondary text-primary shadow-md shadow-primary/20"
+                          ? "text-text font-semibold"
                           : "text-text/70 hover:bg-secondary hover:text-background"
                       }`}
                     >
                       {item.title}
-
-                      {isActive && <ArrowRight className="ml-auto" />}
                     </Link>
                   </li>
                 );
@@ -167,11 +165,9 @@ function AceUITemplateWithSidebar({
                     alt={accountName}
                     className="w-10 h-10 rounded-full object-cover"
                   />
-                  <div>
-                    <h2 className="text-lg font-medium">{accountName}</h2>
-                    <p className="text-sm text-text/70">
-                      {accountRole}
-                    </p>
+                  <div className="min-w-0">
+                    <h2 className={profileNameClass}>{accountName}</h2>
+                    <p className={profileRoleClass}>{accountRole}</p>
                   </div>
                 </div>
                 {isProfilePopupOpen && (

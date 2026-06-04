@@ -60,6 +60,22 @@ describe("Dashboard View", () => {
     expect(screen.getAllByText("Aktif")[0]).toBeInTheDocument();
   });
 
+  it("shows a persistent warning banner while buzzer is active", () => {
+    render(<Dashboard {...defaultProps} />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Peringatan Buzzer Aktif");
+    expect(screen.getByText(/akan tetap tampil sampai buzzer kembali non-aktif/i)).toBeInTheDocument();
+  });
+
+  it("hides the warning banner when buzzer is non-active", () => {
+    const inactiveProps = {
+      ...defaultProps,
+      tbody: [{ ...defaultProps.tbody[0], buzzer: "Non Aktif" }],
+    };
+
+    render(<Dashboard {...inactiveProps} />);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("renders graph component", () => {
     render(<Dashboard {...defaultProps} />);
     expect(screen.getByText("Grafik Monitoring Tinggi Air (Real-time)")).toBeInTheDocument();

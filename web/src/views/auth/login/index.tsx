@@ -12,7 +12,6 @@ import { useState } from "react";
 const TampilanLogin = () => {
   const router = useRouter(); // Gunakan useRouter dari next/router
   const [loading, setLoading] = useState(false);
-  const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,13 +22,12 @@ const TampilanLogin = () => {
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        nama: nama,
         email: email,
         password: password,
       });
 
       if (res?.error) {
-        alert("Login gagal!");
+        alert("Login gagal. Akses hanya diperuntukkan bagi admin.");
       } else {
         // Ganti ke halaman tujuan setelah login
         router.push("/dashboard");
@@ -86,7 +84,7 @@ const TampilanLogin = () => {
 
                 {/* Button */}
                 <AceUIButton disable={loading} types="submit">
-                  {loading ? "Memproses..." : "Masuk & Simpan"}
+                  {loading ? "Memproses..." : "Masuk"}
                 </AceUIButton>
               </form>
             </AceUICard>
