@@ -1,6 +1,6 @@
 "use client";
 
-import AnalysisPanel, { ANALYSIS_META, SensorReading } from "@/views/guest/history/AnalysisPanel";
+import AnalysisPanel, { ANALYSIS_META, SensorReading } from "@/views/analisis/AnalysisPanel";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import DatePicker from "react-datepicker";
@@ -32,12 +32,9 @@ const ANALYSIS_LIST = [
   "Tren Ketinggian Air",
   "Tren Intensitas Hujan",
   "Korelasi Hujan dan Tinggi Air",
-  "Analisis Delay Hujan-Air",
-  "Analisis Jam Rawan",
   "Analisis Kecepatan Kenaikan Air",
   "Statistik Harian",
   "Frekuensi Status Alarm",
-  "Riwayat Monitoring",
   "Prediksi Kenaikan Air",
 ] as const;
 

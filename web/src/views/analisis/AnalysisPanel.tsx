@@ -1,6 +1,5 @@
 "use client";
 import {
-  Area,
   Bar,
   BarChart,
   CartesianGrid,
@@ -87,20 +86,6 @@ export const ANALYSIS_META: Record<
     colorAccent: "#8b5cf6",
     icon: "🔗",
   },
-  "Analisis Delay Hujan-Air": {
-    deskripsi: "Menampilkan jeda waktu antara hujan dan kenaikan air.",
-    dataDigunakan: ["Rain Sensor Value (%)", "Water Level (cm)", "Timestamp"],
-    visualisasi: "Overlay Line Chart",
-    colorAccent: "#f59e0b",
-    icon: "⏱️",
-  },
-  "Analisis Jam Rawan": {
-    deskripsi: "Menampilkan jam yang paling rawan terjadi kenaikan air.",
-    dataDigunakan: ["Water Level (cm)", "Rain Sensor (%)", "Timestamp"],
-    visualisasi: "Bar Chart per Jam",
-    colorAccent: "#ef4444",
-    icon: "⏰",
-  },
   "Analisis Kecepatan Kenaikan Air": {
     deskripsi: "Menampilkan seberapa cepat tinggi air meningkat.",
     dataDigunakan: ["Selisih Water Level terhadap Waktu"],
@@ -121,13 +106,6 @@ export const ANALYSIS_META: Record<
     visualisasi: "Pie Chart",
     colorAccent: "#6366f1",
     icon: "🚨",
-  },
-  "Riwayat Monitoring": {
-    deskripsi: "Menampilkan histori monitoring sensor secara kronologis.",
-    dataDigunakan: ["Semua Data Sensor"],
-    visualisasi: "Data Table",
-    colorAccent: "#14b8a6",
-    icon: "📋",
   },
   "Prediksi Kenaikan Air": {
     deskripsi:
@@ -237,115 +215,6 @@ function KorelasiHujanAir({ data }: { data: SensorReading[] }) {
           dot={false}
         />
       </ComposedChart>
-    </ResponsiveContainer>
-  );
-}
-
-function AnalisisDelayHujanAir({ data }: { data: SensorReading[] }) {
-  return (
-    <ResponsiveContainer width="100%" height={320}>
-      <ComposedChart data={data} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-        <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-        <YAxis
-          yAxisId="left"
-          tick={{ fontSize: 11 }}
-          unit=" cm"
-          domain={["auto", "auto"]}
-        />
-        <YAxis
-          yAxisId="right"
-          orientation="right"
-          tick={{ fontSize: 11 }}
-          unit="%"
-          domain={[0, 100]}
-        />
-        <Tooltip contentStyle={tooltipStyle} />
-        <Legend />
-        <Area
-          yAxisId="right"
-          type="monotone"
-          dataKey="rain_sensor"
-          name="Hujan (%)"
-          stroke={C_RAIN}
-          fill="#6fb3c122"
-          strokeWidth={2}
-        />
-        <Line
-          yAxisId="left"
-          type="monotone"
-          dataKey="water_level"
-          name="Tinggi Air (cm)"
-          stroke={C_WATER}
-          strokeWidth={2.5}
-          dot={false}
-        />
-      </ComposedChart>
-    </ResponsiveContainer>
-  );
-}
-
-function AnalisisJamRawan({ data }: { data: SensorReading[] }) {
-  const byHour: Record<number, { total: number; count: number }> = {};
-  data.forEach((d) => {
-    if (!byHour[d.hour]) byHour[d.hour] = { total: 0, count: 0 };
-    byHour[d.hour].total += d.water_level;
-    byHour[d.hour].count++;
-  });
-
-  const hourlyData = Array.from({ length: 24 }, (_, h) => ({
-    jam: `${h.toString().padStart(2, "0")}:00`,
-    avg_water: byHour[h]
-      ? Math.round(byHour[h].total / byHour[h].count)
-      : 0,
-  }));
-
-  return (
-    <ResponsiveContainer width="100%" height={320}>
-      <BarChart
-        data={hourlyData}
-        margin={{ top: 10, right: 24, left: 0, bottom: 40 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-        <XAxis
-          dataKey="jam"
-          tick={{ fontSize: 9 }}
-          angle={-45}
-          textAnchor="end"
-          height={55}
-        />
-        <YAxis tick={{ fontSize: 11 }} unit=" cm" />
-        <Tooltip
-          contentStyle={tooltipStyle}
-          formatter={(v: unknown) => [`${Number(v)} cm`, "Rata-rata Tinggi Air"]}
-        />
-        <ReferenceLine
-          y={85}
-          stroke="#f59e0b"
-          strokeDasharray="4 4"
-          label={{ value: "Waspada", fill: "#f59e0b", fontSize: 10, position: "right" }}
-        />
-        <ReferenceLine
-          y={120}
-          stroke="#ef4444"
-          strokeDasharray="4 4"
-          label={{ value: "Bahaya", fill: "#ef4444", fontSize: 10, position: "right" }}
-        />
-        <Bar dataKey="avg_water" name="Rata-rata Tinggi Air" radius={[4, 4, 0, 0]}>
-          {hourlyData.map((entry, idx) => (
-            <Cell
-              key={idx}
-              fill={
-                entry.avg_water >= 120
-                  ? "#ef4444"
-                  : entry.avg_water >= 85
-                  ? "#f59e0b"
-                  : "#6fb3c1"
-              }
-            />
-          ))}
-        </Bar>
-      </BarChart>
     </ResponsiveContainer>
   );
 }
@@ -520,70 +389,6 @@ function FrekuensiStatusAlarm({ data }: { data: SensorReading[] }) {
   );
 }
 
-function RiwayatMonitoring({ data }: { data: SensorReading[] }) {
-  return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-72 overflow-y-auto">
-      <table className="w-full text-sm">
-        <thead className="sticky top-0 z-10">
-          <tr className="bg-slate-800 text-white">
-            {["Waktu", "Tinggi Air", "Hujan", "Kecepatan", "Status"].map((h) => (
-              <th key={h} className="text-left px-4 py-3 font-semibold whitespace-nowrap">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {[...data].reverse().map((row, i) => (
-            <tr
-              key={i}
-              className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-            >
-              <td className="px-4 py-2.5 text-slate-500 font-mono text-xs">
-                {row.time}
-              </td>
-              <td className="px-4 py-2.5 font-medium text-slate-800">
-                {row.water_level}{" "}
-                <span className="text-xs text-slate-400">cm</span>
-              </td>
-              <td className="px-4 py-2.5 text-slate-600">
-                {row.rain_sensor}
-                <span className="text-xs text-slate-400">%</span>
-              </td>
-              <td
-                className={`px-4 py-2.5 font-medium text-xs ${
-                  row.delta_water > 0
-                    ? "text-red-500"
-                    : row.delta_water < 0
-                    ? "text-green-500"
-                    : "text-slate-400"
-                }`}
-              >
-                {row.delta_water > 0 ? "+" : ""}
-                {row.delta_water} cm/h
-              </td>
-              <td className="px-4 py-2.5">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    row.status === "Aman"
-                      ? "bg-green-100 text-green-700"
-                      : row.status === "Waspada"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                  {row.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
   const lastWl = data[data.length - 1]?.water_level ?? 60;
   const lastRain = data[data.length - 1]?.rain_sensor ?? 20;
@@ -728,18 +533,12 @@ export default function AnalysisPanel({
         return <TrenIntensitasHujan data={data} />;
       case "Korelasi Hujan dan Tinggi Air":
         return <KorelasiHujanAir data={data} />;
-      case "Analisis Delay Hujan-Air":
-        return <AnalisisDelayHujanAir data={data} />;
-      case "Analisis Jam Rawan":
-        return <AnalisisJamRawan data={data} />;
       case "Analisis Kecepatan Kenaikan Air":
         return <AnalisisKecepatanKenaikanAir data={data} />;
       case "Statistik Harian":
         return <StatistikHarian data={data} />;
       case "Frekuensi Status Alarm":
         return <FrekuensiStatusAlarm data={data} />;
-      case "Riwayat Monitoring":
-        return <RiwayatMonitoring data={data} />;
       case "Prediksi Kenaikan Air":
         return <PrediksiKenaikanAir data={data} />;
       default:

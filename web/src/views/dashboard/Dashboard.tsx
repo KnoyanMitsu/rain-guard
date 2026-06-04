@@ -206,16 +206,15 @@ function Dashboard(data: Data) {
           <select
             value={graphDuration}
             onChange={(e) => setGraphDuration(Number(e.target.value))}
-            className="appearance-none flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 pr-10 text-sm text-white font-semibold shadow-sm transition-all hover:bg-primary/90 active:scale-95 cursor-pointer outline-none"
+            className="appearance-none rounded-xl border border-secondary bg-background px-5 py-2.5 pr-10 text-sm font-semibold text-text shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
           >
-            {/* Opsi select di sini */}
             <option value={10} className="text-text">Last 10 minutes</option>
             <option value={30} className="text-text">Last 30 minutes</option>
             <option value={60} className="text-text">Last 1 hour</option>
             <option value={240} className="text-text">Last 4 hours</option>
             <option value={1440} className="text-text">Last 24 hours</option>
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/80" />
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
         </div>
         </div>
         <AceUICardGraphs
