@@ -1,32 +1,67 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { registerLocale } from "react-datepicker";
+import { id } from "date-fns/locale/id";
 
 import {
   Activity,
   AlertTriangle,
   Calendar,
+  Download,
   ShieldCheck,
   Siren,
 } from "lucide-react";
+
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import exportCSV from "@/pages/dashboard/saveCSV";
+
+registerLocale("id", id);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface HistoryItem {
+export interface HistoryItem {
   tinggi_air: string;
   curah_hujan: string;
   status: string;
-  update_terakhir: string;
+  update_terakhir: string; // ISO string
 }
 
-interface HistoryProps {
+export interface HistoryProps {
   tbody: HistoryItem[];
   thead: { title: string }[];
+}
+
+type FilterMode = "harian" | "bulanan";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function isSameMonth(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -61,20 +96,58 @@ function StatusBadge({ status }: { status: string }) {
 
 function History({ tbody, thead }: HistoryProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterMode, setFilterMode] = useState<FilterMode>("harian");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<Date | null>(null);
 
   const itemsPerPage = 20;
 
-  // ───────────────── FILTER DATE ─────────────────
+  // ───────────────── FILTER ─────────────────
 
-  const filteredData = selectedDate
-    ? tbody.filter((item) => {
-        const itemDate = new Date(item.update_terakhir);
-        const itemFormatted = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, "0")}-${String(itemDate.getDate()).padStart(2, "0")}`;
-        const filterFormatted = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
-        return itemFormatted === filterFormatted;
-      })
-    : tbody;
+  const filteredData = useMemo(() => {
+    if (filterMode === "harian" && selectedDate) {
+      return tbody.filter((item) => {
+        const d = new Date(item.update_terakhir);
+        return isSameDay(d, selectedDate);
+      });
+    }
+    if (filterMode === "bulanan" && selectedMonth) {
+      return tbody.filter((item) => {
+        const d = new Date(item.update_terakhir);
+        return isSameMonth(d, selectedMonth);
+      });
+    }
+    return tbody;
+  }, [tbody, filterMode, selectedDate, selectedMonth]);
+
+  // ───────────────── GRAFIK DATA ─────────────────
+
+  const graphData = useMemo(() => {
+    const sorted = [...filteredData].reverse();
+    if (filterMode === "bulanan" && selectedMonth) {
+      // Agregasi harian untuk tampilan bulanan
+      const byDay: Record<string, { sum: number; count: number }> = {};
+      sorted.forEach((item) => {
+        const d = new Date(item.update_terakhir);
+        const key = `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+        if (!byDay[key]) byDay[key] = { sum: 0, count: 0 };
+        byDay[key].sum += parseFloat(item.tinggi_air) || 0;
+        byDay[key].count++;
+      });
+      return Object.entries(byDay).map(([label, v]) => ({
+        time: label,
+        tinggiAir: Math.round((v.sum / v.count) * 100) / 100,
+      }));
+    }
+    // Harian: setiap titik = satu record
+    return sorted.map((item) => {
+      const d = new Date(item.update_terakhir);
+      return {
+        time: d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+        tinggiAir: parseFloat(item.tinggi_air) || 0,
+      };
+    });
+  }, [filteredData, filterMode, selectedMonth]);
 
   // ───────────────── PAGINATION ─────────────────
 
@@ -84,7 +157,27 @@ function History({ tbody, thead }: HistoryProps) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedDate]);
+  }, [selectedDate, selectedMonth, filterMode]);
+
+  // ───────────────── EXPORT CSV ─────────────────
+
+  function handleExport() {
+    const rows = filteredData.map((item) => ({
+      "Tinggi Air (cm)": parseFloat(item.tinggi_air) || 0,
+      "Curah Hujan": item.curah_hujan,
+      "Status": item.status,
+      "Update Terakhir": new Date(item.update_terakhir).toLocaleString("id-ID"),
+    }));
+
+    let suffix = "semua";
+    if (filterMode === "harian" && selectedDate) {
+      suffix = selectedDate.toLocaleDateString("id-ID").replace(/\//g, "-");
+    } else if (filterMode === "bulanan" && selectedMonth) {
+      suffix = `${selectedMonth.toLocaleString("id-ID", { month: "long" })}-${selectedMonth.getFullYear()}`;
+    }
+
+    exportCSV({ data: rows, fileName: `riwayat-${suffix}.csv` });
+  }
 
   // ───────────────── UI ─────────────────
 
@@ -107,29 +200,79 @@ function History({ tbody, thead }: HistoryProps) {
             </div>
           </div>
 
-          {/* DATE FILTER */}
-          <div className="flex flex-col gap-1.5 min-w-[220px]">
-            <label className="text-sm font-medium text-text">Filter Tanggal</label>
-            <div className="relative z-50">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date: Date | null) => setSelectedDate(date)}
-                placeholderText="Semua tanggal"
-                dateFormat="dd MMM yyyy"
-                isClearable={!!selectedDate}
-                popperClassName="z-[9999]"
-                calendarClassName="shadow-2xl border border-secondary rounded-xl"
-                className="
-                  w-full appearance-none rounded-xl
-                  border border-secondary bg-background
-                  px-4 py-3 pr-11
-                  text-sm font-medium text-text
-                  placeholder:text-black shadow-sm outline-none
-                  transition-all hover:border-primary
-                  focus:border-primary focus:ring-2 focus:ring-primary/20
-                "
-              />
-              <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+          {/* FILTER CONTROLS */}
+          <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
+
+            {/* MODE TOGGLE */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text">Mode Filter</label>
+              <div className="flex rounded-xl overflow-hidden border border-secondary">
+                <button
+                  onClick={() => { setFilterMode("harian"); setSelectedMonth(null); }}
+                  className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-white" : "bg-background text-text hover:bg-secondary/20"}`}
+                >
+                  Harian
+                </button>
+                <button
+                  onClick={() => { setFilterMode("bulanan"); setSelectedDate(null); }}
+                  className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "bulanan" ? "bg-primary text-white" : "bg-background text-text hover:bg-secondary/20"}`}
+                >
+                  Bulanan
+                </button>
+              </div>
+            </div>
+
+            {/* DATE / MONTH PICKER */}
+            {filterMode === "harian" ? (
+              <div className="flex flex-col gap-1.5 min-w-[220px]">
+                <label className="text-sm font-medium text-text">Pilih Tanggal</label>
+                <div className="relative z-50">
+                  <DatePicker
+                    locale="id"
+                    selected={selectedDate}
+                    onChange={(date: Date | null) => setSelectedDate(date)}
+                    placeholderText="Semua tanggal"
+                    dateFormat="dd MMM yyyy"
+                    isClearable={!!selectedDate}
+                    popperClassName="z-[9999]"
+                    calendarClassName="shadow-2xl border border-secondary rounded-xl"
+                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  />
+                  <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5 min-w-[220px]">
+                <label className="text-sm font-medium text-text">Pilih Bulan</label>
+                <div className="relative z-50">
+                  <DatePicker
+                    locale="id"
+                    selected={selectedMonth}
+                    onChange={(date: Date | null) => setSelectedMonth(date)}
+                    placeholderText="Semua bulan"
+                    dateFormat="MMMM yyyy"
+                    showMonthYearPicker
+                    isClearable={!!selectedMonth}
+                    popperClassName="z-[9999]"
+                    calendarClassName="shadow-2xl border border-secondary rounded-xl"
+                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  />
+                  <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                </div>
+              </div>
+            )}
+
+            {/* EXPORT BUTTON */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text opacity-0 select-none">Export</label>
+              <button
+                onClick={handleExport}
+                disabled={filteredData.length === 0}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl border border-primary bg-primary text-white text-sm font-semibold shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="w-4 h-4" />
+                Unduh CSV
+              </button>
             </div>
           </div>
         </div>
@@ -193,11 +336,67 @@ function History({ tbody, thead }: HistoryProps) {
         </div>
       </div>
 
+      {/* GRAFIK */}
+      {graphData.length > 0 && (
+        <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-sm p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-text mb-4">
+            Grafik Tinggi Air{filterMode === "bulanan" && selectedMonth ? ` — ${selectedMonth.toLocaleString("id-ID", { month: "long", year: "numeric" })}` : ""}
+          </h3>
+          <div className="w-full h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={graphData} margin={{ top: 8, right: 16, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="grad-riwayat" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.6} />
+                    <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0.03} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-secondary)" opacity={0.35} />
+                <XAxis
+                  dataKey="time"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.7 }}
+                  interval={filterMode === "bulanan" ? 1 : "preserveStartEnd"}
+                  dy={8}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.7 }}
+                  unit=" cm"
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "10px",
+                    border: "1px solid var(--color-secondary)",
+                    backgroundColor: "var(--color-background)",
+                    color: "var(--color-text)",
+                    fontSize: 12,
+                  }}
+                  formatter={(v: unknown) => [`${Number(v)} cm`, "Tinggi Air"]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="tinggiAir"
+                  name="Tinggi Air (cm)"
+                  stroke="var(--color-accent)"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#grad-riwayat)"
+                  dot={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
       {/* TABLE */}
       <div className="rounded-2xl border border-secondary bg-background/70 backdrop-blur-sm p-6 shadow-sm">
         <div className="mb-5">
           <h3 className="text-xl font-bold text-text">Riwayat Pengamatan</h3>
-          <p className="text-sm text-text/60 mt-1">Menampilkan {currentData.length} data sensor</p>
+          <p className="text-sm text-text/60 mt-1">Menampilkan {currentData.length} dari {filteredData.length} data sensor</p>
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-secondary bg-background/60">
@@ -254,7 +453,7 @@ function History({ tbody, thead }: HistoryProps) {
               let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
               let endPage = Math.min(totalPages, startPage + maxVisible - 1);
               if (endPage - startPage + 1 < maxVisible) startPage = Math.max(1, endPage - maxVisible + 1);
-              const pages = [];
+              const pages: number[] = [];
               for (let i = startPage; i <= endPage; i++) pages.push(i);
               return (
                 <>
