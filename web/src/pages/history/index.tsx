@@ -1,6 +1,6 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
-import History from "@/views/guest/history/history";
+import History from "@/views/history/history";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
