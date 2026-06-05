@@ -389,65 +389,128 @@ function FrekuensiStatusAlarm({ data }: { data: SensorReading[] }) {
   );
 }
 
-function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
-  const lastWl = data[data.length - 1]?.water_level ?? 60;
-  const lastRain = data[data.length - 1]?.rain_sensor ?? 20;
-  const trend = lastRain > 50 ? 5 : lastRain > 30 ? 2 : -1;
+// Linear regression: returns slope (cm per interval) and intercept
+function linearRegression(points: number[]): { slope: number; intercept: number } {
+  const n = points.length;
+  if (n < 2) return { slope: 0, intercept: points[0] ?? 0 };
 
-  // Take last 12 actual points + 6 forecast
-  const actualSlice = data.slice(-12).map((d) => ({
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+  for (let i = 0; i < n; i++) {
+    sumX += i;
+    sumY += points[i];
+    sumXY += i * points[i];
+    sumXX += i * i;
+  }
+
+  const denom = n * sumXX - sumX * sumX;
+  if (denom === 0) return { slope: 0, intercept: sumY / n };
+
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  return { slope, intercept };
+}
+
+function generateForecastLabel(baseDate: Date, stepMinutes: number): string {
+  const d = new Date(baseDate.getTime() + stepMinutes * 60 * 1000);
+  const hh = d.getHours().toString().padStart(2, "0");
+  const mm = d.getMinutes().toString().padStart(2, "0");
+  return `${hh}:${mm} ▸`;
+}
+
+function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
+  // Gunakan semua data yang tersedia, minimal 5 titik untuk regresi
+  const ACTUAL_POINTS = Math.min(data.length, 20);
+  const FORECAST_STEPS = 6;
+
+  const actualSlice = data.slice(-ACTUAL_POINTS).map((d) => ({
     ...d,
     forecast: undefined as number | undefined,
   }));
 
-  const forecastPoints = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date();
-    d.setHours(d.getHours() + i + 1, 0, 0, 0);
+  // Hitung regresi linear dari data aktual
+  const wlValues = actualSlice.map((d) => d.water_level);
+  const rainValues = actualSlice.map((d) => d.rain_sensor);
+  const { slope: wlSlope, intercept: wlIntercept } = linearRegression(wlValues);
+  const { slope: rainSlope } = linearRegression(rainValues);
+
+  // Estimasi interval waktu antar titik dari data (default 10 detik)
+  const INTERVAL_MINUTES = 1; // setiap step prediksi = 1 menit ke depan
+
+  // Base time untuk forecast: ambil dari titik data terakhir jika ada timestamp
+  const lastLabel = actualSlice[actualSlice.length - 1]?.time ?? "00:00";
+  const [lastHH = "0", lastMM = "0"] = lastLabel.replace(" ▸", "").split(":");
+  const baseDate = new Date();
+  baseDate.setHours(parseInt(lastHH, 10), parseInt(lastMM, 10), 0, 0);
+
+  // Buat titik prediksi
+  const forecastPoints = Array.from({ length: FORECAST_STEPS }, (_, i) => {
+    const step = ACTUAL_POINTS + i + 1;
+    const predicted = Math.max(0, Math.round((wlSlope * step + wlIntercept) * 100) / 100);
+    const predictedRain = Math.max(0, Math.round((rainSlope * step) * 100) / 100);
     return {
-      time: `${d.getHours().toString().padStart(2, "0")}:00 ▸`,
-      hour: d.getHours(),
+      time: generateForecastLabel(baseDate, (i + 1) * INTERVAL_MINUTES),
+      hour: (baseDate.getHours() + Math.floor((i + 1) / 60)) % 24,
       water_level: undefined as number | undefined,
-      rain_sensor: undefined as number | undefined,
+      rain_sensor: predictedRain,
       status: "Aman" as const,
-      delta_water: trend,
-      forecast: Math.max(
-        20,
-        Math.min(
-          150,
-          Math.round(lastWl + trend * (i + 1) + (Math.random() - 0.3) * 5)
-        )
-      ),
+      delta_water: wlSlope,
+      forecast: predicted,
     };
   });
 
   const combined = [...actualSlice, ...forecastPoints];
 
+  // Tren dalam cm per interval, ubah ke per-menit untuk tampilan
+  const trendDisplay = Math.round(wlSlope * 100) / 100;
+  const avgRain = rainValues.length > 0
+    ? Math.round(rainValues.reduce((a, b) => a + b, 0) / rainValues.length * 10) / 10
+    : 0;
+
+  const lastForecast = forecastPoints[forecastPoints.length - 1]?.forecast ?? 0;
+  const lastActual = wlValues[wlValues.length - 1] ?? 0;
+
   return (
     <div className="bg-white">
+      {/* Info bar */}
       <div className="flex flex-wrap items-center gap-4 mb-4 text-xs text-slate-500">
         <div className="flex items-center gap-1.5">
           <span className="w-8 h-0.5 bg-blue-500 inline-block rounded" />
-          <span>Data aktual</span>
+          <span>Data aktual ({ACTUAL_POINTS} titik)</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-8 h-0.5 bg-rose-400 inline-block rounded border-dashed border border-rose-400" />
-          <span>Prediksi (6 jam ke depan)</span>
+          <span>Prediksi ({FORECAST_STEPS} menit ke depan)</span>
         </div>
         <span className="ml-auto">
           Tren:{" "}
-          <span
-            className={`font-medium ${
-              trend > 0 ? "text-red-500" : "text-green-500"
-            }`}
-          >
-            {trend > 0 ? `+${trend}` : trend} cm/h
+          <span className={`font-medium ${trendDisplay > 0 ? "text-red-500" : trendDisplay < 0 ? "text-green-500" : "text-slate-500"}`}>
+            {trendDisplay > 0 ? `+${trendDisplay}` : trendDisplay} cm/interval
           </span>
         </span>
       </div>
+
+      {/* Statistik ringkas */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="rounded-xl border border-slate-200 px-4 py-3 text-center">
+          <p className="text-xs text-slate-400 mb-1">Tinggi Air Saat Ini</p>
+          <p className="text-lg font-bold text-blue-600">{lastActual} cm</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 px-4 py-3 text-center">
+          <p className="text-xs text-slate-400 mb-1">Prediksi +{FORECAST_STEPS} menit</p>
+          <p className={`text-lg font-bold ${lastForecast > lastActual ? "text-rose-500" : "text-emerald-500"}`}>
+            {lastForecast} cm
+          </p>
+        </div>
+        <div className="rounded-xl border border-slate-200 px-4 py-3 text-center">
+          <p className="text-xs text-slate-400 mb-1">Rata-rata Hujan</p>
+          <p className="text-lg font-bold text-slate-700">{avgRain}</p>
+        </div>
+      </div>
+
       <ResponsiveContainer width="100%" height={320}>
         <ComposedChart data={combined} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={1} />
+          <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={Math.max(1, Math.floor(combined.length / 10))} />
           <YAxis tick={{ fontSize: 11 }} unit=" cm" domain={["auto", "auto"]} />
           <Tooltip contentStyle={tooltipStyle} />
           <Legend />
@@ -478,6 +541,11 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
           />
         </ComposedChart>
       </ResponsiveContainer>
+
+      <p className="mt-3 text-xs text-slate-400 text-center">
+        Prediksi menggunakan regresi linear dari {ACTUAL_POINTS} data aktual terakhir.
+        Akurasi meningkat seiring bertambahnya data.
+      </p>
     </div>
   );
 }
