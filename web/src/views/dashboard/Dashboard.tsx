@@ -1,8 +1,9 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
 import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
-import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle } from "lucide-react";
+import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
+import AceUILocationHeader, { DeviceData } from "@/component/card/AceUILocationHeader";
 
 type BackupStatus = "idle" | "loading" | "success" | "error";
 
@@ -37,6 +38,7 @@ type Data = {
   thead: Thead[];
   tbody: Tbody[];
   graph: GraphData[];
+  devices: DeviceData[];
   latestWsData?: Tbody; // Menambahkan properti khusus untuk menerima data realtime dari WebSocket
 };
 
@@ -64,6 +66,9 @@ function Dashboard(data: Data) {
   const [graphDuration, setGraphDuration] = useState(60); // Default: 1 hour
   const [backupStatus, setBackupStatus] = useState<BackupStatus>("idle");
   const [backupInfo, setBackupInfo] = useState<BackupInfo>({});
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>(
+    data.devices?.length > 0 ? data.devices[0].device_id : "default"
+  );
 
   useEffect(() => {
     if (backupStatus === "success" || backupStatus === "error") {
@@ -118,6 +123,13 @@ function Dashboard(data: Data) {
   const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
   return (
     <div className="flex flex-col gap-6">
+      {/* INFO LOKASI */}
+      <AceUILocationHeader
+        devices={data.devices}
+        selectedDevice={selectedDeviceId}
+        onDeviceChange={(newId) => setSelectedDeviceId(newId)}
+        city="Malang"
+      />
       {/* TOAST NOTIFIKASI BACKUP */}
       {backupStatus !== "idle" && (
         <div
@@ -174,6 +186,7 @@ function Dashboard(data: Data) {
       {/* SECTION: CARD STATUS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AceUICardStatus
+          className="bg-white border border-gray-100 shadow-sm"
           title="Tinggi Air"
           value={safeDistance.toString()}
           description={`Batas: ${MAX_DISTANCE} cm`} 
@@ -183,6 +196,7 @@ function Dashboard(data: Data) {
         />
 
         <AceUICardStatus
+          className="bg-white border border-gray-100 shadow-sm"
           title="Nilai Sensor Hujan"
           value={safeRain.toString()}
           description={`Batas: ${MAX_RAIN} raw`} 
