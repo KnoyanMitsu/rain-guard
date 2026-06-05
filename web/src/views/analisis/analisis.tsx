@@ -154,8 +154,9 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                     focus:border-primary focus:ring-2 focus:ring-primary/20
                   "
                 />
-                <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
-              </div>
+                {!selectedDate && (
+                  <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                )}                 </div>
             </div>
 
             {/* ANALYSIS DROPDOWN */}
@@ -202,7 +203,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                         `}
                       >
                         <span className="text-left">
-                          {activeAnalyses.includes(name) ? "✅ " : ""}
+                          {activeAnalyses.includes(name) ? "" : ""}
                           {name}
                         </span>
                       </button>

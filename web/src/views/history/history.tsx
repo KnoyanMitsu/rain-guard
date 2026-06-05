@@ -3,16 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { id } from "date-fns/locale/id";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Activity, AlertTriangle, Calendar, Download, ShieldCheck, Siren} from "lucide-react";
+import { Database, HistoryIcon, AlertTriangle, Calendar, Download, ShieldCheck, Siren} from "lucide-react";
 import exportCSV from "@/pages/dashboard/saveCSV";
 import { useSessionStorage } from "@/hooks/useSessionStorage";
 
 registerLocale("id", id);
 
-// ─────────────────────────────────────────────────────────────────────────────
 // TYPES
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface HistoryItem {
   tinggi_air: string;
   curah_hujan: string;
@@ -27,10 +24,7 @@ export interface HistoryProps {
 
 type FilterMode = "harian" | "bulanan";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
-
 function isSameDay(a: Date, b: Date) {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -43,13 +37,10 @@ function isSameMonth(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // STATUS BADGE
-// ─────────────────────────────────────────────────────────────────────────────
-
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    Aman: "bg-emerald-100 text-emerald-900 border border-emerald-300",
+    Aman: "bg-green-100 text-green-900 border border-green-300",
     Waspada: "bg-amber-100 text-amber-900 border border-amber-300",
     Siaga: "bg-amber-100 text-amber-900 border border-amber-300",
     Bahaya: "bg-rose-100 text-rose-900 border border-rose-300",
@@ -69,10 +60,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
-
 function History({ tbody, thead }: HistoryProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterMode, setFilterMode] = useSessionStorage<FilterMode>("history_filter_mode", "harian");
@@ -83,8 +71,7 @@ function History({ tbody, thead }: HistoryProps) {
 
   const itemsPerPage = 20;
 
-  // ───────────────── FILTER ─────────────────
-
+  // FILTER 
   const filteredData = useMemo(() => {
     if (filterMode === "harian" && dateValue) {
       return tbody.filter((item) => {
@@ -101,7 +88,7 @@ function History({ tbody, thead }: HistoryProps) {
     return tbody;
   }, [tbody, filterMode, dateValue, monthValue]);
 
-  // ───────────────── PAGINATION ─────────────────
+  // PAGINATION
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -111,7 +98,7 @@ function History({ tbody, thead }: HistoryProps) {
     setCurrentPage(1);
   }, [dateValue, monthValue, filterMode]);
 
-  // ───────────────── EXPORT CSV ─────────────────
+  // EXPORT CSV
 
   function handleExport() {
     const rows = filteredData.map((item) => ({
@@ -131,7 +118,7 @@ function History({ tbody, thead }: HistoryProps) {
     exportCSV({ data: rows, fileName: `riwayat-${suffix}.csv` });
   }
 
-  // ───────────────── UI ─────────────────
+  // UI
 
   return (
     <div className="flex flex-col gap-6">
@@ -142,7 +129,7 @@ function History({ tbody, thead }: HistoryProps) {
           <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Activity className="w-5 h-5 text-primary" />
+              <HistoryIcon className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Riwayat Monitoring</h2>
@@ -189,7 +176,9 @@ function History({ tbody, thead }: HistoryProps) {
                     calendarClassName="shadow-2xl border border-secondary rounded-xl"
                     className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
+                {!selectedDate && (
                   <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                )}                
                 </div>
               </div>
             ) : (
@@ -208,7 +197,9 @@ function History({ tbody, thead }: HistoryProps) {
                     calendarClassName="shadow-2xl border border-secondary rounded-xl"
                     className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
+                {!selectedMonth && (
                   <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                )}                 
                 </div>
               </div>
             )}
@@ -281,7 +272,7 @@ function History({ tbody, thead }: HistoryProps) {
               <h3 className="text-3xl font-bold text-text mt-2">{filteredData.length}</h3>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-secondary/20 flex items-center justify-center">
-              <Activity className="text-text w-6 h-6" />
+              <Database className="text-text w-6 h-6" />
             </div>
           </div>
         </div>

@@ -14,3 +14,8 @@
   --color-secondary: #aacbb8;
   --color-accent: #89c2a0; */
 }
+
+.react-datepicker__close-icon {
+  right: 0.75rem !important;
+  padding: 0 !important;
+}

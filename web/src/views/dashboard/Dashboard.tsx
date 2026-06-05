@@ -1,10 +1,11 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
 import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
-import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle, MapPin } from "lucide-react";
+import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle, MapPin, DatabaseBackup } from "lucide-react";
 import { useEffect, useState } from "react";
 import AceUILocationHeader, { DeviceData } from "@/component/card/AceUILocationHeader";
 import { useSessionStorage } from "@/hooks/useSessionStorage";
+import AceUIDropdown from "@/component/input/AceUIDropdown";
 
 type BackupStatus = "idle" | "loading" | "success" | "error";
 
@@ -227,21 +228,46 @@ function Dashboard(data: Data) {
       {/* SECTION: GRAFIK */}
       <div className="w-full bg-white border border-secondary shadow-sm rounded-2xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-text">Grafik Monitoring Tinggi Air (Real-time)</h3>
+          <h3 className="text-lg font-semibold text-text">
+            Grafik Monitoring Tinggi Air (Real-time)
+          </h3>
+
+          {/* DROPDOWN DURATION */}
           <div className="relative">
-          <select
-            value={graphDuration}
-            onChange={(e) => setGraphDuration(Number(e.target.value))}
-            className="appearance-none rounded-xl border border-secondary bg-background px-5 py-2.5 pr-10 text-sm font-semibold text-text shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
-          >
-            <option value={10} className="text-text">Last 10 minutes</option>
-            <option value={30} className="text-text">Last 30 minutes</option>
-            <option value={60} className="text-text">Last 1 hour</option>
-            <option value={240} className="text-text">Last 4 hours</option>
-            <option value={1440} className="text-text">Last 24 hours</option>
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
-        </div>
+            <AceUIDropdown
+              title={
+                [
+                  { title: "10 menit terakhir", value: 10 },
+                  { title: "30 menit terakhir", value: 30 },
+                  { title: "1 jam terakhir", value: 60 },
+                  { title: "4 jam terakhir", value: 240 },
+                  { title: "24 jam terakhir", value: 1440 },
+                ].find((d) => d.value === graphDuration)?.title ?? "Pilih durasi"
+              }
+              actions={[
+                {
+                  title: "10 menit terakhir",
+                  onClick: () => setGraphDuration(10),
+                },
+                {
+                  title: "30 menit terakhir",
+                  onClick: () => setGraphDuration(30),
+                },
+                {
+                  title: "1 jam terakhir",
+                  onClick: () => setGraphDuration(60),
+                },
+                {
+                  title: "4 jam terakhir",
+                  onClick: () => setGraphDuration(240),
+                },
+                {
+                  title: "24 jam terakhir",
+                  onClick: () => setGraphDuration(1440),
+                },
+              ]}
+            />
+          </div>
         </div>
         <AceUICardGraphs
           className="bg-white border border-gray-100 shadow-sm"
@@ -277,7 +303,7 @@ function Dashboard(data: Data) {
             </>
           ) : (
             <>
-              <Database className="h-4 w-4" />
+              <DatabaseBackup className="h-4 w-4" />
               Backup ke Hadoop
             </>
           )}
