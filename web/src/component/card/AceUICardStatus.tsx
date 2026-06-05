@@ -9,6 +9,7 @@ type AceUICardStatusProps = {
   unit?: string;
   toggle?: boolean;
   className?: string;
+  description?: string;
 };
 
 function AceUICardStatus({
@@ -19,6 +20,7 @@ function AceUICardStatus({
   unit,
   toggle,
   className = "",
+  description,
 }: AceUICardStatusProps) {
   const switchId = useId();
 
@@ -77,6 +79,11 @@ function AceUICardStatus({
                 </span>
               )}
             </div>
+            {description && (
+              <p className="text-sm font-normal text-text/200 mt-1">
+                {description}
+              </p>
+            )}
           </div>
         </div>
         {toggle && (

@@ -105,6 +105,16 @@ function Dashboard(data: Data) {
   const latestData: Tbody = data.latestWsData || data.tbody[0] || {};
   const isBuzzerActive = latestData.buzzer?.trim().toLowerCase() === "aktif";
   const filteredGraphData = getFilteredGraphData(data.graph, graphDuration);
+  // Batas Maksimum untuk normalisasi nilai
+  const MAX_DISTANCE = 10; // cm
+  const MAX_RAIN = 4095;   // raw
+  // Proteksi nilai minus
+  const rawDistance = parseFloat(String(latestData.distance ?? 0)) || 0;
+  const rawRain = parseInt(String(latestData.rain ?? 0)) || 0;
+
+  const safeDistance = Math.max(0, rawDistance);
+  const safeRain = Math.max(0, rawRain);
+
   const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
   return (
     <div className="flex flex-col gap-6">
@@ -164,18 +174,18 @@ function Dashboard(data: Data) {
       {/* SECTION: CARD STATUS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AceUICardStatus
-          className="bg-white border border-gray-100 shadow-sm"
           title="Tinggi Air"
-          value={formatDistance(latestData.distance)}
+          value={safeDistance.toString()}
+          description={`Batas: ${MAX_DISTANCE} cm`} 
           icon={<Droplets />}
           color="primary"
           unit="cm"
         />
 
         <AceUICardStatus
-          className="bg-white border border-gray-100 shadow-sm"
           title="Nilai Sensor Hujan"
-          value={latestData.rain?.toString() || "0"}
+          value={safeRain.toString()}
+          description={`Batas: ${MAX_RAIN} raw`} 
           icon={<Cloud />}
           color="yellow"
           unit="raw"
