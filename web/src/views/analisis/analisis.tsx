@@ -243,20 +243,20 @@ function Analisis({ tbody, loading }: AnalisisProps) {
       )}
 
       {/* ANALYSIS PANEL */}
-      {!loading && activeAnalyses.map((analysis) => (
-        <AnalysisPanel
-          key={analysis}
-          selectedAnalysis={analysis}
-          onClose={() =>
-            setActiveAnalyses(
-              activeAnalyses.filter(
-                (item) => item !== analysis
+      {!loading && ANALYSIS_LIST.filter((analysis) => activeAnalyses.includes(analysis)).map((analysis) => (
+          <AnalysisPanel
+            key={analysis}
+            selectedAnalysis={analysis}
+            onClose={() =>
+              setActiveAnalyses(
+                activeAnalyses.filter(
+                  (item) => item !== analysis
+                )
               )
-            )
-          }
-          data={sensorData}
-        />
-      ))}
+            }
+            data={sensorData}
+          />
+        ))}
     </div>
   );
 }
