@@ -1,5 +1,5 @@
 "use client";
-import AnalysisPanel, { ANALYSIS_META, SensorReading } from "@/views/analisis/AnalysisPanel";
+import AnalysisPanel, { SensorReading } from "@/views/analisis/AnalysisPanel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -42,7 +42,11 @@ const ANALYSIS_LIST = [
 
 function Analisis({ tbody, loading }: AnalisisProps) {
   const [selectedDate, setSelectedDate] = useSessionStorage<Date | null>("analysis_selected_date",null);
-  const [selectedAnalysis, setSelectedAnalysis] = useSessionStorage<string | null>("analysis_selected_analysis",null);
+  const [activeAnalyses, setActiveAnalyses] =
+    useSessionStorage<string[]>(
+      "analysis_active_analyses",
+      ["Tren Ketinggian Air"]
+    );
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -91,12 +95,18 @@ function Analisis({ tbody, loading }: AnalisisProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelectAnalysis = (name: string) => {
-    setSelectedAnalysis(name);
-    setDropdownOpen(false);
+  const toggleAnalysis = (name: string) => {
+    if (activeAnalyses.includes(name)) {
+      setActiveAnalyses(
+        activeAnalyses.filter((item) => item !== name)
+      );
+    } else {
+      setActiveAnalyses([
+        ...activeAnalyses,
+        name,
+      ]);
+    }
   };
-
-  const activeMeta = selectedAnalysis ? ANALYSIS_META[selectedAnalysis] : null;
 
   // ───────────────── UI ─────────────────
 
@@ -157,14 +167,16 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                   px-5 py-3 rounded-xl
                   border shadow-sm text-sm font-semibold
                   transition-all duration-200
-                  ${selectedAnalysis
+                  ${activeAnalyses.length > 0
                     ? "bg-primary text-background border-primary"
                     : "bg-background text-text border-secondary hover:bg-secondary/10"
                   }
                 `}
               >
                 <Activity className="w-4 h-4" />
-                <span>{selectedAnalysis || "Pilih Analisis"}</span>
+                  <span>
+                    {activeAnalyses.length > 0 ? `${activeAnalyses.length} Analisis Dipilih` : "Pilih Analisis"}
+                  </span>                  
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
@@ -178,25 +190,28 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                     {ANALYSIS_LIST.map((name) => (
                       <button
                         key={name}
-                        onClick={() => handleSelectAnalysis(name)}
+                        onClick={() => toggleAnalysis(name)}
                         className={`
                           w-full flex items-center gap-3
                           px-4 py-3 text-sm transition-all
-                          ${selectedAnalysis === name
+                          ${activeAnalyses.includes(name)
                             ? "bg-primary/10 text-primary font-semibold"
                             : "hover:bg-secondary/10 text-text"
                           }
                         `}
                       >
-                        <span className="text-left">{name}</span>
+                        <span className="text-left">
+                          {activeAnalyses.includes(name) ? "✅ " : ""}
+                          {name}
+                        </span>
                       </button>
                     ))}
                   </div>
 
-                  {selectedAnalysis && (
+                  {activeAnalyses.length > 0 && (
                     <div className="border-t border-secondary/20 p-3">
                       <button
-                        onClick={() => { setSelectedAnalysis(null); setDropdownOpen(false); }}
+                        onClick={() => { setActiveAnalyses([]); setDropdownOpen(false); }}
                         className="w-full py-2 rounded-xl text-sm text-rose-500 hover:bg-rose-50 transition-all"
                       >
                         Reset Analisis
@@ -210,7 +225,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
         </div>
       </div>
 
-      {!selectedAnalysis && !loading && (
+      {activeAnalyses.length === 0 && !loading && (
         <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-10 text-center">
           <Activity className="mx-auto mb-3 h-10 w-10 text-text/20" />
           <p className="text-sm font-semibold text-text/50">Pilih jenis analisis dari dropdown di atas</p>
@@ -228,13 +243,20 @@ function Analisis({ tbody, loading }: AnalisisProps) {
       )}
 
       {/* ANALYSIS PANEL */}
-      {selectedAnalysis && !loading && (
+      {!loading && activeAnalyses.map((analysis) => (
         <AnalysisPanel
-          selectedAnalysis={selectedAnalysis}
-          onClose={() => setSelectedAnalysis(null)}
+          key={analysis}
+          selectedAnalysis={analysis}
+          onClose={() =>
+            setActiveAnalyses(
+              activeAnalyses.filter(
+                (item) => item !== analysis
+              )
+            )
+          }
           data={sensorData}
         />
-      )}
+      ))}
     </div>
   );
 }
