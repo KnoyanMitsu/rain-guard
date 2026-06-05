@@ -4,6 +4,7 @@ import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
 import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import AceUILocationHeader, { DeviceData } from "@/component/card/AceUILocationHeader";
+import { useSessionStorage } from "@/hooks/useSessionStorage";
 
 type BackupStatus = "idle" | "loading" | "success" | "error";
 
@@ -63,10 +64,11 @@ function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
 
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [graphDuration, setGraphDuration] = useState(60); // Default: 1 hour
+  const [graphDuration, setGraphDuration] = useSessionStorage<number>("graphDuration", 60); // Default: 1 hour
   const [backupStatus, setBackupStatus] = useState<BackupStatus>("idle");
   const [backupInfo, setBackupInfo] = useState<BackupInfo>({});
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string>(
+  const [selectedDeviceId, setSelectedDeviceId] = useSessionStorage<string>(
+    "selectedDevice",
     data.devices?.length > 0 ? data.devices[0].device_id : "default"
   );
 

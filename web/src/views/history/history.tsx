@@ -1,22 +1,11 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
-
 import { id } from "date-fns/locale/id";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-import {
-  Activity,
-  AlertTriangle,
-  Calendar,
-  Download,
-  ShieldCheck,
-  Siren,
-} from "lucide-react";
-
-
+import { Activity, AlertTriangle, Calendar, Download, ShieldCheck, Siren} from "lucide-react";
 import exportCSV from "@/pages/dashboard/saveCSV";
+import { useSessionStorage } from "@/hooks/useSessionStorage";
 
 registerLocale("id", id);
 
@@ -86,29 +75,31 @@ function StatusBadge({ status }: { status: string }) {
 
 function History({ tbody, thead }: HistoryProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterMode, setFilterMode] = useState<FilterMode>("harian");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<Date | null>(null);
+  const [filterMode, setFilterMode] = useSessionStorage<FilterMode>("history_filter_mode", "harian");
+  const [selectedDate, setSelectedDate] = useSessionStorage<Date | null>("history_selected_date", null  );
+  const [selectedMonth, setSelectedMonth] = useSessionStorage<Date | null>("history_selected_month", null);
+  const dateValue = selectedDate ? new Date(selectedDate as any) : null;
+  const monthValue = selectedMonth ? new Date(selectedMonth as any) : null;
 
   const itemsPerPage = 20;
 
   // ───────────────── FILTER ─────────────────
 
   const filteredData = useMemo(() => {
-    if (filterMode === "harian" && selectedDate) {
+    if (filterMode === "harian" && dateValue) {
       return tbody.filter((item) => {
         const d = new Date(item.update_terakhir);
-        return isSameDay(d, selectedDate);
+        return isSameDay(d, dateValue);
       });
     }
-    if (filterMode === "bulanan" && selectedMonth) {
+    if (filterMode === "bulanan" && monthValue) {
       return tbody.filter((item) => {
         const d = new Date(item.update_terakhir);
-        return isSameMonth(d, selectedMonth);
+        return isSameMonth(d, monthValue);
       });
     }
     return tbody;
-  }, [tbody, filterMode, selectedDate, selectedMonth]);
+  }, [tbody, filterMode, dateValue, monthValue]);
 
   // ───────────────── PAGINATION ─────────────────
 
@@ -118,7 +109,7 @@ function History({ tbody, thead }: HistoryProps) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedDate, selectedMonth, filterMode]);
+  }, [dateValue, monthValue, filterMode]);
 
   // ───────────────── EXPORT CSV ─────────────────
 
@@ -131,10 +122,10 @@ function History({ tbody, thead }: HistoryProps) {
     }));
 
     let suffix = "semua";
-    if (filterMode === "harian" && selectedDate) {
-      suffix = selectedDate.toLocaleDateString("id-ID").replace(/\//g, "-");
-    } else if (filterMode === "bulanan" && selectedMonth) {
-      suffix = `${selectedMonth.toLocaleString("id-ID", { month: "long" })}-${selectedMonth.getFullYear()}`;
+    if (filterMode === "harian" && dateValue) {
+      suffix = dateValue.toLocaleDateString("id-ID").replace(/\//g, "-");
+    } else if (filterMode === "bulanan" && monthValue) {
+      suffix = `${monthValue.toLocaleString("id-ID", { month: "long" })}-${monthValue.getFullYear()}`;
     }
 
     exportCSV({ data: rows, fileName: `riwayat-${suffix}.csv` });
@@ -189,11 +180,11 @@ function History({ tbody, thead }: HistoryProps) {
                 <div className="relative z-50 bg-primary/10 rounded-xl">
                   <DatePicker
                     locale="id"
-                    selected={selectedDate}
+                    selected={dateValue}
                     onChange={(date: Date | null) => setSelectedDate(date)}
                     placeholderText="Semua tanggal"
                     dateFormat="dd MMM yyyy"
-                    isClearable={!!selectedDate}
+                    isClearable={!!dateValue}
                     popperClassName="z-[9999]"
                     calendarClassName="shadow-2xl border border-secondary rounded-xl"
                     className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -207,12 +198,12 @@ function History({ tbody, thead }: HistoryProps) {
                 <div className="relative z-50">
                   <DatePicker
                     locale="id"
-                    selected={selectedMonth}
+                    selected={monthValue}
                     onChange={(date: Date | null) => setSelectedMonth(date)}
                     placeholderText="Semua bulan"
                     dateFormat="MMMM yyyy"
                     showMonthYearPicker
-                    isClearable={!!selectedMonth}
+                    isClearable={!!monthValue}
                     popperClassName="z-[9999]"
                     calendarClassName="shadow-2xl border border-secondary rounded-xl"
                     className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"

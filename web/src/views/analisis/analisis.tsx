@@ -1,12 +1,10 @@
 "use client";
-
 import AnalysisPanel, { ANALYSIS_META, SensorReading } from "@/views/analisis/AnalysisPanel";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
 import { Activity, Calendar, ChevronDown } from "lucide-react";
+import { useSessionStorage } from "@/hooks/useSessionStorage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -43,8 +41,8 @@ const ANALYSIS_LIST = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Analisis({ tbody, loading }: AnalisisProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useSessionStorage<Date | null>("analysis_selected_date",null);
+  const [selectedAnalysis, setSelectedAnalysis] = useSessionStorage<string | null>("analysis_selected_analysis",null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
