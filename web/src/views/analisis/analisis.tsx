@@ -41,7 +41,8 @@ const ANALYSIS_LIST = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Analisis({ tbody, loading }: AnalisisProps) {
-  const [selectedDate, setSelectedDate] = useSessionStorage<Date | null>("analysis_selected_date",null);
+  const [selectedDateStr, setSelectedDateStr] = useSessionStorage<string | null>("analysis_selected_date", null);
+  const selectedDate = useMemo(() => (selectedDateStr ? new Date(selectedDateStr) : null), [selectedDateStr]);
   const [activeAnalyses, setActiveAnalyses] =
     useSessionStorage<string[]>(
       "analysis_active_analyses",
@@ -137,7 +138,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
               <div className="relative z-50">
                 <DatePicker
                   selected={selectedDate}
-                  onChange={(date: Date | null) => setSelectedDate(date)}
+                  onChange={(date: Date | null) => setSelectedDateStr(date ? date.toISOString() : null)}
                   placeholderText="Semua tanggal"
                   dateFormat="dd MMM yyyy"
                   isClearable={!!selectedDate}
