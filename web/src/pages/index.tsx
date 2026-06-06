@@ -1,16 +1,7 @@
 import db from "@/utils/db/firebase";
-import GuestDashboard from "@/views/guest/dashboard/Dashboard";
+import Dashboard from "@/views/guest/dashboard/Dashboard";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
-
-import db from "@/utils/db/firebase";
-import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-} from "firebase/firestore";
 
 function index() {
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
@@ -22,15 +13,6 @@ function index() {
     status_rain: "-",
     buzzer: "-",
   });
-
-  // WEBSOCKET
-  useEffect(() => {
-    // GANTI DENGAN URL WEBSOCKET KAMU
-    const ws = new WebSocket("ws://YOUR_WEBSOCKET_URL");
-
-    ws.onopen = () => {
-      console.log("✅ WebSocket Connected");
-    };
 
   // 1. Firebase History
   useEffect(() => {
@@ -45,6 +27,7 @@ function index() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => {
           const item = doc.data();
+          const distanceValue = Number(item.distance || 0);
           const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
           return {
             id: doc.id,
@@ -69,7 +52,7 @@ function index() {
               parseFloat(item.distance || 0),
           };
         });
-        setFirebaseData(data);
+        setRealtimeData(data);
       },
       (error) => {
         console.error(
