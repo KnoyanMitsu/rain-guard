@@ -1,6 +1,6 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
-import Analisis from "@/views/guest/analisis/analisis";
+import Analisis from "@/views/analisis/analisis";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";

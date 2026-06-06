@@ -1,4 +1,6 @@
-import Dashboard from "@/views/guest/dashboard/Dashboard";
+import db from "@/utils/db/firebase";
+import GuestDashboard from "@/views/guest/dashboard/Dashboard";
+import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 import db from "@/utils/db/firebase";
@@ -23,41 +25,14 @@ function index() {
 
   // WEBSOCKET
   useEffect(() => {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
-    const wsUrl = baseUrl.endsWith("/")
-      ? `${baseUrl}ws/getIot`
-      : `${baseUrl}/ws/getIot`;
-
-    const ws = new WebSocket(wsUrl);
+    // GANTI DENGAN URL WEBSOCKET KAMU
+    const ws = new WebSocket("ws://YOUR_WEBSOCKET_URL");
 
     ws.onopen = () => {
       console.log("✅ WebSocket Connected");
     };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      setWsData({
-        distance: data.distance || 0,
-        rain: data.rain || 0,
-        status_rain: data.status_rain || "-",
-        buzzer: data.buzzer || "-",
-      });
-    };
-
-    ws.onerror = (err) => {
-      console.error("❌ WebSocket Error:", err);
-    };
-
-    ws.onclose = () => {
-      console.log("❌ WebSocket Closed");
-    };
-
-    return () => ws.close();
-  }, []);
-
-  // FIREBASE
+  // 1. Firebase History
   useEffect(() => {
     const q = query(
       collection(db, "history"),
@@ -70,17 +45,10 @@ function index() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => {
           const item = doc.data();
-          const distanceValue = Number(item.distance || 0);
-
-          const lastSeen = item.timestamp
-            ? new Date(item.timestamp)
-            : new Date();
-
+          const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
           return {
             id: doc.id,
-
             tinggi_air: `${item.distance || 0} cm`,
-
             curah_hujan: `${item.rain || 0} mm`,
 
             status:
@@ -90,36 +58,81 @@ function index() {
                   ? "Waspada"
                   : "Aman",
 
-            update_terakhir: lastSeen.toLocaleString("id-ID"),
+            update_terakhir:
+              lastSeen.toLocaleString("id-ID"),
 
             // GRAPH
-            time: lastSeen.toLocaleTimeString("id-ID"),
+            time:
+              lastSeen.toLocaleTimeString("id-ID"),
 
-            tinggiAir: parseFloat(item.distance || 0),
+            tinggiAir:
+              parseFloat(item.distance || 0),
           };
         });
-
-        setRealtimeData(data);
+        setFirebaseData(data);
       },
       (error) => {
-        console.error("❌ Firebase Error:", error);
-      },
+        console.error(
+          "❌ Firebase Error:",
+          error
+        );
+      }
     );
 
     return () => unsubscribe();
   }, []);
 
+  // 2. WebSocket — same config as admin
+  useEffect(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
+    const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
+
+    let socket: WebSocket;
+
+    function connect() {
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log("WebSocket Connected: " + wsUrl);
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          setWsData({
+            distance: data.distance ?? 0,
+            rain: data.rain ?? 0,
+            status_rain: data.status_rain ?? "-",
+            buzzer: data.buzzer ?? "Non Aktif",
+          });
+        } catch (err) {
+          console.error("WebSocket parse error:", err);
+        }
+      };
+
+      socket.onerror = () => {};
+
+      socket.onclose = () => {
+        setTimeout(connect, 5000);
+      };
+    }
+
+    connect();
+    return () => {
+      if (socket) socket.close();
+    };
+  }, []);
+
   return (
     <Dashboard
       websocketData={wsData} // Kirim data WS
-      thead={[
-        // Tambahkan thead
+      thead={[               // Tambahkan thead
         { title: "Tinggi Air" },
         { title: "Curah Hujan" },
         { title: "Status Alarm" },
         { title: "Update Terakhir" },
       ]}
-      tbody={realtimeData} // Tambahkan tbody dari Firebase
+      tbody={realtimeData}   // Tambahkan tbody dari Firebase
       graph={realtimeData
         .map((item) => ({
           time: item.time,

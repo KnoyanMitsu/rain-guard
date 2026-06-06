@@ -1,11 +1,13 @@
 "use client";
 
 import AceUIAppname from "@/component/aestetic/AceUIAppname";
+import logo from "@/component/asset/logo rain-guard.png";
 import AceUICard from "@/component/card/AceUICard";
 import AceUIButton from "@/component/input/AceUIButton";
 import AceUIInput from "@/component/input/AceUIInput";
 import AceUITemplateTwoGrid from "@/component/template/AceUITemplateTwoGrid";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -56,11 +58,12 @@ const TampilanLogin = () => {
             <AceUICard>
               {/* Header */}
               <div className="text-center mb-8 mt-8">
+                <Image src={logo} alt="Logo Rain Guard" width={85} height={85} className="mx-auto mb-4" />
                 <h1 className="text-3xl font-extrabold text-black">
-                  Masuk Ke Akun
+                  Welcome Back!!
                 </h1>
                 <p className="text-gray-500 text-sm mt-2">
-                  Masuk ke halaman Dashboard
+                  Akses Dashboard Monitoring Rain-Guard
                 </p>
               </div>
 
