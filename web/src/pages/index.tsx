@@ -108,7 +108,7 @@ function index() {
 
   return (
     <Dashboard
-      websocketData={wsData} // Kirim data WS
+      latestWsData={wsData} // Kirim data WS
       thead={[               // Tambahkan thead
         { title: "Tinggi Air" },
         { title: "Curah Hujan" },
