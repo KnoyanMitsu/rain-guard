@@ -1,9 +1,9 @@
 import db from "@/utils/db/firebase";
-import Dashboard from "@/views/guest/dashboard/Dashboard";
+import GuestDashboard from "@/views/guest/dashboard/Dashboard";
 import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-function index() {
+function Index() {
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
   // WEBSOCKET DATA
@@ -107,7 +107,7 @@ function index() {
   }, []);
 
   return (
-    <Dashboard
+    <GuestDashboard
       latestWsData={wsData} // Kirim data WS
       thead={[               // Tambahkan thead
         { title: "Tinggi Air" },
@@ -126,4 +126,4 @@ function index() {
   );
 }
 
-export default index;
+export default Index;
