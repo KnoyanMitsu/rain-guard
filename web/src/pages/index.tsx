@@ -23,8 +23,13 @@ function index() {
 
   // WEBSOCKET
   useEffect(() => {
-    // GANTI DENGAN URL WEBSOCKET KAMU
-    const ws = new WebSocket("ws://YOUR_WEBSOCKET_URL");
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
+    const wsUrl = baseUrl.endsWith("/")
+      ? `${baseUrl}ws/getIot`
+      : `${baseUrl}/ws/getIot`;
+
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log("✅ WebSocket Connected");
@@ -57,7 +62,7 @@ function index() {
     const q = query(
       collection(db, "history"),
       orderBy("timestamp", "desc"),
-      limit(360)
+      limit(360),
     );
 
     const unsubscribe = onSnapshot(
@@ -85,26 +90,20 @@ function index() {
                   ? "Waspada"
                   : "Aman",
 
-            update_terakhir:
-              lastSeen.toLocaleString("id-ID"),
+            update_terakhir: lastSeen.toLocaleString("id-ID"),
 
             // GRAPH
-            time:
-              lastSeen.toLocaleTimeString("id-ID"),
+            time: lastSeen.toLocaleTimeString("id-ID"),
 
-            tinggiAir:
-              parseFloat(item.distance || 0),
+            tinggiAir: parseFloat(item.distance || 0),
           };
         });
 
         setRealtimeData(data);
       },
       (error) => {
-        console.error(
-          "❌ Firebase Error:",
-          error
-        );
-      }
+        console.error("❌ Firebase Error:", error);
+      },
     );
 
     return () => unsubscribe();
@@ -113,13 +112,14 @@ function index() {
   return (
     <Dashboard
       websocketData={wsData} // Kirim data WS
-      thead={[               // Tambahkan thead
+      thead={[
+        // Tambahkan thead
         { title: "Tinggi Air" },
         { title: "Curah Hujan" },
         { title: "Status Alarm" },
         { title: "Update Terakhir" },
       ]}
-      tbody={realtimeData}   // Tambahkan tbody dari Firebase
+      tbody={realtimeData} // Tambahkan tbody dari Firebase
       graph={realtimeData
         .map((item) => ({
           time: item.time,
