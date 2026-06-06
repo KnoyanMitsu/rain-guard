@@ -1,6 +1,12 @@
 import db from "@/utils/db/firebase";
 import GuestDashboard from "@/views/guest/dashboard/Dashboard";
-import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 function Index() {
@@ -28,7 +34,9 @@ function Index() {
         const data = snapshot.docs.map((doc) => {
           const item = doc.data();
           const distanceValue = Number(item.distance || 0);
-          const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
+          const lastSeen = item.timestamp
+            ? new Date(item.timestamp)
+            : new Date();
           return {
             id: doc.id,
             tinggi_air: `${item.distance || 0} cm`,
@@ -41,25 +49,19 @@ function Index() {
                   ? "Waspada"
                   : "Aman",
 
-            update_terakhir:
-              lastSeen.toLocaleString("id-ID"),
+            update_terakhir: lastSeen.toLocaleString("id-ID"),
 
             // GRAPH
-            time:
-              lastSeen.toLocaleTimeString("id-ID"),
+            time: lastSeen.toLocaleTimeString("id-ID"),
 
-            tinggiAir:
-              parseFloat(item.distance || 0),
+            tinggiAir: parseFloat(item.distance || 0),
           };
         });
         setRealtimeData(data);
       },
       (error) => {
-        console.error(
-          "❌ Firebase Error:",
-          error
-        );
-      }
+        console.error("❌ Firebase Error:", error);
+      },
     );
 
     return () => unsubscribe();
@@ -67,8 +69,11 @@ function Index() {
 
   // 2. WebSocket — same config as admin
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
-    const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
+    const wsUrl = baseUrl.endsWith("/")
+      ? `${baseUrl}ws/getIot`
+      : `${baseUrl}/ws/getIot`;
 
     let socket: WebSocket;
 
@@ -109,13 +114,14 @@ function Index() {
   return (
     <GuestDashboard
       latestWsData={wsData} // Kirim data WS
-      thead={[               // Tambahkan thead
+      thead={[
+        // Tambahkan thead
         { title: "Tinggi Air" },
         { title: "Curah Hujan" },
         { title: "Status Alarm" },
         { title: "Update Terakhir" },
       ]}
-      tbody={realtimeData}   // Tambahkan tbody dari Firebase
+      tbody={realtimeData} // Tambahkan tbody dari Firebase
       graph={realtimeData
         .map((item) => ({
           time: item.time,

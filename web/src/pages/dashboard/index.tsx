@@ -94,7 +94,7 @@ function Index() {
 
   // 2. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
+    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
     const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
     
     let socket: WebSocket;
