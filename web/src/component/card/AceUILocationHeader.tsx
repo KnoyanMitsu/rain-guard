@@ -1,7 +1,6 @@
-import React from "react";
-import AceUICard from "./AceUICard";
-import AceUIDropdown, { DropdownAction } from "../input/AceUIDropdown";
 import { MapPin } from "lucide-react";
+import AceUIDropdown, { DropdownAction } from "../input/AceUIDropdown";
+import AceUICard from "./AceUICard";
 
 export interface DeviceData {
   device_id: string;
@@ -58,7 +57,7 @@ export default function AceUILocationHeader({
         </div>
 
         {/* KANAN: Ikon MapPin dan Kota */}
-        <div className="flex items-center gap-2 bg-secondary text-primary px-4 py-3 rounded-xl text-sm font-bold w-fit shadow-sm">
+        <div className="flex items-center gap-2 bg-primary text-white px-4 py-3 rounded-xl text-sm font-bold w-fit shadow-sm">
           <MapPin size={18} />
           {city}
         </div>

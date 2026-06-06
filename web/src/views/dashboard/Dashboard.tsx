@@ -1,11 +1,11 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
-import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
-import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle, MapPin, DatabaseBackup } from "lucide-react";
-import { useEffect, useState } from "react";
 import AceUILocationHeader, { DeviceData } from "@/component/card/AceUILocationHeader";
-import { useSessionStorage } from "@/hooks/useSessionStorage";
+import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
 import AceUIDropdown from "@/component/input/AceUIDropdown";
+import { useSessionStorage } from "@/hooks/useSessionStorage";
+import { Bell, CheckCircle, Cloud, CloudRain, Database, DatabaseBackup, Droplets, Loader2, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type BackupStatus = "idle" | "loading" | "success" | "error";
 
