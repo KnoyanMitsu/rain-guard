@@ -1,0 +1,42 @@
+@startuml
+title Activity Diagram Pilih, Download, dan Lihat riwayat CSV
+
+|Admin User|
+start
+:Buka menu Login;
+:Masukkan email dan password;
+
+|Sistem|
+:Menampilkan form login;
+:Validasi email dan password;
+
+if (Login valid?) then (Ya)
+  :Menampilkan dashboard admin;
+
+  |Admin User|
+  :Memilih menu Riwayat;
+  :Memilih data riwayat CSV;
+
+  |Sistem|
+  :Menampilkan data riwayat;
+  :Memproses data riwayat;
+  :Membuat file CSV;
+  :Mengunduh file CSV;
+
+  |Admin User|
+  :Menerima file CSV;
+  :Membuka file CSV;
+  :Melihat isi riwayat CSV;
+
+  stop
+
+else (Tidak)
+  :Menampilkan pesan error;
+
+  |Admin User|
+  :Mengulang login;
+
+  stop
+endif
+
+@enduml

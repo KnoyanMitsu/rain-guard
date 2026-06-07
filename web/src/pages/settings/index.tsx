@@ -1,5 +1,5 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
-import HadoopFiles from "@/views/hadoop/HadoopFiles";
+import Settings from "@/views/settings/Settings";
 import { signOut, useSession } from "next-auth/react";
 
 const SIDEBAR_MENU = [
@@ -10,10 +10,9 @@ const SIDEBAR_MENU = [
   { title: "Pengaturan", link: "/settings" },
 ];
 
-function HadoopPage() {
+function SettingsPage() {
   const { data: session }: any = useSession();
-  const displayName =
-    session?.user?.name || session?.user?.fullname || session?.user?.nama || "Admin";
+  const displayName = session?.user?.name || session?.user?.fullname || session?.user?.nama || "Admin";
 
   const handleLogout = async () => {
     await signOut({ redirect: true, callbackUrl: "/auth/login" });
@@ -28,11 +27,11 @@ function HadoopPage() {
       accountName={displayName}
       accountImage={`https://ui-avatars.com/api/?name=${displayName}`}
       accountRole="Admin"
-      header="Hadoop Backup"
+      header="Pengaturan"
     >
-      <HadoopFiles />
+      <Settings />
     </AceUITemplateWithSidebar>
   );
 }
 
-export default HadoopPage;
+export default SettingsPage;

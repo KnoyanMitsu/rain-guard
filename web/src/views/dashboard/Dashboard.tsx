@@ -1,7 +1,10 @@
 import AceUICardGraphs from "@/component/card/AceUICardGraphs";
 import AceUICardStatus from "@/component/card/AceUICardStatus";
+import AceUILocationHeader, { DeviceData } from "@/component/card/AceUILocationHeader";
 import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
-import { Bell, CheckCircle, ChevronDown, Cloud, CloudRain, Database, Droplets, Loader2, XCircle } from "lucide-react";
+import AceUIDropdown from "@/component/input/AceUIDropdown";
+import { useSessionStorage } from "@/hooks/useSessionStorage";
+import { Bell, CheckCircle, Cloud, CloudRain, Database, DatabaseBackup, Droplets, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type BackupStatus = "idle" | "loading" | "success" | "error";
@@ -37,7 +40,9 @@ type Data = {
   thead: Thead[];
   tbody: Tbody[];
   graph: GraphData[];
+  devices: DeviceData[];
   latestWsData?: Tbody; // Menambahkan properti khusus untuk menerima data realtime dari WebSocket
+  lokasi?: string; // Dinamis dari konfigurasi Firebase
 };
 
 function formatDistance(value: number | string | undefined) {
@@ -61,9 +66,13 @@ function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
 
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [graphDuration, setGraphDuration] = useState(60); // Default: 1 hour
+  const [graphDuration, setGraphDuration] = useSessionStorage<number>("graphDuration", 60); // Default: 1 hour
   const [backupStatus, setBackupStatus] = useState<BackupStatus>("idle");
   const [backupInfo, setBackupInfo] = useState<BackupInfo>({});
+  const [selectedDeviceId, setSelectedDeviceId] = useSessionStorage<string>(
+    "selectedDevice",
+    data.devices?.length > 0 ? data.devices[0].device_id : "default"
+  );
 
   useEffect(() => {
     if (backupStatus === "success" || backupStatus === "error") {
@@ -105,9 +114,26 @@ function Dashboard(data: Data) {
   const latestData: Tbody = data.latestWsData || data.tbody[0] || {};
   const isBuzzerActive = latestData.buzzer?.trim().toLowerCase() === "aktif";
   const filteredGraphData = getFilteredGraphData(data.graph, graphDuration);
+  // Batas Maksimum untuk normalisasi nilai
+  const MAX_DISTANCE = 10; // cm
+  const MAX_RAIN = 4095;   // raw
+  // Proteksi nilai minus
+  const rawDistance = parseFloat(String(latestData.distance ?? 0)) || 0;
+  const rawRain = parseInt(String(latestData.rain ?? 0)) || 0;
+
+  const safeDistance = Math.max(0, rawDistance);
+  const safeRain = Math.max(0, rawRain);
+
   const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
   return (
     <div className="flex flex-col gap-6">
+      {/* INFO LOKASI */}
+      <AceUILocationHeader
+        devices={data.devices}
+        selectedDevice={selectedDeviceId}
+        onDeviceChange={(newId) => setSelectedDeviceId(newId)}
+        city={data.lokasi || "Malang"}
+      />
       {/* TOAST NOTIFIKASI BACKUP */}
       {backupStatus !== "idle" && (
         <div
@@ -166,7 +192,8 @@ function Dashboard(data: Data) {
         <AceUICardStatus
           className="bg-white border border-gray-100 shadow-sm"
           title="Tinggi Air"
-          value={formatDistance(latestData.distance)}
+          value={safeDistance.toString()}
+          description={`Batas: ${MAX_DISTANCE} cm`} 
           icon={<Droplets />}
           color="primary"
           unit="cm"
@@ -175,7 +202,8 @@ function Dashboard(data: Data) {
         <AceUICardStatus
           className="bg-white border border-gray-100 shadow-sm"
           title="Nilai Sensor Hujan"
-          value={latestData.rain?.toString() || "0"}
+          value={safeRain.toString()}
+          description={`Batas: ${MAX_RAIN} raw`} 
           icon={<Cloud />}
           color="yellow"
           unit="raw"
@@ -201,21 +229,46 @@ function Dashboard(data: Data) {
       {/* SECTION: GRAFIK */}
       <div className="w-full bg-white border border-secondary shadow-sm rounded-2xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-text">Grafik Monitoring Tinggi Air (Real-time)</h3>
+          <h3 className="text-lg font-semibold text-text">
+            Grafik Monitoring Tinggi Air (Real-time)
+          </h3>
+
+          {/* DROPDOWN DURATION */}
           <div className="relative">
-          <select
-            value={graphDuration}
-            onChange={(e) => setGraphDuration(Number(e.target.value))}
-            className="appearance-none rounded-xl border border-secondary bg-background px-5 py-2.5 pr-10 text-sm font-semibold text-text shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
-          >
-            <option value={10} className="text-text">Last 10 minutes</option>
-            <option value={30} className="text-text">Last 30 minutes</option>
-            <option value={60} className="text-text">Last 1 hour</option>
-            <option value={240} className="text-text">Last 4 hours</option>
-            <option value={1440} className="text-text">Last 24 hours</option>
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
-        </div>
+            <AceUIDropdown
+              title={
+                [
+                  { title: "10 menit terakhir", value: 10 },
+                  { title: "30 menit terakhir", value: 30 },
+                  { title: "1 jam terakhir", value: 60 },
+                  { title: "4 jam terakhir", value: 240 },
+                  { title: "24 jam terakhir", value: 1440 },
+                ].find((d) => d.value === graphDuration)?.title ?? "Pilih durasi"
+              }
+              actions={[
+                {
+                  title: "10 menit terakhir",
+                  onClick: () => setGraphDuration(10),
+                },
+                {
+                  title: "30 menit terakhir",
+                  onClick: () => setGraphDuration(30),
+                },
+                {
+                  title: "1 jam terakhir",
+                  onClick: () => setGraphDuration(60),
+                },
+                {
+                  title: "4 jam terakhir",
+                  onClick: () => setGraphDuration(240),
+                },
+                {
+                  title: "24 jam terakhir",
+                  onClick: () => setGraphDuration(1440),
+                },
+              ]}
+            />
+          </div>
         </div>
         <AceUICardGraphs
           className="bg-white border border-gray-100 shadow-sm"
@@ -251,7 +304,7 @@ function Dashboard(data: Data) {
             </>
           ) : (
             <>
-              <Database className="h-4 w-4" />
+              <DatabaseBackup className="h-4 w-4" />
               Backup ke Hadoop
             </>
           )}

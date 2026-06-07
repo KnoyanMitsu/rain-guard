@@ -1,0 +1,46 @@
+@startuml
+title Activity Diagram Backup Data ke Hadoop
+
+|Admin User|
+start
+:Buka menu Login;
+
+|Sistem|
+:Menampilkan form login;
+
+|Admin User|
+:Masukkan email dan password;
+
+|Sistem|
+:Validasi email dan password;
+
+if (Login valid?) then (Ya)
+  :Menampilkan Dashboard Admin;
+
+  |Admin User|
+  :Memilih menu Dasbor;
+
+  |Sistem|
+  :Menampilkan halaman dasbor;
+
+  |Admin User|
+  :Menekan tombol "Backup ke Hadoop";
+
+  |Sistem|
+  :Melakukan backup data;
+  :Menyimpan backup ke Hadoop;
+  :Menampilkan status backup berhasil;
+
+  |Admin User|
+  :Melihat status berhasil;
+  stop
+
+else (Tidak)
+  :Menampilkan pesan error;
+
+  |Admin User|
+  :Mengulang input email dan password;
+  stop
+endif
+
+@enduml

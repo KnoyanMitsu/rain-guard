@@ -17,10 +17,7 @@ import {
   YAxis,
 } from "recharts";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface SensorReading {
   time: string;
   hour: number;
@@ -30,10 +27,7 @@ export interface SensorReading {
   delta_water: number;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Design tokens
-// ─────────────────────────────────────────────────────────────────────────────
-
 const C_WATER = "#3b82f6";
 const C_RAIN = "#6fb3c1";
 const PIE_COLORS: Record<string, string> = {
@@ -51,10 +45,7 @@ const tooltipStyle = {
   padding: "8px 12px",
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Analysis metadata config
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const ANALYSIS_META: Record<
   string,
   {
@@ -117,10 +108,7 @@ export const ANALYSIS_META: Record<
   },
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Chart components
-// ─────────────────────────────────────────────────────────────────────────────
-
 function TrenKetinggianAir({ data }: { data: SensorReading[] }) {
   return (
     <ResponsiveContainer width="100%" height={320}>
@@ -550,10 +538,7 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Main AnalysisPanel component
-// ─────────────────────────────────────────────────────────────────────────────
-
 interface AnalysisPanelProps {
   selectedAnalysis: string;
   onClose: () => void;
@@ -616,7 +601,7 @@ export default function AnalysisPanel({
 
   return (
     <div className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
-      {/* ── Panel header ────────────────────────────────────── */}
+      {/* Panel header */}
       <div
         className="flex items-start justify-between px-6 py-4 border-b border-slate-100"
         style={{ borderLeftColor: meta.colorAccent, borderLeftWidth: 4 }}
@@ -651,7 +636,7 @@ export default function AnalysisPanel({
         </button>
       </div>
 
-      {/* ── Data info bar ────────────────────────────────────── */}
+      {/* Data info bar */}
       <div className="flex flex-wrap items-center gap-2 px-6 py-3 bg-white border-b border-slate-100">
         <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">
           Data:
@@ -675,7 +660,7 @@ export default function AnalysisPanel({
         </span>
       </div>
 
-      {/* ── Chart / Table area ───────────────────────────────── */}
+      {/* Chart / Table area */}
       <div className="p-6">{renderChart()}</div>
     </div>
   );

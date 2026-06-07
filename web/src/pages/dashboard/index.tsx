@@ -1,7 +1,7 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
 import Dashboard from "@/views/dashboard/Dashboard";
-import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, doc, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -19,46 +19,101 @@ function Index() {
   // State terpisah untuk Firebase (Tabel & Grafik) dan WebSocket (4 Kartu Status)
   const [firebaseData, setFirebaseData] = useState<any[]>([]);
   const [wsData, setWsData] = useState<any>(null);
-
+  const [deviceList, setDeviceList] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any>(null);
+  
   // 1. useEffect untuk FIREBASE (Data Riwayat)
   useEffect(() => {
-    const q = query(
+    const qHistory = query(
       collection(db, "history"),
       orderBy("timestamp", "desc"),
-      limit(360) 
+      limit(360)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log("✅ Jumlah data dari Firebase:", snapshot.docs.length); 
-      
-      const data = snapshot.docs.map((doc) => {
-        const item = doc.data();
-        const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
+    const unsubscribeHistory = onSnapshot(
+      qHistory,
+      (snapshot) => {
+        console.log(
+          "✅ Jumlah data dari Firebase:",
+          snapshot.docs.length
+        );
 
-        return {
-          id: doc.id,
-          tinggi_air: `${item.distance || 0} cm`,
-          curah_hujan: `${item.rain || 0} mm`,    
-          // Menyimpan nilai original untuk grafik/kebutuhan lain
-          distance: item.distance || 0,
-          rain: item.rain || 0,
-          status: item.status_rain === "Ya" ? "Bahaya" : "Aman", 
-          update_terakhir: lastSeen.toLocaleString("id-ID"),
-        };
-      });
-      
-      setFirebaseData(data);
-    }, (error) => {
-      console.error("❌ Gagal mengambil data Firebase:", error);
-    });
+        const data = snapshot.docs.map((doc) => {
+          const item = doc.data();
+          const lastSeen = item.timestamp
+            ? new Date(item.timestamp)
+            : new Date();
 
-    return () => unsubscribe();
+          return {
+            id: doc.id,
+            tinggi_air: `${item.distance || 0} cm`,
+            curah_hujan: `${item.rain || 0} mm`,
+            distance: item.distance || 0,
+            rain: item.rain || 0,
+            status: item.status_rain === "Ya"
+              ? "Bahaya"
+              : "Aman",
+            update_terakhir:
+              lastSeen.toLocaleString("id-ID"),
+          };
+        });
+
+        setFirebaseData(data);
+      },
+      (error) => {
+        console.error(
+          "❌ Gagal mengambil data Firebase:",
+          error
+        );
+      }
+    );
+
+    const qDevices = query(
+      collection(db, "devices")
+    );
+
+    const unsubscribeDevices = onSnapshot(
+      qDevices,
+      (snapshot) => {
+        const devs = snapshot.docs.map((doc) => ({
+          device_id:
+            doc.data().device_id || doc.id,
+          lokasi:
+            doc.data().lokasi ||
+            "Lokasi Tidak Diketahui",
+        }));
+
+        setDeviceList(devs);
+      }
+    );
+
+    return () => {
+      unsubscribeHistory();
+      unsubscribeDevices();
+    };
   }, []);
 
-  // 2. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
+  // 2. useEffect untuk SETTINGS
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://4.145.113.15:1880";
-    const wsUrl = baseUrl.endsWith("/") ? `${baseUrl}ws/getIot` : `${baseUrl}/ws/getIot`;
+    const unsubscribeSettings = onSnapshot(
+      doc(db, "settings", "config"),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setSettings(docSnap.data());
+        }
+      }
+    );
+    return () => unsubscribeSettings();
+  }, []);
+
+  // 3. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
+  useEffect(() => {
+    const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
+    let formattedWsUrl = wsIp;
+    if (!formattedWsUrl.startsWith("ws://") && !formattedWsUrl.startsWith("wss://")) {
+      formattedWsUrl = `wss://${formattedWsUrl}`;
+    }
+    const wsUrl = formattedWsUrl.endsWith("/") ? `${formattedWsUrl}ws/getIot` : `${formattedWsUrl}/ws/getIot`;
     
     let socket: WebSocket;
 
@@ -100,7 +155,7 @@ function Index() {
     return () => {
       if (socket) socket.close();
     };
-  }, []);
+  }, [settings?.websocket_ip]);
 
   const handleLogout = async () => {
     await signOut({ redirect: true, callbackUrl: "/auth/login" });
@@ -115,6 +170,7 @@ function Index() {
         { title: "Riwayat", link: "/history" },
         { title: "Analisis Data", link: "/analisis" },
         { title: "Hadoop Backup", link: "/hadoop" },
+        { title: "Pengaturan", link: "/settings" },
       ]}
       account={true}
       accountName={displayName}
@@ -123,8 +179,12 @@ function Index() {
       header="Dasbor"
     >
       <Dashboard
+        // Lempar data lokasi dinamis dari settings
+        lokasi={settings?.lokasi}
         // Lempar data WebSocket khusus ke props latestWsData
         latestWsData={wsData} 
+        // Lempar daftar perangkat ke header untuk dropdown
+        devices={deviceList}
         // Lempar data Firebase ke tabel dan grafik
         tbody={firebaseData}
         thead={[

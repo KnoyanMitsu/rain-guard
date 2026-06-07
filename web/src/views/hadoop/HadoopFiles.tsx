@@ -142,7 +142,7 @@ export default function HadoopFiles() {
       <div className={`${panelClass} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-            <Database className="h-5 w-5 text-primary" />
+            <DatabaseBackup className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text">File Backup di HDFS</h3>
