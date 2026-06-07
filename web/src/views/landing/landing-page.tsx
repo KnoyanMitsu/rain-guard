@@ -148,7 +148,6 @@ export default function LandingPage() {
                 {/* Tiang Sensor & Box ESP32 */}
                 <rect x="195" y="180" width="10" height="120" fill="#94A3B8" />
                 <rect x="175" y="150" width="50" height="40" rx="4" fill="#1E293B" />
-                <circle cx="200" cy="170" r="4" fill="#10B981" className="animate-ping" />
                 
                 {/* Sensor Ultrasonik */}
                 <path d="M185 280L165 310H235L215 280H185Z" fill="#64748B" opacity="0.8" />
