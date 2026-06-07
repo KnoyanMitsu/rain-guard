@@ -9,17 +9,24 @@ export default function Settings() {
   const [websocketIp, setWebsocketIp] = useState("");
   const [hadoopIp, setHadoopIp] = useState("");
   const [lokasi, setLokasi] = useState("");
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [toast, setToast] = useState<{show: boolean, title: string, message: string, type: "success" | "error"}>({ show: false, title: "", message: "", type: "success" });
+  const [toast, setToast] = useState<{ show: boolean; title: string; message: string; type: "success" | "error" }>({
+    show: false,
+    title: "",
+    message: "",
+    type: "success",
+  });
 
   useEffect(() => {
     async function loadSettings() {
       try {
         const docSnap = await getDoc(doc(db, "settings", "config"));
+
         if (docSnap.exists()) {
           const data = docSnap.data();
+
           if (data.websocket_ip) setWebsocketIp(data.websocket_ip);
           if (data.hadoop_ip) setHadoopIp(data.hadoop_ip);
           if (data.lokasi) setLokasi(data.lokasi);
@@ -30,35 +37,90 @@ export default function Settings() {
         setIsLoading(false);
       }
     }
+
     loadSettings();
   }, []);
 
+  const sendLocationToEsp = () => {
+    return new Promise<void>((resolve, reject) => {
+      let baseUrl = websocketIp.trim();
+
+      if (!baseUrl) {
+        reject(new Error("WebSocket URL kosong"));
+        return;
+      }
+
+      baseUrl = baseUrl.replace(/\/$/, "");
+
+      const socketUrl = `${baseUrl}/ws/iot`;
+
+      console.log("Connecting WebSocket to:", socketUrl);
+
+      const ws = new WebSocket(socketUrl);
+
+      ws.onopen = () => {
+        const payload = {
+          type: "set_location",
+          location: lokasi,
+        };
+
+        console.log("Sending location to ESP:", payload);
+
+        ws.send(JSON.stringify(payload));
+
+        setTimeout(() => {
+          ws.close();
+          resolve();
+        }, 500);
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        reject(error);
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket closed");
+      };
+    });
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
+
     try {
-      await setDoc(doc(db, "settings", "config"), {
-        websocket_ip: websocketIp,
-        hadoop_ip: hadoopIp,
-        lokasi: lokasi,
-        updated_at: new Date().toISOString()
-      }, { merge: true });
-      
+      await setDoc(
+        doc(db, "settings", "config"),
+        {
+          websocket_ip: websocketIp,
+          hadoop_ip: hadoopIp,
+          lokasi: lokasi,
+          updated_at: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      await sendLocationToEsp();
+
       setToast({
         show: true,
         title: "Sukses",
-        message: "Konfigurasi berhasil disimpan!",
-        type: "success"
+        message: "Konfigurasi berhasil disimpan dan dikirim ke ESP!",
+        type: "success",
       });
-      setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
+
+      setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
     } catch (error) {
-      console.error("Gagal menyimpan pengaturan:", error);
+      console.error("Gagal menyimpan/mengirim pengaturan:", error);
+
       setToast({
         show: true,
         title: "Gagal",
-        message: "Terjadi kesalahan saat menyimpan.",
-        type: "error"
+        message: "Konfigurasi tersimpan ke Firebase, tapi gagal dikirim ke ESP.",
+        type: "error",
       });
-      setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
+
+      setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
     } finally {
       setIsSaving(false);
     }
@@ -74,18 +136,14 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-      {/* Menggunakan AceUIFloatingWarning untuk pesan balik */}
-      <AceUIFloatingWarning 
-        show={toast.show}
-        title={toast.title}
-        message={toast.message}
-        type={toast.type}
-      />
+      <AceUIFloatingWarning show={toast.show} title={toast.title} message={toast.message} type={toast.type} />
 
       <div className="rounded-2xl border border-secondary bg-white/80 backdrop-blur-xl p-8 shadow-sm">
         <div className="mb-8 border-b border-secondary/30 pb-6">
           <h2 className="text-2xl font-bold text-text mb-2">Konfigurasi Sistem</h2>
-          <p className="text-text/70 text-sm">Sesuaikan IP WebSocket, koneksi Hadoop, dan nama Lokasi pemantau secara dinamis.</p>
+          <p className="text-text/70 text-sm">
+            Sesuaikan IP WebSocket, koneksi Hadoop, dan nama Lokasi pemantau secara dinamis.
+          </p>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -96,12 +154,12 @@ export default function Settings() {
             <div className="flex-grow">
               <AceUIInput
                 label="WebSocket URL / IP"
-                placeholder="wss://[IP_ADDRESS]:1880"
+                placeholder="ws://4.145.113.15:1880"
                 type="text"
                 value={websocketIp}
                 onChange={(e) => setWebsocketIp(e.target.value)}
               />
-              <p className="text-xs text-text/50 mt-2">Sistem otomatis mendeteksi format wss:// atau ws://</p>
+              <p className="text-xs text-text/50 mt-2">Gunakan ws://4.145.113.15:1880</p>
             </div>
           </div>
 
@@ -133,7 +191,7 @@ export default function Settings() {
                 value={lokasi}
                 onChange={(e) => setLokasi(e.target.value)}
               />
-              <p className="text-xs text-text/50 mt-2">Akan ditampilkan pada Header Dashboard utama</p>
+              <p className="text-xs text-text/50 mt-2">Akan dikirim ke ESP dan ditampilkan pada Dashboard utama</p>
             </div>
           </div>
         </div>
