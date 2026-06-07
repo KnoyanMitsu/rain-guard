@@ -2,7 +2,6 @@ import db from "@/utils/db/firebase";
 import GuestDashboard from "@/views/guest/dashboard/Dashboard";
 import {
   collection,
-  doc,
   limit,
   onSnapshot,
   orderBy,
@@ -20,8 +19,6 @@ function Index() {
     status_rain: "-",
     buzzer: "-",
   });
-
-  const [settings, setSettings] = useState<any>(null);
 
   // 1. Firebase History
   useEffect(() => {
@@ -70,27 +67,13 @@ function Index() {
     return () => unsubscribe();
   }, []);
 
-  // 1.5. Firebase Settings
-  useEffect(() => {
-    const unsubscribeSettings = onSnapshot(
-      doc(db, "settings", "config"),
-      (docSnap) => {
-        if (docSnap.exists()) {
-          setSettings(docSnap.data());
-        }
-      }
-    );
-    return () => unsubscribeSettings();
-  }, []);
-
   // 2. WebSocket — same config as admin
   useEffect(() => {
-    const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
-    let formattedWsUrl = wsIp;
-    if (!formattedWsUrl.startsWith("ws://") && !formattedWsUrl.startsWith("wss://")) {
-      formattedWsUrl = `wss://${formattedWsUrl}`;
-    }
-    const wsUrl = formattedWsUrl.endsWith("/") ? `${formattedWsUrl}ws/getIot` : `${formattedWsUrl}/ws/getIot`;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
+    const wsUrl = baseUrl.endsWith("/")
+      ? `${baseUrl}ws/getIot`
+      : `${baseUrl}/ws/getIot`;
 
     let socket: WebSocket;
 
@@ -126,7 +109,7 @@ function Index() {
     return () => {
       if (socket) socket.close();
     };
-  }, [settings?.websocket_ip]);
+  }, []);
 
   return (
     <GuestDashboard

@@ -1,4 +1,6 @@
+import logo from "@/component/asset/logo rain-guard.png"; // Sesuaikan path-nya
 import { ArrowRight, LogOut, Menu } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -41,7 +43,12 @@ function AceUITemplateWithSidebar({
       <div className="md:grid grid-cols-5 h-screen bg-background text-text">
         {/* Desktop */}
         <div className="hidden md:flex col-span-1 p-6 flex-col gap-6">
-          <h1 className="text-3xl font-bold mb-10">{appname}</h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="flex-shrink-0">
+              <Image src={logo} alt="Logo" width={40} height={40} />
+            </div>
+            <h1 className="text-3xl font-bold truncate">{appname}</h1>
+          </div>
           <nav>
             <ul className="flex flex-col gap-2">
               {listMenu.map((item, index) => {
@@ -60,6 +67,7 @@ function AceUITemplateWithSidebar({
                       }`}
                     >
                       {item.title}
+                
                     </Link>
                   </li>
                 );
@@ -122,6 +130,10 @@ function AceUITemplateWithSidebar({
           }`}
         >
           <div className="flex justify-between items-center mb-10">
+            <div className="flex items-center gap-2">
+            <Image src={logo} alt="Logo" width={32} height={32} />
+            <h1 className="text-3xl font-bold">{appname}</h1>
+          </div>
             <button
               onClick={() => setIsOpen(false)}
               className="p-2 bg-secondary rounded-full hover:bg-primary hover:text-background transition-colors"
