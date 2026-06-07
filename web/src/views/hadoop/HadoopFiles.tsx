@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Database, FileJson, RefreshCw, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Database, Download, FileJson, Loader2, RefreshCw, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type HdfsFile = {
@@ -50,6 +50,7 @@ export default function HadoopFiles() {
   const [errorContent, setErrorContent] = useState("");
   const [previewPage, setPreviewPage] = useState(1);
   const [sortAsc, setSortAsc] = useState(false);
+  const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
 
   const PREVIEW_PER_PAGE = 15;
 
@@ -96,6 +97,26 @@ export default function HadoopFiles() {
     setSelectedFile(null);
     setFileContent([]);
     setErrorContent("");
+  }
+
+  async function downloadFile(fileName: string) {
+    setDownloadingFile(fileName);
+    try {
+      const res = await fetch(`/api/hadoop-files?file=${encodeURIComponent(fileName)}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      const blob = new Blob([JSON.stringify(json.data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(`Gagal mengunduh: ${err.message}`);
+    } finally {
+      setDownloadingFile(null);
+    }
   }
 
   useEffect(() => { fetchFiles(); }, []);
@@ -198,19 +219,34 @@ export default function HadoopFiles() {
                     <td className="px-5 py-4 text-sm text-text/70">{formatSize(file.size)}</td>
                     <td className="px-5 py-4 text-sm text-text/70">{file.modifiedAt}</td>
                     <td className="px-5 py-4">
-                      <button
-                        onClick={() =>
-                          selectedFile === file.fileName
-                            ? closePreview()
-                            : fetchFileContent(file.fileName)
-                        }
-                        className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all
-                          ${selectedFile === file.fileName
-                            ? "border-primary/30 bg-primary/10 text-primary"
-                            : "border-secondary text-text hover:bg-secondary/20"}`}
-                      >
-                        {selectedFile === file.fileName ? "Tutup" : "Lihat Isi"}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() =>
+                            selectedFile === file.fileName
+                              ? closePreview()
+                              : fetchFileContent(file.fileName)
+                          }
+                          className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all
+                            ${selectedFile === file.fileName
+                              ? "border-primary/30 bg-primary/10 text-primary"
+                              : "border-secondary text-text hover:bg-secondary/20"}`}
+                        >
+                          {selectedFile === file.fileName ? "Tutup" : "Lihat Isi"}
+                        </button>
+                        <button
+                          onClick={() => downloadFile(file.fileName)}
+                          disabled={downloadingFile === file.fileName}
+                          title="Unduh file"
+                          className="flex items-center gap-1.5 rounded-lg border border-secondary px-3 py-1.5 text-xs font-semibold text-text transition-all hover:bg-secondary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {downloadingFile === file.fileName ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Download className="h-3.5 w-3.5" />
+                          )}
+                          Unduh
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
