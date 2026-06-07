@@ -42,6 +42,7 @@ type Data = {
   graph: GraphData[];
   devices: DeviceData[];
   latestWsData?: Tbody; // Menambahkan properti khusus untuk menerima data realtime dari WebSocket
+  lokasi?: string; // Dinamis dari konfigurasi Firebase
 };
 
 function formatDistance(value: number | string | undefined) {
@@ -131,7 +132,7 @@ function Dashboard(data: Data) {
         devices={data.devices}
         selectedDevice={selectedDeviceId}
         onDeviceChange={(newId) => setSelectedDeviceId(newId)}
-        city="Malang"
+        city={data.lokasi || "Malang"}
       />
       {/* TOAST NOTIFIKASI BACKUP */}
       {backupStatus !== "idle" && (

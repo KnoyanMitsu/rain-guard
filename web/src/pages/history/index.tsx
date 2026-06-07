@@ -97,6 +97,7 @@ function HistoryPage() {
         { title: "Riwayat", link: "/history" },
         { title: "Analisis Data", link: "/analisis" },
         { title: "Hadoop Backup", link: "/hadoop" },
+        { title: "Pengaturan", link: "/settings" },
       ]}
       account={true}
       accountName={displayName}

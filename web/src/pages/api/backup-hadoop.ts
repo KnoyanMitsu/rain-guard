@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "@/utils/db/firebase";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import http from "http";
 
-const HDFS_HOST = "localhost";
 const HDFS_PORT = 9870;
 const HDFS_USER = process.env.HDFS_USER || "hadoop";
 const HDFS_DIR = "/rain-guard";
@@ -52,6 +51,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    // 0. Ambil konfigurasi IP Hadoop dari Firebase Settings
+    let hadoopHost = "localhost";
+    try {
+      const settingsDoc = await getDoc(doc(db, "settings", "config"));
+      if (settingsDoc.exists()) {
+        const data = settingsDoc.data();
+        if (data.hadoop_ip) {
+          hadoopHost = data.hadoop_ip;
+        }
+      }
+    } catch (e) {
+      console.warn("Gagal mengambil konfigurasi hadoop dari Firebase, fallback ke localhost", e);
+    }
+
     // 1. Ambil semua data dari Firestore collection "history"
     let snapshot;
     try {
@@ -85,13 +98,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 3. Buat direktori /rain-guard di HDFS (idempotent - aman jika sudah ada)
     await hdfsRequest(
-      "PUT", HDFS_HOST, HDFS_PORT,
+      "PUT", hadoopHost, HDFS_PORT,
       `/webhdfs/v1${HDFS_DIR}?op=MKDIRS&user.name=${HDFS_USER}`
     );
 
     // 4. WebHDFS upload Step 1: kirim CREATE request ke NameNode → dapat redirect ke DataNode
     const step1 = await hdfsRequest(
-      "PUT", HDFS_HOST, HDFS_PORT,
+      "PUT", hadoopHost, HDFS_PORT,
       `/webhdfs/v1${hdfsFilePath}?op=CREATE&overwrite=true&user.name=${HDFS_USER}`
     );
 
@@ -99,7 +112,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error(
         `HDFS tidak merespons dengan redirect (307). ` +
         `Status: ${step1.statusCode}. ` +
-        `Pastikan Hadoop NameNode aktif di ${HDFS_HOST}:${HDFS_PORT}.`
+        `Pastikan Hadoop NameNode aktif di ${hadoopHost}:${HDFS_PORT}.`
       );
     }
 
@@ -111,7 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 6. WebHDFS upload Step 2: kirim data aktual ke DataNode
     const step2 = await hdfsRequest(
-      "PUT", "localhost", dataNodePort,
+      "PUT", hadoopHost, dataNodePort,
       dataNodePath, jsonData
     );
 
@@ -125,7 +138,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 7. Verifikasi file benar-benar tersimpan di HDFS
     const verify = await hdfsRequest(
-      "GET", HDFS_HOST, HDFS_PORT,
+      "GET", hadoopHost, HDFS_PORT,
       `/webhdfs/v1${hdfsFilePath}?op=GETFILESTATUS&user.name=${HDFS_USER}`
     );
 
@@ -139,7 +152,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       fileName,
-      hdfsPath: `hdfs://localhost${hdfsFilePath}`,
+      hdfsPath: `hdfs://${hadoopHost}${hdfsFilePath}`,
       recordCount: sensorData.length,
     });
   } catch (error: any) {

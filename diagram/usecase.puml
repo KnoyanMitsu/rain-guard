@@ -1,0 +1,36 @@
+@startuml usecase
+left to right direction
+
+actor Admin
+actor "Guest / Tamu" as Guest
+
+rectangle "Sistem Monitoring Banjir" {
+  usecase "Login /auth/login" as UC_Login
+  usecase "View Dashboard Admin" as UC_DashboardAdmin
+  usecase "View Dashboard Tamu" as UC_DashboardGuest
+
+  usecase "Backup ke Hadoop" as UC_BackupHadoop
+  usecase "Download History CSV" as UC_DownloadCSV
+  usecase "View History Logs Rain" as UC_HistoryRain
+  usecase "List Hadoop Backup" as UC_ListBackup
+}
+
+Admin --> UC_Login
+Admin --> UC_DashboardAdmin
+Admin --> UC_DashboardGuest
+Admin --> UC_BackupHadoop
+Admin --> UC_DownloadCSV
+Admin --> UC_HistoryRain
+Admin --> UC_ListBackup
+
+Guest --> UC_DashboardGuest
+
+UC_Login ..> UC_DashboardAdmin : <<include>>
+UC_DashboardAdmin ..> UC_BackupHadoop : <<include>>
+UC_DashboardAdmin ..> UC_DownloadCSV : <<include>>
+UC_DashboardAdmin ..> UC_HistoryRain : <<include>>
+UC_DashboardAdmin ..> UC_ListBackup : <<include>>
+
+UC_ListBackup ..> UC_BackupHadoop : <<include>>
+
+@enduml

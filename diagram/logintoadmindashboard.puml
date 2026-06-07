@@ -1,0 +1,51 @@
+@startuml
+title Activity Diagram Login ke Admin Dashboard
+
+|Admin User|
+start
+:Membuka halaman website;
+:Memilih menu Login;
+
+|Sistem|
+:Menampilkan halaman login;
+
+|Admin User|
+:Memasukkan email;
+:Memasukkan password;
+:Menekan tombol Login;
+
+|Sistem|
+:Memvalidasi email dan password;
+
+if (Email dan password valid?) then (Ya)
+  :Membuat sesi login admin;
+  :Mengarahkan ke Admin Dashboard;
+
+  |Admin User|
+  :Melihat halaman Admin Dashboard;
+  stop
+
+else (Tidak)
+  :Menampilkan pesan error login;
+
+  |Admin User|
+  :Memasukkan ulang email dan password;
+  :Menekan tombol Login;
+
+  |Sistem|
+  :Memvalidasi ulang email dan password;
+
+  if (Email dan password valid?) then (Ya)
+    :Membuat sesi login admin;
+    :Mengarahkan ke Admin Dashboard;
+
+    |Admin User|
+    :Melihat halaman Admin Dashboard;
+    stop
+  else (Tidak)
+    :Menampilkan pesan error login;
+    stop
+  endif
+endif
+
+@enduml
