@@ -1,21 +1,19 @@
 "use client";
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   ComposedChart,
   Legend,
   Line,
-  LineChart,
-  Pie,
-  PieChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { AceUICardMetric } from "@/component/card/AceUICardStats";
+import AceUICardStats from "@/component/card/AceUICardStats";
+import { AceUILineChart, AceUIBarChart, AceUIComposedChart, AceUIPieChart } from "@/component/card/AceUICardChart";
+import AceUICardChart from "@/component/card/AceUICardChart";
 
 // Types
 export interface SensorReading {
@@ -109,140 +107,74 @@ export const ANALYSIS_META: Record<
 };
 
 // Chart components
-function TrenKetinggianAir({ data }: { data: SensorReading[] }) {
+function TrenKetinggianAir({
+  data, meta, onClose
+}: {
+  data: SensorReading[]; meta: any; onClose?: () => void;
+}) {
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <LineChart data={data} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-        <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-        <YAxis tick={{ fontSize: 11 }} unit=" cm" domain={["auto", "auto"]} />
-        <Tooltip
-          contentStyle={tooltipStyle}
-          formatter={(v: unknown) => [`${Number(v)} cm`, "Tinggi Air"]}
-        />
-        <Legend />
-        <ReferenceLine y={85} stroke="#f59e0b" strokeDasharray="4 4" />
-        <ReferenceLine y={120} stroke="#ef4444" strokeDasharray="4 4" />
-        <Line
-          type="monotone"
-          dataKey="water_level"
-          name="Tinggi Air (cm)"
-          stroke={C_WATER}
-          strokeWidth={2.5}
-          dot={false}
-          activeDot={{ r: 5 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <AceUILineChart
+      title="Tren Ketinggian Air"
+      icon={meta.icon}
+      description={meta.deskripsi}
+      onClose={onClose}
+      data={data}
+      lines={[
+        {
+          dataKey: "water_level",
+          name: "Tinggi Air (cm)",
+          color: "#3b82f6",
+        },
+      ]}
+    />
   );
 }
 
-function TrenIntensitasHujan({ data }: { data: SensorReading[] }) {
+function TrenIntensitasHujan({
+  data, meta, onClose
+}: {
+  data: SensorReading[]; meta: any; onClose?: () => void;
+}) {
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <LineChart data={data} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-        <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-        <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
-        <Tooltip
-          contentStyle={tooltipStyle}
-          formatter={(v: unknown) => [`${Number(v)}%`, "Intensitas Hujan"]}
-        />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="rain_sensor"
-          name="Intensitas Hujan (%)"
-          stroke={C_RAIN}
-          strokeWidth={2.5}
-          dot={false}
-          activeDot={{ r: 5 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <AceUILineChart
+      title="Tren Intensitas Hujan"
+      icon={meta.icon}
+      description={meta.deskripsi}
+      onClose={onClose}
+      data={data}
+      lines={[
+        {
+          dataKey: "rain_sensor",
+          name: "Intensitas Hujan (%)",
+          color: "#6fb3c1",
+        },
+      ]}
+    />
   );
 }
 
-function KorelasiHujanAir({ data }: { data: SensorReading[] }) {
+function KorelasiHujanAir({
+  data, meta, onClose
+}: {
+  data: SensorReading[]; meta: any; onClose?: () => void;
+}) {
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <ComposedChart data={data} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-        <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-        <YAxis
-          yAxisId="left"
-          tick={{ fontSize: 11 }}
-          unit=" cm"
-          domain={["auto", "auto"]}
-        />
-        <YAxis
-          yAxisId="right"
-          orientation="right"
-          tick={{ fontSize: 11 }}
-          unit="%"
-          domain={[0, 100]}
-        />
-        <Tooltip contentStyle={tooltipStyle} />
-        <Legend />
-        <Line
-          yAxisId="left"
-          type="monotone"
-          dataKey="water_level"
-          name="Tinggi Air (cm)"
-          stroke={C_WATER}
-          strokeWidth={2.5}
-          dot={false}
-        />
-        <Line
-          yAxisId="right"
-          type="monotone"
-          dataKey="rain_sensor"
-          name="Intensitas Hujan (%)"
-          stroke="#8b5cf6"
-          strokeWidth={2.5}
-          dot={false}
-        />
-      </ComposedChart>
-    </ResponsiveContainer>
+    <AceUIComposedChart title="Korelasi Hujan dan Tinggi Air" icon={meta.icon} description={meta.deskripsi} onClose={onClose} data={data} />
   );
 }
 
-function AnalisisKecepatanKenaikanAir({ data }: { data: SensorReading[] }) {
+function AnalisisKecepatanKenaikanAir({
+  data, meta, onClose
+}: {
+  data: SensorReading[]; meta: any; onClose?: () => void;
+}) {
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <BarChart data={data} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-        <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-        <YAxis tick={{ fontSize: 11 }} unit=" cm/h" />
-        <Tooltip
-          contentStyle={tooltipStyle}
-          formatter={(v: unknown) => [`${Number(v)} cm/h`, "Kecepatan Kenaikan"]}
-        />
-        <ReferenceLine y={0} stroke="#94a3b8" />
-        <Bar
-          dataKey="delta_water"
-          name="Kecepatan Kenaikan (cm/h)"
-          radius={[3, 3, 0, 0]}
-        >
-          {data.map((entry, idx) => (
-            <Cell
-              key={idx}
-              fill={
-                entry.delta_water > 5
-                  ? "#ef4444"
-                  : entry.delta_water > 0
-                  ? "#f59e0b"
-                  : "#22c55e"
-              }
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <AceUIBarChart title="Kecepatan Kenaikan Air" icon={meta.icon} description={meta.deskripsi} onClose={onClose} data={data}
+    />
   );
 }
 
-function StatistikHarian({ data }: { data: SensorReading[] }) {
+function StatistikHarian({ data, meta, onClose }: { data: SensorReading[]; meta: any; onClose?: () => void }) {
   const wl = data.map((d) => d.water_level);
   const rain = data.map((d) => d.rain_sensor);
 
@@ -272,108 +204,62 @@ function StatistikHarian({ data }: { data: SensorReading[] }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 py-2">
-      {stats.map((s) => (
-        <div
-          key={s.label}
-          className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm"
-        >
-          <div
-            className="px-5 py-3 text-sm font-semibold text-white"
-            style={{ backgroundColor: s.color }}
-          >
-            {s.label}
-          </div>
-          <div style={{ backgroundColor: s.bg }}>
-            {[
-              { key: "Minimum", val: s.min, icon: "↓", cls: "text-blue-500" },
-              { key: "Maksimum", val: s.max, icon: "↑", cls: "text-red-500" },
-              { key: "Rata-rata", val: s.avg, icon: "≈", cls: "text-slate-500" },
-            ].map(({ key, val, icon, cls }) => (
-              <div
-                key={key}
-                className="flex items-center justify-between px-5 py-3 border-b border-slate-100 last:border-0"
-              >
-                <div className="flex items-center gap-2">
-                  <span className={`font-bold text-base ${cls}`}>{icon}</span>
-                  <span className="text-sm text-slate-500">{key}</span>
-                </div>
-                <span className="font-semibold text-slate-800 text-sm">
-                  {val}{" "}
-                  <span className="text-slate-400 font-normal">{s.unit}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
+    <AceUICardChart title="Statistik Harian" icon={meta.icon} description={meta.deskripsi} onClose={onClose}>
+      <div className="grid md:grid-cols-2 gap-4">
+        <AceUICardStats
+          title="Tinggi Air"
+          stats={[
+            { label: "Minimum", value: Math.min(...wl), unit: "cm", color: "#3b82f6" },
+            { label: "Maksimum", value: Math.max(...wl), unit: "cm", color: "#ef4444" },
+            { label: "Rata-rata", value: Math.round(wl.reduce((a, b) => a + b, 0) / wl.length), unit: "cm", color: "#64748b" },
+          ]}
+        />
+        <AceUICardStats
+          title="Intensitas Hujan"
+          stats={[
+            { label: "Minimum", value: Math.min(...rain), unit: "%", color: "#3b82f6" },
+            { label: "Maksimum", value: Math.max(...rain), unit: "%", color: "#ef4444" },
+            { label: "Rata-rata", value: Math.round(rain.reduce((a, b) => a + b, 0) / rain.length), unit: "%", color: "#64748b" },
+          ]}
+        />
+      </div>
+    </AceUICardChart>
   );
 }
 
-function FrekuensiStatusAlarm({ data }: { data: SensorReading[] }) {
+function FrekuensiStatusAlarm({ data, meta, onClose }: { data: SensorReading[]; meta: any; onClose?: () => void }) {
   const counts = { Aman: 0, Waspada: 0, Bahaya: 0 };
   data.forEach((d) => {
     counts[d.status]++;
   });
 
-  const pieData = (
-    ["Aman", "Waspada", "Bahaya"] as Array<"Aman" | "Waspada" | "Bahaya">
-  )
-    .map((k) => ({ name: k, value: counts[k] }))
-    .filter((d) => d.value > 0);
+  const pieData = [
+    {
+      name: "Aman",
+      value: counts.Aman,
+      color: "#22c55e",
+    },
+    {
+      name: "Waspada",
+      value: counts.Waspada,
+      color: "#f59e0b",
+    },
+    {
+      name: "Bahaya",
+      value: counts.Bahaya,
+      color: "#ef4444",
+    },
+  ].filter((d) => d.value > 0);
 
   return (
-    <div className="flex flex-col md:flex-row items-center gap-8 py-4">
-      <ResponsiveContainer width={260} height={260}>
-        <PieChart>
-          <Pie
-            data={pieData}
-            cx="50%"
-            cy="50%"
-            innerRadius={68}
-            outerRadius={108}
-            paddingAngle={3}
-            dataKey="value"
-          >
-            {pieData.map((entry, idx) => (
-              <Cell key={idx} fill={PIE_COLORS[entry.name]} />
-            ))}
-          </Pie>
-          <Tooltip contentStyle={tooltipStyle} />
-        </PieChart>
-      </ResponsiveContainer>
-
-      <div className="flex flex-col gap-4 flex-1">
-        {pieData.map((d) => (
-          <div key={d.name} className="flex items-center gap-3">
-            <span
-              className="w-3 h-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: PIE_COLORS[d.name] }}
-            />
-            <span className="text-sm text-slate-600 w-20">{d.name}</span>
-            <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${((d.value / data.length) * 100).toFixed(1)}%`,
-                  backgroundColor: PIE_COLORS[d.name],
-                }}
-              />
-            </div>
-            <span className="text-sm font-semibold text-slate-800 w-8 text-right">
-              {d.value}
-            </span>
-            <span className="text-xs text-slate-400 w-10">
-              {((d.value / data.length) * 100).toFixed(0)}%
-            </span>
-          </div>
-        ))}
-        <p className="text-xs text-slate-400 mt-1">
-          Total pembacaan: {data.length} data point
-        </p>
-      </div>
-    </div>
+    <AceUIPieChart
+      title="Frekuensi Status Alarm"
+      icon={meta.icon}
+      description={meta.deskripsi}
+      onClose={onClose}
+      data={pieData}
+      total={data.length}
+    />
   );
 }
 
@@ -405,7 +291,7 @@ function generateForecastLabel(baseDate: Date, stepMinutes: number): string {
   return `${hh}:${mm} ▸`;
 }
 
-function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
+function PrediksiKenaikanAir({ data, meta, onClose }: { data: SensorReading[]; meta: any; onClose?: () => void }) {
   // Gunakan semua data yang tersedia, minimal 5 titik untuk regresi
   const ACTUAL_POINTS = Math.min(data.length, 20);
   const FORECAST_STEPS = 6;
@@ -458,49 +344,31 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
   const lastActual = wlValues[wlValues.length - 1] ?? 0;
 
   return (
-    <div className="bg-white">
-      {/* Info bar */}
-      <div className="flex flex-wrap items-center gap-4 mb-4 text-xs text-slate-500">
-        <div className="flex items-center gap-1.5">
-          <span className="w-8 h-0.5 bg-blue-500 inline-block rounded" />
-          <span>Data aktual ({ACTUAL_POINTS} titik)</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-8 h-0.5 bg-rose-400 inline-block rounded border-dashed border border-rose-400" />
-          <span>Prediksi ({FORECAST_STEPS} menit ke depan)</span>
-        </div>
-        <span className="ml-auto">
-          Tren:{" "}
-          <span className={`font-medium ${trendDisplay > 0 ? "text-red-500" : trendDisplay < 0 ? "text-green-500" : "text-slate-500"}`}>
-            {trendDisplay > 0 ? `+${trendDisplay}` : trendDisplay} cm/interval
-          </span>
-        </span>
-      </div>
-
+    <AceUICardChart title="Prediksi Kenaikan Air" icon={meta.icon} description={meta.deskripsi} onClose={onClose}>
       {/* Statistik ringkas */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="rounded-xl border border-slate-200 px-4 py-3 text-center">
-          <p className="text-xs text-slate-400 mb-1">Tinggi Air Saat Ini</p>
-          <p className="text-lg font-bold text-blue-600">{lastActual} cm</p>
-        </div>
-        <div className="rounded-xl border border-slate-200 px-4 py-3 text-center">
-          <p className="text-xs text-slate-400 mb-1">Prediksi +{FORECAST_STEPS} menit</p>
-          <p className={`text-lg font-bold ${lastForecast > lastActual ? "text-rose-500" : "text-emerald-500"}`}>
-            {lastForecast} cm
-          </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 px-4 py-3 text-center">
-          <p className="text-xs text-slate-400 mb-1">Rata-rata Hujan</p>
-          <p className="text-lg font-bold text-slate-700">{avgRain}</p>
-        </div>
+      <div className="grid md:grid-cols-3 gap-4 mb-4">
+        <AceUICardMetric title="Tinggi Air Saat Ini" value={lastActual} unit="cm" />
+        <AceUICardMetric title={`Prediksi +${FORECAST_STEPS} Menit`} value={lastForecast} unit="cm" />
+        <AceUICardMetric title="Rata-rata Hujan" value={avgRain} unit="%" />
       </div>
-
       <ResponsiveContainer width="100%" height={320}>
         <ComposedChart data={combined} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={Math.max(1, Math.floor(combined.length / 10))} />
-          <YAxis tick={{ fontSize: 11 }} unit=" cm" domain={["auto", "auto"]} />
-          <Tooltip contentStyle={tooltipStyle} />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-secondary)" opacity={0.35}/>
+          <XAxis dataKey="time" axisLine={false} tickLine={false}
+            tick={{fontSize: 12, fill: "var(--color-text)", opacity: 0.82,}}
+            interval={Math.max(1, Math.floor(combined.length / 10))} dy={10}
+          />
+          <YAxis tick={{ fontSize: 11 }} unit=" cm" domain={["auto", "auto"]}/>
+          <Tooltip
+            contentStyle={{
+              borderRadius: "8px",
+              border: "1px solid var(--color-secondary)",
+              boxShadow: "0 10px 25px -5px rgb(0 0 0 / 0.35)",
+              backgroundColor: "var(--color-background)",
+              color: "var(--color-text)",
+            }}
+            labelStyle={{ color: "var(--color-text)", fontWeight: 700,}}
+          />
           <Legend />
           <ReferenceLine
             x={actualSlice[actualSlice.length - 1]?.time}
@@ -512,7 +380,7 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
             type="monotone"
             dataKey="water_level"
             name="Tinggi Air Aktual (cm)"
-            stroke={C_WATER}
+            stroke="var(--color-accent)"
             strokeWidth={2.5}
             dot={false}
             connectNulls={false}
@@ -529,12 +397,11 @@ function PrediksiKenaikanAir({ data }: { data: SensorReading[] }) {
           />
         </ComposedChart>
       </ResponsiveContainer>
-
       <p className="mt-3 text-xs text-slate-400 text-center">
         Prediksi menggunakan regresi linear dari {ACTUAL_POINTS} data aktual terakhir.
         Akurasi meningkat seiring bertambahnya data.
       </p>
-    </div>
+    </AceUICardChart>
   );
 }
 
@@ -581,87 +448,27 @@ export default function AnalysisPanel({
   const renderChart = () => {
     switch (selectedAnalysis) {
       case "Tren Ketinggian Air":
-        return <TrenKetinggianAir data={data} />;
+        return <TrenKetinggianAir data={data} meta={meta} onClose={onClose} />;
       case "Tren Intensitas Hujan":
-        return <TrenIntensitasHujan data={data} />;
+        return <TrenIntensitasHujan data={data} meta={meta} onClose={onClose} />;
       case "Korelasi Hujan dan Tinggi Air":
-        return <KorelasiHujanAir data={data} />;
+        return <KorelasiHujanAir data={data} meta={meta} onClose={onClose} />;
       case "Analisis Kecepatan Kenaikan Air":
-        return <AnalisisKecepatanKenaikanAir data={data} />;
+        return <AnalisisKecepatanKenaikanAir data={data} meta={meta} onClose={onClose} />;
       case "Statistik Harian":
-        return <StatistikHarian data={data} />;
+        return <StatistikHarian data={data} meta={meta} onClose={onClose} />;
       case "Frekuensi Status Alarm":
-        return <FrekuensiStatusAlarm data={data} />;
+        return <FrekuensiStatusAlarm data={data} meta={meta} onClose={onClose} />;
       case "Prediksi Kenaikan Air":
-        return <PrediksiKenaikanAir data={data} />;
+        return <PrediksiKenaikanAir data={data} meta={meta} onClose={onClose} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
-      {/* Panel header */}
-      <div
-        className="flex items-start justify-between px-6 py-4 border-b border-slate-100"
-        style={{ borderLeftColor: meta.colorAccent, borderLeftWidth: 4 }}
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{meta.icon}</span>
-          <div>
-            <h3 className="text-base font-semibold text-slate-800 leading-tight">
-              {selectedAnalysis}
-            </h3>
-            <p className="text-sm text-slate-500 mt-0.5">{meta.deskripsi}</p>
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          className="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100 flex-shrink-0"
-          title="Tutup analisis"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Data info bar */}
-      <div className="flex flex-wrap items-center gap-2 px-6 py-3 bg-white border-b border-slate-100">
-        <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">
-          Data:
-        </span>
-        {meta.dataDigunakan.map((d) => (
-          <span
-            key={d}
-            className="px-2.5 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 text-slate-600 shadow-sm"
-          >
-            {d}
-          </span>
-        ))}
-        <span className="ml-auto text-xs text-slate-400">
-          Visualisasi:{" "}
-          <span
-            className="font-semibold"
-            style={{ color: meta.colorAccent }}
-          >
-            {meta.visualisasi}
-          </span>
-        </span>
-      </div>
-
-      {/* Chart / Table area */}
-      <div className="p-6">{renderChart()}</div>
+    <div className="mt-5">
+      {renderChart()}
     </div>
   );
 }
