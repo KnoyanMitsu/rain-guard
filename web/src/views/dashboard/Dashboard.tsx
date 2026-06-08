@@ -22,7 +22,7 @@ export type Tbody = {
   rain?: number | string;
   status_rain?: string;
   buzzer?: string;
-  status?: string; // Untuk badge warna
+  status?: string;
   update_terakhir?: string;
   [key: string]: any;
 };
@@ -41,32 +41,191 @@ type Data = {
   tbody: Tbody[];
   graph: GraphData[];
   devices: DeviceData[];
-  latestWsData?: Tbody; // Menambahkan properti khusus untuk menerima data realtime dari WebSocket
-  lokasi?: string; // Dinamis dari konfigurasi Firebase
+  latestWsData?: Tbody;
+  lokasi?: string;
 };
+
+const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
 
 function formatDistance(value: number | string | undefined) {
   const numericValue = Number(String(value ?? 0).replace(" cm", ""));
-
-  if (Number.isNaN(numericValue)) {
-    return "0";
-  }
-
+  if (Number.isNaN(numericValue)) return "0";
   return numericValue.toFixed(2);
 }
 
-function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
-  const maxPoints = Math.ceil((durationMinutes * 60) / 10); // 10 detik per titik
-  // Jika data lebih sedikit dari yang dibutuhkan, tampilkan semua data
-  if (graphData.length <= maxPoints) {
-    return graphData;
-  }
+export function getFilteredGraphData(graphData: GraphData[], durationMinutes: number) {
+  const maxPoints = Math.ceil((durationMinutes * 60) / 10);
+  if (graphData.length <= maxPoints) return graphData;
   return graphData.slice(-maxPoints);
 }
 
+function getWaterStatus(distance: number) {
+  if (distance > 10) return "Bahaya";
+  if (distance >= 5) return "Waspada";
+  return "Aman";
+}
+
+// ── SHARED COMPONENTS ──
+
+export function DashboardCards({
+  latestData,
+  isBuzzerActive,
+}: {
+  latestData: Tbody;
+  isBuzzerActive: boolean;
+}) {
+  const MAX_DISTANCE = 10;
+  const MAX_RAIN = 4095;
+  const rawDistance = parseFloat(String(latestData.distance ?? 0)) || 0;
+  const rawRain = parseInt(String(latestData.rain ?? 0)) || 0;
+  const safeDistance = Math.max(0, rawDistance);
+  const safeRain = Math.max(0, rawRain);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <AceUICardStatus
+        className="bg-white border border-gray-100 shadow-sm"
+        title="Tinggi Air"
+        value={safeDistance.toString()}
+        description={`Batas: ${MAX_DISTANCE} cm`}
+        icon={<Droplets />}
+        color="primary"
+        unit="cm"
+      />
+      <AceUICardStatus
+        className="bg-white border border-gray-100 shadow-sm"
+        title="Nilai Sensor Hujan"
+        value={safeRain.toString()}
+        description={`Batas: ${MAX_RAIN} raw`}
+        icon={<Cloud />}
+        color="yellow"
+        unit="raw"
+      />
+      <AceUICardStatus
+        className="bg-white border border-gray-100 shadow-sm"
+        title="Status Hujan"
+        value={latestData.status_rain || "-"}
+        icon={<CloudRain />}
+        color={latestData.status_rain === "Ya" ? "red" : "green"}
+      />
+      <AceUICardStatus
+        className="bg-white border border-gray-100 shadow-sm"
+        title="Status Alarm"
+        value={latestData.buzzer || "-"}
+        icon={<Bell />}
+        color={isBuzzerActive ? "red" : "green"}
+      />
+    </div>
+  );
+}
+
+export function DashboardGraph({
+  graphDuration,
+  setGraphDuration,
+  filteredGraphData,
+}: {
+  graphDuration: number;
+  setGraphDuration: (val: number) => void;
+  filteredGraphData: GraphData[];
+}) {
+  const options = [
+    { title: "10 menit terakhir", value: 10 },
+    { title: "30 menit terakhir", value: 30 },
+    { title: "1 jam terakhir", value: 60 },
+    { title: "4 jam terakhir", value: 240 },
+    { title: "24 jam terakhir", value: 1440 },
+  ];
+
+  return (
+    <div className="w-full bg-white border border-secondary shadow-sm rounded-2xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold text-text">Grafik Monitoring Tinggi Air (Real-time)</h3>
+        <div className="relative">
+          <AceUIDropdown
+            title={options.find((d) => d.value === graphDuration)?.title ?? "Pilih durasi"}
+            actions={options.map((opt) => ({
+              title: opt.title,
+              onClick: () => setGraphDuration(opt.value),
+            }))}
+          />
+        </div>
+      </div>
+      <AceUICardGraphs
+        className="bg-white border border-gray-100 shadow-sm"
+        data={filteredGraphData}
+        start={0}
+        end={10}
+        dataKey="tinggiAir"
+        titlelegend="Tinggi Air (cm)"
+        title=""
+      />
+    </div>
+  );
+}
+
+export function DashboardTable({
+  thead,
+  tbody,
+}: {
+  thead: Thead[];
+  tbody: Tbody[];
+}) {
+  return (
+    <div className={`${panelClass} p-6`}>
+      <h2 className="text-xl font-bold text-text mb-4">Riwayat Pengamatan</h2>
+      <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-secondary/20 text-text">
+            <tr>
+              {thead.map((h, i) => (
+                <th key={i} className="text-left px-5 py-4 font-semibold uppercase tracking-wider text-xs">
+                  {h.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {tbody.slice(0, 10).map((row, i) => {
+              const distanceValue = Number(String(row.distance ?? row.tinggi_air ?? 0).replace(" cm", ""));
+              const statusValue = getWaterStatus(distanceValue);
+              return (
+                <tr key={i} className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors">
+                  <td className="px-5 py-4 font-semibold text-black">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
+                  <td className="px-5 py-4 font-semibold text-black">{row.curah_hujan || row.rain}</td>
+                  <td className="px-5 py-4">
+                    <StatusBadge status={statusValue} />
+                  </td>
+                  <td className="px-5 py-4 font-semibold text-black">{row.update_terakhir}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── STATUS BADGE ──
+
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    Aman: "bg-emerald-100 text-emerald-900 border-emerald-400",
+    Waspada: "bg-amber-100 text-amber-900 border-amber-400",
+    Bahaya: "bg-rose-100 text-rose-900 border-rose-400",
+  };
+  return (
+    <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold tracking-wide shadow-sm ${styles[status] ?? "bg-secondary/10 text-text border-secondary"}`}>
+      {status}
+    </span>
+  );
+}
+
+// ── MAIN DASHBOARD ──
+
 function Dashboard(data: Data) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [graphDuration, setGraphDuration] = useSessionStorage<number>("graphDuration", 60); // Default: 1 hour
+  const [graphDuration, setGraphDuration] = useSessionStorage<number>("graphDuration", 60);
   const [backupStatus, setBackupStatus] = useState<BackupStatus>("idle");
   const [backupInfo, setBackupInfo] = useState<BackupInfo>({});
   const [selectedDeviceId, setSelectedDeviceId] = useSessionStorage<string>(
@@ -104,37 +263,19 @@ function Dashboard(data: Data) {
     }
   }
 
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(data.tbody.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = data.tbody.slice(startIndex, startIndex + itemsPerPage);
-
-  // Memprioritaskan data dari WebSocket untuk 4 kartu status di atas
-  // Jika latestWsData kosong/belum masuk, akan *fallback* menggunakan index 0 dari tbody
   const latestData: Tbody = data.latestWsData || data.tbody[0] || {};
   const isBuzzerActive = latestData.buzzer?.trim().toLowerCase() === "aktif";
   const filteredGraphData = getFilteredGraphData(data.graph, graphDuration);
-  // Batas Maksimum untuk normalisasi nilai
-  const MAX_DISTANCE = 10; // cm
-  const MAX_RAIN = 4095;   // raw
-  // Proteksi nilai minus
-  const rawDistance = parseFloat(String(latestData.distance ?? 0)) || 0;
-  const rawRain = parseInt(String(latestData.rain ?? 0)) || 0;
 
-  const safeDistance = Math.max(0, rawDistance);
-  const safeRain = Math.max(0, rawRain);
-
-  const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
   return (
     <div className="flex flex-col gap-6">
-      {/* INFO LOKASI */}
       <AceUILocationHeader
         devices={data.devices}
         selectedDevice={selectedDeviceId}
         onDeviceChange={(newId) => setSelectedDeviceId(newId)}
         city={data.lokasi || "Malang"}
       />
-      {/* TOAST NOTIFIKASI BACKUP */}
+
       {backupStatus !== "idle" && (
         <div
           className={`fixed top-4 right-4 z-50 w-80 rounded-2xl border px-4 py-4 shadow-xl transition-all
@@ -143,31 +284,17 @@ function Dashboard(data: Data) {
             ${backupStatus === "error" ? "border-rose-200 bg-rose-50 text-rose-900" : ""}`}
         >
           <div className="flex items-start gap-3">
-            {backupStatus === "loading" && (
-              <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-blue-600" />
-            )}
-            {backupStatus === "success" && (
-              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-            )}
-            {backupStatus === "error" && (
-              <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
-            )}
+            {backupStatus === "loading" && <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-blue-600" />}
+            {backupStatus === "success" && <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />}
+            {backupStatus === "error" && <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />}
             <div className="min-w-0 flex-1">
-              {backupStatus === "loading" && (
-                <p className="text-sm font-semibold">Sedang melakukan backup...</p>
-              )}
+              {backupStatus === "loading" && <p className="text-sm font-semibold">Sedang melakukan backup...</p>}
               {backupStatus === "success" && (
                 <>
                   <p className="text-sm font-semibold">Backup berhasil!</p>
-                  <p className="mt-1 break-all text-xs text-emerald-700">
-                    File: {backupInfo.fileName}
-                  </p>
-                  <p className="break-all text-xs text-emerald-600">
-                    HDFS: {backupInfo.hdfsPath}
-                  </p>
-                  <p className="text-xs text-emerald-600">
-                    {backupInfo.recordCount} record tersimpan
-                  </p>
+                  <p className="mt-1 break-all text-xs text-emerald-700">File: {backupInfo.fileName}</p>
+                  <p className="break-all text-xs text-emerald-600">HDFS: {backupInfo.hdfsPath}</p>
+                  <p className="text-xs text-emerald-600">{backupInfo.recordCount} record tersimpan</p>
                 </>
               )}
               {backupStatus === "error" && (
@@ -187,101 +314,14 @@ function Dashboard(data: Data) {
         message="Status alarm sedang aktif. (Banner ini akan tetap tampil sampai alarm kembali non-aktif)"
       />
 
-      {/* SECTION: CARD STATUS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AceUICardStatus
-          className="bg-white border border-gray-100 shadow-sm"
-          title="Tinggi Air"
-          value={safeDistance.toString()}
-          description={`Batas: ${MAX_DISTANCE} cm`} 
-          icon={<Droplets />}
-          color="primary"
-          unit="cm"
-        />
+      <DashboardCards latestData={latestData} isBuzzerActive={isBuzzerActive} />
 
-        <AceUICardStatus
-          className="bg-white border border-gray-100 shadow-sm"
-          title="Nilai Sensor Hujan"
-          value={safeRain.toString()}
-          description={`Batas: ${MAX_RAIN} raw`} 
-          icon={<Cloud />}
-          color="yellow"
-          unit="raw"
-        />
+      <DashboardGraph
+        graphDuration={graphDuration}
+        setGraphDuration={setGraphDuration}
+        filteredGraphData={filteredGraphData}
+      />
 
-        <AceUICardStatus
-          className="bg-white border border-gray-100 shadow-sm"
-          title="Status Hujan"
-          value={latestData.status_rain || "-"}
-          icon={<CloudRain />}
-          color={latestData.status_rain === "Ya" ? "red" : "green"}
-        />
-
-        <AceUICardStatus
-          className="bg-white border border-gray-100 shadow-sm"
-          title="Status Alarm"
-          value={latestData.buzzer || "-"}
-          icon={<Bell />}
-          color={isBuzzerActive ? "red" : "green"}
-        />
-      </div>
-
-      {/* SECTION: GRAFIK */}
-      <div className="w-full bg-white border border-secondary shadow-sm rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-text">
-            Grafik Monitoring Tinggi Air (Real-time)
-          </h3>
-
-          {/* DROPDOWN DURATION */}
-          <div className="relative">
-            <AceUIDropdown
-              title={
-                [
-                  { title: "10 menit terakhir", value: 10 },
-                  { title: "30 menit terakhir", value: 30 },
-                  { title: "1 jam terakhir", value: 60 },
-                  { title: "4 jam terakhir", value: 240 },
-                  { title: "24 jam terakhir", value: 1440 },
-                ].find((d) => d.value === graphDuration)?.title ?? "Pilih durasi"
-              }
-              actions={[
-                {
-                  title: "10 menit terakhir",
-                  onClick: () => setGraphDuration(10),
-                },
-                {
-                  title: "30 menit terakhir",
-                  onClick: () => setGraphDuration(30),
-                },
-                {
-                  title: "1 jam terakhir",
-                  onClick: () => setGraphDuration(60),
-                },
-                {
-                  title: "4 jam terakhir",
-                  onClick: () => setGraphDuration(240),
-                },
-                {
-                  title: "24 jam terakhir",
-                  onClick: () => setGraphDuration(1440),
-                },
-              ]}
-            />
-          </div>
-        </div>
-        <AceUICardGraphs
-          className="bg-white border border-gray-100 shadow-sm"
-          data={filteredGraphData}
-          start={0}
-          end={10}
-          dataKey="tinggiAir"
-          titlelegend="Tinggi Air (cm)"
-          title=""
-        />
-      </div>
-
-      {/* SECTION: HADOOP BACKUP */}
       <div className={`${panelClass} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -289,7 +329,6 @@ function Dashboard(data: Data) {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text">Backup ke Hadoop HDFS</h3>
-            
           </div>
         </div>
         <button
@@ -311,129 +350,8 @@ function Dashboard(data: Data) {
         </button>
       </div>
 
-      {/* SECTION: CUSTOM TABLE (SAMA DENGAN HISTORY) */}
-      <div className={`${panelClass} p-6`}>
-        <h2 className="text-xl font-bold text-text mb-4">Riwayat Pengamatan</h2>
-        <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">
-          <table className="w-full border-collapse text-sm">
-            <thead className="bg-secondary/20 text-text">
-              <tr>
-                {data.thead.map((h, i) => (
-                  <th
-                    key={i}
-                    className="
-                  text-left
-                  px-5 py-4
-                  font-semibold
-                  uppercase
-                  tracking-wider
-                  text-xs
-                "
-                  >
-                    {h.title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.map((row, i) => {
-                const distanceValue = Number(
-                  String(row.distance ?? row.tinggi_air ?? 0).replace(" cm", "")
-                );
-
-                const statusValue =
-                  distanceValue > 10
-                    ? "Bahaya"
-                    : distanceValue >= 5
-                      ? "Waspada"
-                      : "Aman";
-
-                return (
-                  <tr
-                    key={i}
-                    className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors"
-                  >
-                    {/* Tambahkan font-bold dan text-black di bawah ini */}
-                    <td className="px-5 py-4 font-semibold text-black">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
-                    <td className="px-5 py-4 font-semibold text-black">{row.curah_hujan || row.rain}</td>
-                    <td className="px-5 py-4">
-                      <StatusBadge status={statusValue} />
-                    </td>
-                    <td className="px-5 py-4 font-semibold text-black">{row.update_terakhir}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* PAGINATION BUTTONS */}
-        {/* <div className="flex justify-end mt-5 gap-2">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg border transition-all
-              ${currentPage === 1 ? "text-text/40 bg-background/50 cursor-not-allowed border-secondary/10" : "text-text bg-secondary/20 hover:bg-secondary/30 border-secondary"}`}
-          >
-            Sebelumnya
-          </button>
-
-          {(() => {
-            const maxVisible = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-
-            if (endPage - startPage + 1 < maxVisible) {
-              startPage = Math.max(1, endPage - maxVisible + 1);
-            }
-
-            const pages = [];
-            for (let i = startPage; i <= endPage; i++) {
-              pages.push(i);
-            }
-
-            return (
-              <>
-                {startPage > 1 && <span className="px-2 text-gray-500 self-end mb-2">...</span>}
-                {pages.map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setCurrentPage(n)}
-                    className={`px-4 py-2 rounded-lg border transition-all
-                      ${n === currentPage ? "bg-primary text-background font-semibold border-primary shadow-md shadow-primary/20" : "text-text bg-background/60 hover:bg-secondary/20 border-secondary"}`}
-                  >
-                    {n}
-                  </button>
-                ))}
-                {endPage < totalPages && <span className="px-2 text-text/50 self-end mb-2">...</span>}
-              </>
-            );
-          })()}
-
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg border transition-all
-              ${currentPage === totalPages ? "text-text/40 bg-background/50 cursor-not-allowed border-secondary/10" : "text-text bg-secondary/20 hover:bg-secondary/30 border-secondary"}`}
-          >
-            Selanjutnya
-          </button>
-        </div> */}
-      </div>
+      <DashboardTable thead={data.thead} tbody={data.tbody} />
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    Aman: "bg-emerald-100 text-emerald-900 border-emerald-400",
-    Waspada: "bg-amber-100 text-amber-900 border-amber-400",
-    Bahaya: "bg-rose-100 text-rose-900 border-rose-400",
-  };
-  return (
-    <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold tracking-wide shadow-sm ${styles[status] ?? "bg-secondary/10 text-text border-secondary"}`}>
-      {status}
-    </span>
   );
 }
 
