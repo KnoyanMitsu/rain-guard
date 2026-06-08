@@ -58,18 +58,18 @@ export default function LandingPage() {
               <Image src={LogoRainGuard} alt="Logo" layout="fill" objectFit="contain" />
             </div>
             <span className="text-xl font-bold tracking-tight text-slate-900">
-              Rain<span className="text-blue-600 font-extrabold">Guard</span>
+              Rain<span className="text-primary font-extrabold">Guard</span>
             </span>
           </div>
           
           <div className="flex items-center gap-4">
             <Link href="/guest">
-              <span className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors duration-200 cursor-pointer hidden sm:block">
+                <span className="text-sm font-semibold text-slate-500 hover:text-primary transition-colors duration-200 cursor-pointer hidden sm:block">
                 Dasbor Publik
               </span>
             </Link>
             <Link href="/auth/login">
-              <button className="text-xs font-bold text-white bg-slate-800 hover:bg-blue-600 px-5 py-2.5 rounded-lg transition-all duration-300 shadow-sm hover:shadow-blue-600/30 active:scale-95">
+              <button className="text-xs font-bold text-white bg-slate-800 hover:bg-primary px-5 py-2.5 rounded-lg transition-all duration-300 shadow-sm hover:shadow-primary/30 active:scale-95">
                 Admin Panel
               </button>
             </Link>
@@ -80,14 +80,14 @@ export default function LandingPage() {
       {/* 2. HERO SECTION DENGAN VISUAL */}
       <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 max-w-6xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-12">
         {/* Dekorasi Latar Belakang */}
-        <div className="absolute top-20 left-0 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl -z-10" />
+        <div className="absolute top-20 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl -z-10" />
 
         {/* Teks Kiri */}
         <div className="flex-1 text-center lg:text-left z-10">
           <AnimateOnScroll>
-            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-xs font-bold mb-6 shadow-sm">
-              <ShieldCheck size={14} className="text-blue-600" />
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-6 shadow-sm">
+              <ShieldCheck size={14} className="text-primary" />
               Tugas Akhir / Prototype IoT Polinema
             </div>
           </AnimateOnScroll>
@@ -95,7 +95,7 @@ export default function LandingPage() {
           <AnimateOnScroll delay={100}>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] mb-6">
               Deteksi Dini, <br />
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
+              <span className="bg-gradient-to-r from-primary to-primary/100 bg-clip-text text-transparent">
                 Cegah Bencana Nanti.
               </span>
             </h1>
@@ -110,7 +110,7 @@ export default function LandingPage() {
           <AnimateOnScroll delay={300}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/guest">
-                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1">
+                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1">
                   Buka Dasbor
                   <ArrowRight size={18} />
                 </button>
@@ -119,7 +119,7 @@ export default function LandingPage() {
                 onClick={scrollToVideo}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-sm hover:-translate-y-1"
               >
-                <Play size={18} className="text-blue-600 fill-blue-600" />
+                <Play size={18} className="text-primary fill-primary" />
                 Demo Alat
               </button>
             </div>
@@ -141,9 +141,9 @@ export default function LandingPage() {
               <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-xl group-hover:scale-105 transition-transform duration-700 ease-out" fill="none" xmlns="http://www.w3.org/2000/svg">
                 {/* Awan & Hujan */}
                 <path d="M120 130C120 110 140 90 165 90C180 90 195 100 200 110C210 100 230 100 240 115C255 115 270 130 270 150C270 170 250 185 225 185H145C125 185 120 165 120 130Z" fill="#E2E8F0" />
-                <rect x="150" y="200" width="4" height="15" rx="2" fill="#3B82F6" className="animate-pulse" />
-                <rect x="190" y="195" width="4" height="20" rx="2" fill="#3B82F6" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
-                <rect x="230" y="205" width="4" height="12" rx="2" fill="#3B82F6" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
+                <rect x="150" y="200" width="4" height="15" rx="2" fill="#4546c2" className="animate-pulse" />
+                <rect x="190" y="195" width="4" height="20" rx="2" fill="#4546c2" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
+                <rect x="230" y="205" width="4" height="12" rx="2" fill="#4546c2" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
                 
                 {/* Tiang Sensor & Box ESP32 */}
                 <rect x="195" y="180" width="10" height="120" fill="#94A3B8" />
@@ -151,11 +151,11 @@ export default function LandingPage() {
                 
                 {/* Sensor Ultrasonik */}
                 <path d="M185 280L165 310H235L215 280H185Z" fill="#64748B" opacity="0.8" />
-                <path d="M165 310 C165 330, 235 330, 235 310" stroke="#3B82F6" strokeWidth="2" strokeDasharray="4 4" className="animate-pulse" />
+                <path d="M165 310 C165 330, 235 330, 235 310" stroke="#4546c2" strokeWidth="2" strokeDasharray="4 4" className="animate-pulse" />
                 
                 {/* Air Sungai */}
-                <path d="M50 340Q125 320 200 340T350 340L350 400L50 400Z" fill="#3B82F6" opacity="0.2" />
-                <path d="M50 350Q125 370 200 350T350 350L350 400L50 400Z" fill="#2563EB" opacity="0.4" />
+                <path d="M50 340Q125 320 200 340T350 340L350 400L50 400Z" fill="#4546c2" opacity="0.2" />
+                <path d="M50 350Q125 370 200 350T350 350L350 400L50 400Z" fill="#4546c2" opacity="0.4" />
               </svg>
             </div>
           </AnimateOnScroll>
@@ -167,22 +167,22 @@ export default function LandingPage() {
         <AnimateOnScroll delay={500}>
           <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-10 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100">
             <div className="flex flex-col items-center text-center px-4">
-              <Activity className="text-blue-500 mb-3" size={28} />
+              <Activity className="text-primary mb-3" size={28} />
               <h3 className="text-3xl font-black text-slate-800">10s</h3>
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Interval Update</p>
             </div>
             <div className="flex flex-col items-center text-center px-4">
-              <Wifi className="text-blue-500 mb-3" size={28} />
+              <Wifi className="text-primary mb-3" size={28} />
               <h3 className="text-3xl font-black text-slate-800">Multi</h3>
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Arsitektur Node</p>
             </div>
             <div className="flex flex-col items-center text-center px-4">
-              <Database className="text-blue-500 mb-3" size={28} />
+              <Database className="text-primary mb-3" size={28} />
               <h3 className="text-3xl font-black text-slate-800">NoSQL</h3>
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Cloud Firebase</p>
             </div>
             <div className="flex flex-col items-center text-center px-4">
-              <BatteryCharging className="text-blue-500 mb-3" size={28} />
+              <BatteryCharging className="text-primary mb-3" size={28} />
               <h3 className="text-3xl font-black text-slate-800">24/7</h3>
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Battery Backed</p>
             </div>
@@ -260,7 +260,7 @@ export default function LandingPage() {
       <section className="py-24 bg-slate-900 text-white overflow-hidden">
         <div className="max-w-6xl mx-auto px-6 relative">
           {/* Latar belakang abstrak */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
           
           <AnimateOnScroll>
             <div className="text-center mb-16">
@@ -273,7 +273,7 @@ export default function LandingPage() {
             {/* Step 1 */}
             <AnimateOnScroll delay={100}>
               <div className="bg-slate-800/80 backdrop-blur border border-slate-700 p-6 rounded-2xl w-64 text-center">
-                <Cpu className="text-blue-400 mx-auto mb-4" size={32} />
+                <Cpu className="text-primary mx-auto mb-4" size={32} />
                 <h4 className="font-bold mb-2">1. Akuisisi Data</h4>
                 <p className="text-xs text-slate-400">Sensor membaca lingkungan fisik</p>
               </div>
@@ -311,10 +311,10 @@ export default function LandingPage() {
             <h2 className="text-3xl font-extrabold text-slate-900 mb-8">Video Demonstrasi</h2>
             <div className="relative aspect-video w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl shadow-slate-300 border-4 border-white group cursor-pointer">
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/40 to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-transparent z-10" />
               
               <div className="absolute inset-0 flex flex-col items-center justify-center z-20 transition-transform duration-500 group-hover:scale-105">
-                <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-xl shadow-blue-600/40 mb-4 group-hover:bg-blue-500">
+                <div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center shadow-xl shadow-primary/40 mb-4 group-hover:bg-primary/80">
                   <Play size={32} className="ml-2 fill-white" />
                 </div>
                 <p className="text-white font-bold text-lg">Tonton Pengujian Alat</p>
@@ -328,13 +328,13 @@ export default function LandingPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-6">
           <AnimateOnScroll>
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl shadow-blue-600/20">
+            <div className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl shadow-primary/20">
               <h2 className="text-3xl md:text-4xl font-black mb-4">Siap Memantau Secara Langsung?</h2>
               <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
                 Eksplorasi antarmuka Dasbor Publik RainGuard. Pantau perubahan tinggi air dan pergerakan grafik sensor saat ini juga tanpa perlu mendaftar.
               </p>
               <Link href="/">
-                <button className="bg-white text-blue-600 font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-50 transition-all hover:scale-105 active:scale-95">
+                <button className="bg-white text-primary font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-50 transition-all hover:scale-105 active:scale-95">
                   Buka Dasbor Sekarang
                 </button>
               </Link>
