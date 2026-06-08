@@ -3,7 +3,7 @@ import HadoopFiles from "@/views/hadoop/HadoopFiles";
 import { signOut, useSession } from "next-auth/react";
 
 const SIDEBAR_MENU = [
-  { title: "Dasbor", link: "/dashboard/" },
+  { title: "Dasbor", link: "/dashboard" },
   { title: "Riwayat", link: "/history" },
   { title: "Analisis Data", link: "/analisis" },
   { title: "Hadoop Backup", link: "/hadoop" },

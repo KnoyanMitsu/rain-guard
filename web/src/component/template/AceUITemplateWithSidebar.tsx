@@ -50,24 +50,23 @@ function AceUITemplateWithSidebar({
             <h1 className="text-3xl font-bold truncate">{appname}</h1>
           </div>
           <nav>
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-1">
               {listMenu.map((item, index) => {
                 const isActive = router.pathname === item.link;
                 return (
                   <li key={index}>
                     <Link
                       href={item.link}
-                      className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
-                        // isActive
-                        //   ? "bg-secondary text-primary shadow-md shadow-primary/20"
-                        //   : "text-text/70 hover:bg-secondary hover:text-background"
+                      className={`flex items-center h-12 rounded-lg font-medium transition-all duration-300 ${
                         isActive
-                        ? "text-text font-semibold"
-                        : "text-text/70 hover:bg-secondary hover:text-background"
-                      }`}
+                          ? "text-text font-semibold translate-x-2"
+                          : "text-text/70 hover:bg-secondary/30 hover:text-text hover:translate-x-1"
+                      } px-4`}
                     >
+                      <span className={`inline-block w-[3px] h-5 rounded-r-full transition-all duration-300 mr-3 shrink-0 ${
+                        isActive ? "bg-primary" : "bg-secondary/20"
+                      }`} />
                       {item.title}
-                
                     </Link>
                   </li>
                 );
@@ -142,7 +141,7 @@ function AceUITemplateWithSidebar({
             </button>
           </div>
           <nav>
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-1">
               {listMenu.map((item, index) => {
                 const isActive = router.pathname === item.link;
                 return (
@@ -150,12 +149,15 @@ function AceUITemplateWithSidebar({
                     <Link
                       href={item.link}
                       onClick={() => setIsOpen(false)}
-                      className={`px-4 py-2 h-12 flex items-center rounded-lg font-medium transition-all duration-300 ${
+                      className={`flex items-center h-12 rounded-lg font-medium transition-all duration-300 ${
                         isActive
-                          ? "text-text font-semibold"
-                          : "text-text/70 hover:bg-secondary hover:text-background"
-                      }`}
+                          ? "text-text font-semibold translate-x-2"
+                          : "text-text/70 hover:bg-secondary/30 hover:text-text hover:translate-x-1"
+                      } px-4`}
                     >
+                      <span className={`inline-block w-[3px] h-5 rounded-r-full transition-all duration-300 mr-3 shrink-0 ${
+                        isActive ? "bg-primary" : "bg-secondary/20"
+                      }`} />
                       {item.title}
                     </Link>
                   </li>
