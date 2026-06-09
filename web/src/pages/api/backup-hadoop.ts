@@ -189,7 +189,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       fileName,
-      hdfsPath: `hdfs://${originalUrl.hostname}${hdfsFilePath}`,
+      hdfsPath: `hdfs://${new URL(hadoopBaseUrl).hostname}${hdfsFilePath}`,
       recordCount: sensorData.length,
     });
   } catch (error: any) {
