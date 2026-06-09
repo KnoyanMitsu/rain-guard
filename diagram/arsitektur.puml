@@ -1,0 +1,48 @@
+@startuml
+skinparam rectangle {
+    BackgroundColor #f8f9fa
+    FontColor Black
+    BorderColor #343a40
+}
+skinparam database {
+    BackgroundColor #e9ecef
+    FontColor Black
+    BorderColor #343a40
+}
+skinparam node {
+    BackgroundColor #f8f9fa
+    FontColor Black
+    BorderColor #343a40
+}
+skinparam component {
+    BackgroundColor #e3f2fd
+    FontColor Black
+    BorderColor #0277bd
+}
+skinparam arrow {
+    Color #343a40
+    FontColor Black
+}
+
+skinparam backgroundcolor transparent
+
+node "IoT (ESP32)" as IoT
+
+node "Azure" as Azure {
+    component "Node-RED" as NodeRED
+}
+
+database "Firebase\n(Nyimpan History Data dan\nsebagai database login)" as Firebase
+
+node "Vercel (yang bisa\ndilihat oleh pengguna)" as Vercel
+
+database "Hadoop\n(Backup Storage)" as Hadoop
+
+IoT -right-> NodeRED : Websocket
+NodeRED ..> Firebase : Nyimpan History tiap jam
+Azure -right-> Vercel : Fetch Realtime Data IoT\n(seperti darurat, tinggi air,\nstatus hujan)
+Firebase -down-> Vercel : Fetch History
+Vercel -up-> Firebase : Membaca User
+Vercel -down-> Hadoop : Backup Data / Trigger Backup
+
+@enduml

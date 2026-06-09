@@ -1,0 +1,30 @@
+@startuml
+title Activity Diagram Konfigurasi Sistem
+
+|Admin User|
+start
+:Membuka halaman Settings;
+
+|Sistem|
+:Memuat data konfigurasi dari Firebase;
+:Menampilkan form konfigurasi (WebSocket IP, Hadoop IP, Lokasi);
+
+|Admin User|
+:Mengubah data WebSocket IP, Hadoop IP, atau Lokasi;
+:Menekan tombol "Simpan Konfigurasi";
+
+|Sistem|
+:Menyimpan data konfigurasi ke Firebase (Tabel settings);
+:Mencoba mengirimkan data Lokasi ke perangkat ESP via WebSocket;
+
+if (Koneksi WebSocket ke ESP berhasil?) then (Ya)
+  :Menampilkan notifikasi sukses\n"Konfigurasi berhasil disimpan dan dikirim ke ESP";
+else (Tidak)
+  :Menampilkan notifikasi error\n"Konfigurasi tersimpan ke Firebase, tapi gagal dikirim ke ESP";
+endif
+
+|Admin User|
+:Melihat notifikasi status penyimpanan;
+stop
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+title Sequence Diagram - Pengaturan Sistem (Settings)
+
+skinparam sequence {
+    ArrowColor #343a40
+    LifeLineBorderColor #343a40
+    LifeLineBackgroundColor #f8f9fa
+    ParticipantBorderColor #343a40
+    ParticipantBackgroundColor #e3f2fd
+    ParticipantFontColor Black
+    ActorBorderColor #343a40
+    ActorBackgroundColor #f8f9fa
+    ActorFontColor Black
+    ArrowFontColor Black
+    DatabaseBackgroundColor #e9ecef
+    DatabaseBorderColor #343a40
+    DatabaseFontColor Black
+    GroupBorderColor #343a40
+    GroupFontColor Black
+    GroupHeaderFontColor Black
+}
+
+skinparam backgroundcolor transparent
+skinparam titleFontColor Black
+
+actor "Admin User" as Admin
+participant "Frontend\n(Settings Page)" as Frontend
+database "Firebase\n(Firestore)" as Firebase
+participant "IoT Device\n(ESP32 / Node-RED)" as ESP32
+
+== Memuat Pengaturan Saat Buka Halaman ==
+Admin -> Frontend : Membuka menu Pengaturan
+activate Frontend
+
+Frontend -> Firebase : getDoc("settings/config")
+activate Firebase
+Firebase --> Frontend : Return data (websocket_ip, hadoop_ip, lokasi)
+deactivate Firebase
+
+Frontend --> Admin : Tampilkan form konfigurasi
+deactivate Frontend
+
+== Menyimpan Pengaturan ==
+Admin -> Frontend : Mengubah data & Klik "Simpan Konfigurasi"
+activate Frontend
+
+Frontend -> Firebase : setDoc("settings/config", data)
+activate Firebase
+Firebase --> Frontend : Konfigurasi tersimpan
+deactivate Firebase
+
+alt Koneksi ke ESP32
+    Frontend -> ESP32 : Buka koneksi WebSocket (ws://<websocket_ip>/ws/iot)
+    activate ESP32
+    ESP32 --> Frontend : Koneksi Terbuka
+    
+    Frontend -> ESP32 : send({ type: "set_location", location: "..." })
+    ESP32 -> ESP32 : Update lokasi internal
+    Frontend -> ESP32 : Tutup koneksi
+    deactivate ESP32
+    
+    Frontend --> Admin : Tampilkan notifikasi "Sukses: Tersimpan & Dikirim ke ESP"
+else Gagal Koneksi ke ESP32
+    Frontend --> Admin : Tampilkan notifikasi "Gagal dikirim ke ESP"
+end
+
+deactivate Frontend
+
+@enduml

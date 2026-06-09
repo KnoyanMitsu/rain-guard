@@ -1,0 +1,62 @@
+@startuml
+title Sequence Diagram - Monitoring Status Realtime & History
+
+skinparam sequence {
+    ArrowColor #343a40
+    LifeLineBorderColor #343a40
+    LifeLineBackgroundColor #f8f9fa
+    ParticipantBorderColor #343a40
+    ParticipantBackgroundColor #e3f2fd
+    ParticipantFontColor Black
+    ActorBorderColor #343a40
+    ActorBackgroundColor #f8f9fa
+    ActorFontColor Black
+    ArrowFontColor Black
+    DatabaseBackgroundColor #e9ecef
+    DatabaseBorderColor #343a40
+    DatabaseFontColor Black
+    GroupBorderColor #343a40
+    GroupFontColor Black
+    GroupHeaderFontColor Black
+}
+
+skinparam backgroundcolor transparent
+skinparam titleFontColor Black
+
+actor "IoT Device\n(ESP32)" as IoT
+participant "Node-RED\n(Azure)" as NodeRED
+participant "Frontend\n(Dashboard)" as Frontend
+database "Firebase\n(Firestore)" as Firebase
+actor "Pengguna\n(Admin / Tamu)" as User
+
+== Data Flow dari IoT ==
+IoT -> NodeRED : Kirim data sensor\n(tinggi air, curah hujan, dll)
+activate NodeRED
+
+NodeRED -> Firebase : Simpan ke collection("history")\n(secara berkala)
+activate Firebase
+deactivate Firebase
+deactivate NodeRED
+
+== Realtime Dashboard ==
+User -> Frontend : Buka halaman Dashboard
+activate Frontend
+
+Frontend -> NodeRED : Buka koneksi WebSocket\n(/ws/getIot)
+activate NodeRED
+NodeRED --> Frontend : Data Realtime\n(Update Buzzer, Distance, dll)
+deactivate NodeRED
+
+Frontend -> Firebase : onSnapshot(collection("history"))
+activate Firebase
+Firebase --> Frontend : Snapshot data riwayat awal\n(untuk Tabel & Grafik)
+
+alt Saat ada penambahan data history baru di Firebase
+    Firebase --> Frontend : Push snapshot update
+end
+deactivate Firebase
+
+Frontend --> User : Tampilkan status Realtime,\nGrafik, dan Tabel Data
+deactivate Frontend
+
+@enduml

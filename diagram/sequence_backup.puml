@@ -1,0 +1,74 @@
+@startuml
+title Sequence Diagram - Backup Data ke Hadoop
+
+skinparam sequence {
+    ArrowColor #343a40
+    LifeLineBorderColor #343a40
+    LifeLineBackgroundColor #f8f9fa
+    ParticipantBorderColor #343a40
+    ParticipantBackgroundColor #e3f2fd
+    ParticipantFontColor Black
+    ActorBorderColor #343a40
+    ActorBackgroundColor #f8f9fa
+    ActorFontColor Black
+    ArrowFontColor Black
+    DatabaseBackgroundColor #e9ecef
+    DatabaseBorderColor #343a40
+    DatabaseFontColor Black
+}
+
+skinparam backgroundcolor transparent
+skinparam titleFontColor Black
+
+actor "Admin User" as Admin
+participant "Frontend\n(Vercel)" as Frontend
+participant "API Route\n(/api/backup-hadoop)" as API
+database "Firebase\n(Firestore)" as Firebase
+participant "Hadoop\nNameNode" as NameNode
+participant "Hadoop\nDataNode" as DataNode
+
+Admin -> Frontend : Klik tombol "Backup ke Hadoop"
+activate Frontend
+
+Frontend -> API : POST /api/backup-hadoop
+activate API
+
+API -> Firebase : Ambil konfigurasi (settings/config)
+activate Firebase
+Firebase --> API : Return config (hadoop_ip)
+deactivate Firebase
+
+API -> Firebase : Ambil semua data (collection "history")
+activate Firebase
+Firebase --> API : Return data sensor (JSON)
+deactivate Firebase
+
+API -> API : Generate nama file backup\n(backup-YYYY-MM-DD-HH-mm.json)
+
+API -> NameNode : PUT /webhdfs/v1/rain-guard?op=MKDIRS
+activate NameNode
+NameNode --> API : 200 OK
+deactivate NameNode
+
+API -> NameNode : PUT /webhdfs/v1/.../backup.json?op=CREATE
+activate NameNode
+NameNode --> API : 307 Temporary Redirect\n(Location: DataNode URL)
+deactivate NameNode
+
+API -> DataNode : PUT JSON Data ke DataNode URL
+activate DataNode
+DataNode --> API : 201 Created
+deactivate DataNode
+
+API -> NameNode : GET /webhdfs/v1/.../backup.json?op=GETFILESTATUS
+activate NameNode
+NameNode --> API : 200 OK (Verifikasi berhasil)
+deactivate NameNode
+
+API --> Frontend : 200 OK\n(success: true, fileName, hdfsPath)
+deactivate API
+
+Frontend --> Admin : Tampilkan notifikasi\n"Backup berhasil"
+deactivate Frontend
+
+@enduml
