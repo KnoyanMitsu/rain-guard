@@ -56,7 +56,8 @@ export default async function handler(
       count: mockHistoryData.length 
     });
   } catch (error: any) {
-    console.error("Seeding error:", error);
+    const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+    console.error("Seeding error:", errStr);
     res.status(500).json({ success: false, message: "Seeding failed", error: error.message });
   }
 }

@@ -107,7 +107,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ success: true, files });
     }
   } catch (error: any) {
-    console.error("[hadoop-files] Error:", error);
+    const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+    console.error("[hadoop-files] Error:", errStr);
     return res.status(500).json({ success: false, message: error.message });
   }
 }

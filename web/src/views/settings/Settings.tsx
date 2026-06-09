@@ -59,8 +59,6 @@ export default function Settings() {
 
       const socketUrl = `${baseUrl}/ws/iot`;
 
-      console.log("Connecting WebSocket to:", socketUrl);
-
       const ws = new WebSocket(socketUrl);
 
       ws.onopen = () => {
@@ -68,8 +66,6 @@ export default function Settings() {
           type: "set_location",
           location: lokasi,
         };
-
-        console.log("Sending location to ESP:", payload);
 
         ws.send(JSON.stringify(payload));
 
@@ -80,12 +76,12 @@ export default function Settings() {
       };
 
       ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+        console.error("WebSocket error:", errStr);
         reject(error);
       };
 
       ws.onclose = () => {
-        console.log("WebSocket closed");
       };
     });
   };

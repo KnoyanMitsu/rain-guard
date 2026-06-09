@@ -10,8 +10,7 @@ function getRandom(min, max) {
 }
 
 ws.on('open', () => {
-    console.log(`Berhasil terhubung ke: ${url}`);
-    console.log("Memulai pengiriman data acak setiap 5 detik...");
+    // Looping pengiriman data
 
     // Looping pengiriman data
     setInterval(() => {
@@ -32,16 +31,13 @@ ws.on('open', () => {
 
         // 4. Kirim data
         ws.send(JSON.stringify(payload));
-        
-        console.log("--- Data Terkirim ---");
-        console.log(payload);
     }, 5000); // 5000ms = 5 detik
 });
 
 ws.on('error', (err) => {
-    console.error("Koneksi Error:", err.message);
+    const errStr = String(err.message).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+    console.error("Koneksi Error:", errStr);
 });
 
 ws.on('close', () => {
-    console.log("Koneksi ditutup. Mencoba menghubungkan ulang...");
 });

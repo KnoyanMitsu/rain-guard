@@ -60,7 +60,8 @@ function Index() {
         setRealtimeData(data);
       },
       (error) => {
-        console.error("❌ Firebase Error:", error);
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+        console.error("❌ Firebase Error:", errStr);
       },
     );
 
@@ -81,7 +82,6 @@ function Index() {
       socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
-        console.log("WebSocket Connected: " + wsUrl);
       };
 
       socket.onmessage = (event) => {
@@ -94,7 +94,8 @@ function Index() {
             buzzer: data.buzzer ?? "Non Aktif",
           });
         } catch (err) {
-          console.error("WebSocket parse error:", err);
+          const errStr = String(err).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+          console.error("WebSocket parse error:", errStr);
         }
       };
 

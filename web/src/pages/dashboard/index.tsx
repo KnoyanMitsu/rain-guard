@@ -33,11 +33,6 @@ function Index() {
     const unsubscribeHistory = onSnapshot(
       qHistory,
       (snapshot) => {
-        console.log(
-          "✅ Jumlah data dari Firebase:",
-          snapshot.docs.length
-        );
-
         const data = snapshot.docs.map((doc) => {
           const item = doc.data();
           const lastSeen = item.timestamp
@@ -61,9 +56,10 @@ function Index() {
         setFirebaseData(data);
       },
       (error) => {
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
         console.error(
           "❌ Gagal mengambil data Firebase:",
-          error
+          errStr
         );
       }
     );
@@ -121,7 +117,6 @@ function Index() {
       socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
-        console.log("✅ WebSocket Connected to: " + wsUrl);
       };
 
       socket.onmessage = (event) => {
@@ -136,16 +131,17 @@ function Index() {
             update_terakhir: new Date().toLocaleTimeString("id-ID"),
           });
         } catch (err) {
-          console.error("❌ Gagal baca JSON WebSocket:", err);
+          const errStr = String(err).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+          console.error("❌ Gagal baca JSON WebSocket:", errStr);
         }
       };
 
       socket.onerror = (error) => {
-        console.error("⚠️ WebSocket Error:", error);
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+        console.error("⚠️ WebSocket Error:", errStr);
       };
 
       socket.onclose = () => {
-        console.log("🔌 WebSocket Disconnected. Reconnecting in 5s...");
         setTimeout(connect, 5000);
       };
     }

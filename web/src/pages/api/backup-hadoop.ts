@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
     } catch (e) {
-      console.warn("Gagal mengambil konfigurasi hadoop dari Firebase, fallback ke localhost", e);
+      // Fallback ke localhost
     }
 
     // 1. Ambil semua data dari Firestore collection "history"
@@ -156,7 +156,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       recordCount: sensorData.length,
     });
   } catch (error: any) {
-    console.error("[backup-hadoop] Error:", error);
+    const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+    console.error("[backup-hadoop] Error:", errStr);
     return res.status(500).json({
       success: false,
       message: error.message || "Backup ke Hadoop gagal",
