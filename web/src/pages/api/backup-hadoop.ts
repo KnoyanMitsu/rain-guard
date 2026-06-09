@@ -15,33 +15,30 @@ type HdfsResponse = {
 
 function hdfsRequest(
   method: string,
-  host: string,
-  port: number,
-  path: string,
+  url: string,
   body?: string
 ): Promise<HdfsResponse> {
   return new Promise((resolve, reject) => {
-    const headers: http.OutgoingHttpHeaders = {};
+    const options: RequestInit = {
+      method,
+      redirect: "manual",
+    };
     if (body) {
-      headers["Content-Type"] = "application/octet-stream";
-      headers["Content-Length"] = Buffer.byteLength(body);
+      options.headers = {
+        "Content-Type": "application/octet-stream",
+      };
+      options.body = body;
     }
 
-    const req = http.request({ method, hostname: host, port, path, headers }, (res) => {
-      let rawData = "";
-      res.on("data", (chunk: string) => { rawData += chunk; });
-      res.on("end", () => {
+    fetch(url, options)
+      .then(async (res) => {
         resolve({
-          statusCode: res.statusCode ?? 0,
-          location: res.headers.location,
-          data: rawData,
+          statusCode: res.status,
+          location: res.headers.get("location") || undefined,
+          data: await res.text(),
         });
-      });
-    });
-
-    req.on("error", (err) => reject(err));
-    if (body) req.write(body);
-    req.end();
+      })
+      .catch((err) => reject(err));
   });
 }
 
@@ -52,13 +49,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // 0. Ambil konfigurasi IP Hadoop dari Firebase Settings
-    let hadoopHost = "localhost";
+    let hadoopBaseUrl = "http://localhost:9870";
     try {
       const settingsDoc = await getDoc(doc(db, "settings", "config"));
       if (settingsDoc.exists()) {
         const data = settingsDoc.data();
         if (data.hadoop_ip) {
-          hadoopHost = data.hadoop_ip;
+          let ip = data.hadoop_ip.trim();
+          if (!ip.startsWith("http://") && !ip.startsWith("https://")) {
+            ip = "http://" + ip;
+          }
+          hadoopBaseUrl = ip;
         }
       }
     } catch (e) {
@@ -98,34 +99,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 3. Buat direktori /rain-guard di HDFS (idempotent - aman jika sudah ada)
     await hdfsRequest(
-      "PUT", hadoopHost, HDFS_PORT,
-      `/webhdfs/v1${HDFS_DIR}?op=MKDIRS&user.name=${HDFS_USER}`
+      "PUT",
+      `${hadoopBaseUrl}/webhdfs/v1${HDFS_DIR}?op=MKDIRS&user.name=${HDFS_USER}`
     );
 
     // 4. WebHDFS upload Step 1: kirim CREATE request ke NameNode → dapat redirect ke DataNode
     const step1 = await hdfsRequest(
-      "PUT", hadoopHost, HDFS_PORT,
-      `/webhdfs/v1${hdfsFilePath}?op=CREATE&overwrite=true&user.name=${HDFS_USER}`
+      "PUT",
+      `${hadoopBaseUrl}/webhdfs/v1${hdfsFilePath}?op=CREATE&overwrite=true&user.name=${HDFS_USER}`
     );
 
     if (step1.statusCode !== 307 || !step1.location) {
       throw new Error(
         `HDFS tidak merespons dengan redirect (307). ` +
         `Status: ${step1.statusCode}. ` +
-        `Pastikan Hadoop NameNode aktif di ${hadoopHost}:${HDFS_PORT}.`
+        `Pastikan Hadoop NameNode aktif di ${hadoopBaseUrl}.`
       );
     }
 
     // 5. Parse URL DataNode dari header Location
-    //    Ganti hostname → localhost agar kompatibel dengan Hadoop di Windows lokal
+    //    Ganti hostname → hostname asli agar kompatibel jika menggunakan proxy/domain
     const dataNodeUrl = new URL(step1.location);
-    const dataNodePort = parseInt(dataNodeUrl.port, 10) || 9864;
-    const dataNodePath = dataNodeUrl.pathname + dataNodeUrl.search;
+    const originalUrl = new URL(hadoopBaseUrl);
+    dataNodeUrl.hostname = originalUrl.hostname;
 
     // 6. WebHDFS upload Step 2: kirim data aktual ke DataNode
     const step2 = await hdfsRequest(
-      "PUT", hadoopHost, dataNodePort,
-      dataNodePath, jsonData
+      "PUT",
+      dataNodeUrl.toString(),
+      jsonData
     );
 
     if (step2.statusCode !== 201) {
@@ -138,8 +140,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 7. Verifikasi file benar-benar tersimpan di HDFS
     const verify = await hdfsRequest(
-      "GET", hadoopHost, HDFS_PORT,
-      `/webhdfs/v1${hdfsFilePath}?op=GETFILESTATUS&user.name=${HDFS_USER}`
+      "GET",
+      `${hadoopBaseUrl}/webhdfs/v1${hdfsFilePath}?op=GETFILESTATUS&user.name=${HDFS_USER}`
     );
 
     if (verify.statusCode !== 200) {
@@ -152,7 +154,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       fileName,
-      hdfsPath: `hdfs://${hadoopHost}${hdfsFilePath}`,
+      hdfsPath: `hdfs://${originalUrl.hostname}${hdfsFilePath}`,
       recordCount: sensorData.length,
     });
   } catch (error: any) {

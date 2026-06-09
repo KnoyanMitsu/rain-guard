@@ -1,38 +1,63 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import http from "http";
+import db from "@/utils/db/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
-const HDFS_HOST = "localhost";
-const HDFS_PORT = 9870;
 const HDFS_USER = process.env.HDFS_USER || "hadoop";
 const HDFS_DIR = "/rain-guard";
 
 function hdfsRequest(
   method: string,
-  host: string,
-  port: number,
-  path: string
+  url: string,
+  body?: string
 ): Promise<{ statusCode: number; location?: string; data: string }> {
   return new Promise((resolve, reject) => {
-    const req = http.request({ method, hostname: host, port, path }, (res) => {
-      let raw = "";
-      res.on("data", (chunk: string) => { raw += chunk; });
-      res.on("end", () => {
+    const options: RequestInit = {
+      method,
+      redirect: "manual",
+    };
+    if (body) {
+      options.headers = {
+        "Content-Type": "application/octet-stream",
+      };
+      options.body = body;
+    }
+
+    fetch(url, options)
+      .then(async (res) => {
         resolve({
-          statusCode: res.statusCode ?? 0,
-          location: res.headers.location,
-          data: raw,
+          statusCode: res.status,
+          location: res.headers.get("location") || undefined,
+          data: await res.text(),
         });
-      });
-    });
-    req.on("error", reject);
-    req.end();
+      })
+      .catch((err) => reject(err));
   });
 }
 
-async function listFiles() {
+async function getHadoopBaseUrl() {
+  let hadoopBaseUrl = "http://localhost:9870";
+  try {
+    const settingsDoc = await getDoc(doc(db, "settings", "config"));
+    if (settingsDoc.exists()) {
+      const data = settingsDoc.data();
+      if (data.hadoop_ip) {
+        let ip = data.hadoop_ip.trim();
+        if (!ip.startsWith("http://") && !ip.startsWith("https://")) {
+          ip = "http://" + ip;
+        }
+        hadoopBaseUrl = ip;
+      }
+    }
+  } catch (e) {
+    // Fallback ke localhost
+  }
+  return hadoopBaseUrl;
+}
+
+async function listFiles(hadoopBaseUrl: string) {
   const res = await hdfsRequest(
-    "GET", HDFS_HOST, HDFS_PORT,
-    `/webhdfs/v1${HDFS_DIR}?op=LISTSTATUS&user.name=${HDFS_USER}`
+    "GET",
+    `${hadoopBaseUrl}/webhdfs/v1${HDFS_DIR}?op=LISTSTATUS&user.name=${HDFS_USER}`
   );
 
   // Direktori belum ada (belum pernah backup)
@@ -58,13 +83,13 @@ async function listFiles() {
     .sort((a, b) => b.modifiedTimestamp - a.modifiedTimestamp);
 }
 
-async function readFile(fileName: string) {
+async function readFile(fileName: string, hadoopBaseUrl: string) {
   const filePath = `${HDFS_DIR}/${fileName}`;
 
   // Step 1: minta NameNode → dapat redirect ke DataNode
   const step1 = await hdfsRequest(
-    "GET", HDFS_HOST, HDFS_PORT,
-    `/webhdfs/v1${filePath}?op=OPEN&user.name=${HDFS_USER}`
+    "GET",
+    `${hadoopBaseUrl}/webhdfs/v1${filePath}?op=OPEN&user.name=${HDFS_USER}`
   );
 
   if (step1.statusCode !== 307 || !step1.location) {
@@ -73,13 +98,14 @@ async function readFile(fileName: string) {
     );
   }
 
-  // Step 2: baca data dari DataNode (ganti hostname → localhost)
+  // Step 2: baca data dari DataNode (ganti hostname → hostname proxy)
   const dataNodeUrl = new URL(step1.location);
-  const dataNodePort = parseInt(dataNodeUrl.port, 10) || 9864;
-  const dataNodePath = dataNodeUrl.pathname + dataNodeUrl.search;
+  const originalUrl = new URL(hadoopBaseUrl);
+  dataNodeUrl.hostname = originalUrl.hostname;
 
   const step2 = await hdfsRequest(
-    "GET", "localhost", dataNodePort, dataNodePath
+    "GET",
+    dataNodeUrl.toString()
   );
 
   if (step2.statusCode !== 200) {
@@ -97,13 +123,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { file } = req.query;
 
   try {
+    const hadoopBaseUrl = await getHadoopBaseUrl();
+
     if (file && typeof file === "string") {
       // Mode: baca isi file tertentu
-      const content = await readFile(file);
+      const content = await readFile(file, hadoopBaseUrl);
       return res.status(200).json({ success: true, data: content });
     } else {
       // Mode: list semua file
-      const files = await listFiles();
+      const files = await listFiles(hadoopBaseUrl);
       return res.status(200).json({ success: true, files });
     }
   } catch (error: any) {
