@@ -50,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // 0. Ambil konfigurasi IP Hadoop dari Firebase Settings
     let hadoopBaseUrl = "http://localhost:9870";
+    let datanodes: string[] = [];
     try {
       const settingsDoc = await getDoc(doc(db, "settings", "config"));
       if (settingsDoc.exists()) {
@@ -60,6 +61,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ip = "http://" + ip;
           }
           hadoopBaseUrl = ip;
+        }
+        if (data.datanodes && Array.isArray(data.datanodes)) {
+          datanodes = data.datanodes.map((dn: any) => typeof dn === 'string' ? dn : dn.external).filter(Boolean);
+        } else if (data.datanode_ip) {
+          datanodes = [data.datanode_ip.trim()];
         }
       }
     } catch (e) {
@@ -118,10 +124,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 5. Parse URL DataNode dari header Location
-    //    Ganti hostname → hostname asli agar kompatibel jika menggunakan proxy/domain
+    //    Ganti hostname dan port sesuai list datanodes
     const dataNodeUrl = new URL(step1.location);
-    const originalUrl = new URL(hadoopBaseUrl);
-    dataNodeUrl.hostname = originalUrl.hostname;
+    const originalDnHostname = dataNodeUrl.hostname;
+    
+    let matchedExternal = "";
+    if (datanodes.length > 0) {
+      const originalDnShort = originalDnHostname.split('.')[0];
+      matchedExternal = datanodes.find(dn => {
+         try {
+           return new URL(dn).hostname.includes(originalDnShort);
+         } catch {
+           return dn.includes(originalDnShort);
+         }
+      }) || datanodes[0];
+    }
+
+    if (matchedExternal) {
+      if (matchedExternal.startsWith("http://") || matchedExternal.startsWith("https://")) {
+        const customDatanode = new URL(matchedExternal);
+        dataNodeUrl.protocol = customDatanode.protocol;
+        dataNodeUrl.hostname = customDatanode.hostname;
+        if (customDatanode.port) {
+          dataNodeUrl.port = customDatanode.port;
+        } else {
+          dataNodeUrl.port = "";
+        }
+      } else {
+        dataNodeUrl.hostname = matchedExternal;
+      }
+    } else {
+      const originalUrl = new URL(hadoopBaseUrl);
+      dataNodeUrl.hostname = originalUrl.hostname;
+    }
 
     // 6. WebHDFS upload Step 2: kirim data aktual ke DataNode
     const step2 = await hdfsRequest(

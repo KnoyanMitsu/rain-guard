@@ -2,12 +2,13 @@ import AceUIInput from "@/component/input/AceUIInput";
 import AceUIFloatingWarning from "@/component/feedback/AceUIFloatingWarning";
 import db from "@/utils/db/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { Database, Loader2, MapPin, Save, Wifi } from "lucide-react";
+import { Database, Loader2, MapPin, Save, Wifi, Server, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Settings() {
   const [websocketIp, setWebsocketIp] = useState("");
   const [hadoopIp, setHadoopIp] = useState("");
+  const [datanodes, setDatanodes] = useState<string[]>([]);
   const [lokasi, setLokasi] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +35,12 @@ export default function Settings() {
 
           if (data.websocket_ip) setWebsocketIp(data.websocket_ip);
           if (data.hadoop_ip) setHadoopIp(data.hadoop_ip);
+          if (data.datanodes && Array.isArray(data.datanodes)) {
+            const parsed = data.datanodes.map((dn: any) => typeof dn === 'string' ? dn : (dn.external || ""));
+            setDatanodes(parsed.filter(Boolean));
+          } else if (data.datanode_ip) {
+            setDatanodes([data.datanode_ip]);
+          }
           if (data.lokasi) setLokasi(data.lokasi);
         }
       } catch (error) {
@@ -95,6 +102,7 @@ export default function Settings() {
         {
           websocket_ip: websocketIp,
           hadoop_ip: hadoopIp,
+          datanodes: datanodes,
           lokasi: lokasi,
           updated_at: new Date().toISOString(),
         },
@@ -209,6 +217,59 @@ export default function Settings() {
                 Akan dikirim ke ESP dan ditampilkan pada Dashboard utama
               </p>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-4 mt-4 border-t border-secondary/30 pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Server className="text-primary" size={24} />
+                <h3 className="text-lg font-semibold text-text">Daftar DataNode</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDatanodes([...datanodes, ""])}
+                className="flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg font-medium transition-all text-sm"
+              >
+                <Plus size={16} />
+                Tambah DataNode
+              </button>
+            </div>
+            
+            <p className="text-sm text-text/70 mb-2">
+              Masukkan daftar URL atau IP publik DataNode yang bisa diakses dari luar.
+            </p>
+
+            {datanodes.length === 0 && (
+              <div className="text-center py-6 bg-secondary/10 rounded-xl text-text/50 text-sm border border-secondary/20 border-dashed">
+                Belum ada DataNode yang ditambahkan. Sistem akan mencoba melakukan deteksi otomatis.
+              </div>
+            )}
+
+            {datanodes.map((dn, index) => (
+              <div key={index} className="flex flex-col md:flex-row gap-4 items-start md:items-center bg-secondary/10 p-4 rounded-xl border border-secondary/20">
+                <div className="flex-grow w-full">
+                  <AceUIInput
+                    label={`External Host / URL (Akses Publik) ${index + 1}`}
+                    placeholder="Contoh: https://datanode1.domain.com"
+                    type="text"
+                    value={dn}
+                    onChange={(e) => {
+                      const newDn = [...datanodes];
+                      newDn[index] = e.target.value;
+                      setDatanodes(newDn);
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDatanodes(datanodes.filter((_, i) => i !== index))}
+                  className="mt-6 md:mt-2 p-3 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-all"
+                  title="Hapus DataNode"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
