@@ -12,7 +12,12 @@ export default function Settings() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [toast, setToast] = useState<{ show: boolean; title: string; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    type: "success" | "error";
+  }>({
     show: false,
     title: "",
     message: "",
@@ -97,7 +102,7 @@ export default function Settings() {
           lokasi: lokasi,
           updated_at: new Date().toISOString(),
         },
-        { merge: true }
+        { merge: true },
       );
 
       await sendLocationToEsp();
@@ -116,7 +121,8 @@ export default function Settings() {
       setToast({
         show: true,
         title: "Gagal",
-        message: "Konfigurasi tersimpan ke Firebase, tapi gagal dikirim ke ESP.",
+        message:
+          "Konfigurasi tersimpan ke Firebase, tapi gagal dikirim ke ESP.",
         type: "error",
       });
 
@@ -136,13 +142,21 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-      <AceUIFloatingWarning show={toast.show} title={toast.title} message={toast.message} type={toast.type} />
+      <AceUIFloatingWarning
+        show={toast.show}
+        title={toast.title}
+        message={toast.message}
+        type={toast.type}
+      />
 
       <div className="rounded-2xl border border-secondary bg-white/80 backdrop-blur-xl p-8 shadow-sm">
         <div className="mb-8 border-b border-secondary/30 pb-6">
-          <h2 className="text-2xl font-bold text-text mb-2">Konfigurasi Sistem</h2>
+          <h2 className="text-2xl font-bold text-text mb-2">
+            Konfigurasi Sistem
+          </h2>
           <p className="text-text/70 text-sm">
-            Sesuaikan IP WebSocket, koneksi Hadoop, dan nama Lokasi pemantau secara dinamis.
+            Sesuaikan IP WebSocket, koneksi Hadoop, dan nama Lokasi pemantau
+            secara dinamis.
           </p>
         </div>
 
@@ -154,12 +168,14 @@ export default function Settings() {
             <div className="flex-grow">
               <AceUIInput
                 label="WebSocket URL / IP"
-                placeholder="ws://4.145.113.15:1880"
+                placeholder="ws://[IP_ADDRESS]"
                 type="text"
                 value={websocketIp}
                 onChange={(e) => setWebsocketIp(e.target.value)}
               />
-              <p className="text-xs text-text/50 mt-2">Gunakan ws://4.145.113.15:1880</p>
+              <p className="text-xs text-text/50 mt-2">
+                Gunakan ws://[IP_ADDRESS]
+              </p>
             </div>
           </div>
 
@@ -175,7 +191,9 @@ export default function Settings() {
                 value={hadoopIp}
                 onChange={(e) => setHadoopIp(e.target.value)}
               />
-              <p className="text-xs text-text/50 mt-2">Alamat IP WebHDFS NameNode (Default: localhost)</p>
+              <p className="text-xs text-text/50 mt-2">
+                Alamat IP WebHDFS NameNode (Default: localhost)
+              </p>
             </div>
           </div>
 
@@ -191,7 +209,9 @@ export default function Settings() {
                 value={lokasi}
                 onChange={(e) => setLokasi(e.target.value)}
               />
-              <p className="text-xs text-text/50 mt-2">Akan dikirim ke ESP dan ditampilkan pada Dashboard utama</p>
+              <p className="text-xs text-text/50 mt-2">
+                Akan dikirim ke ESP dan ditampilkan pada Dashboard utama
+              </p>
             </div>
           </div>
         </div>
