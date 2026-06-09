@@ -86,7 +86,7 @@ export function DashboardCards({
       <AceUICardStatus
         className="bg-background border border-secondary shadow-sm"
         title="Tinggi Air"
-        value={safeDistance.toString()}
+        value={formatDistance(safeDistance)}
         description={`Batas: ${MAX_DISTANCE} cm`}
         icon={<Droplets />}
         color="primary"

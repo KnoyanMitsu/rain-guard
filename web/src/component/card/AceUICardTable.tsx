@@ -137,7 +137,7 @@ function AceUICardTable({
                     className="px-4 py-3 font-medium text-background cursor-pointer hover:opacity-80 select-none"
                     onClick={() => requestSort(index)}
                   >
-                    <div className="flex items-center gap-1">
+                    <div className="flex text-text items-center gap-1">
                       {item.title}
                       {sortConfig.index === index && sortConfig.direction && (
                         <span>
