@@ -45,7 +45,7 @@ type Data = {
   lokasi?: string;
 };
 
-const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
+const panelClass = "rounded-2xl border border-secondary bg-background backdrop-blur-sm";
 
 function formatDistance(value: number | string | undefined) {
   const numericValue = Number(String(value ?? 0).replace(" cm", ""));
@@ -84,7 +84,7 @@ export function DashboardCards({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <AceUICardStatus
-        className="bg-white border border-gray-100 shadow-sm"
+        className="bg-background border border-secondary shadow-sm"
         title="Tinggi Air"
         value={safeDistance.toString()}
         description={`Batas: ${MAX_DISTANCE} cm`}
@@ -93,7 +93,7 @@ export function DashboardCards({
         unit="cm"
       />
       <AceUICardStatus
-        className="bg-white border border-gray-100 shadow-sm"
+        className="bg-background border border-secondary shadow-sm"
         title="Nilai Sensor Hujan"
         value={safeRain.toString()}
         description={`Batas: ${MAX_RAIN} raw`}
@@ -102,14 +102,14 @@ export function DashboardCards({
         unit="raw"
       />
       <AceUICardStatus
-        className="bg-white border border-gray-100 shadow-sm"
+        className="bg-background border border-secondary shadow-sm"
         title="Status Hujan"
         value={latestData.status_rain || "-"}
         icon={<CloudRain />}
         color={latestData.status_rain === "Ya" ? "red" : "green"}
       />
       <AceUICardStatus
-        className="bg-white border border-gray-100 shadow-sm"
+        className="bg-background border border-secondary shadow-sm"
         title="Status Alarm"
         value={latestData.buzzer || "-"}
         icon={<Bell />}
@@ -137,7 +137,7 @@ export function DashboardGraph({
   ];
 
   return (
-    <div className="w-full bg-white border border-secondary shadow-sm rounded-2xl p-5">
+    <div className="w-full bg-background border border-secondary shadow-sm rounded-2xl p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-semibold text-text">Grafik Monitoring Tinggi Air (Real-time)</h3>
         <div className="relative">
@@ -151,7 +151,7 @@ export function DashboardGraph({
         </div>
       </div>
       <AceUICardGraphs
-        className="bg-white border border-gray-100 shadow-sm"
+        className="bg-background border border-secondary shadow-sm"
         data={filteredGraphData}
         start={0}
         end={10}
@@ -173,7 +173,7 @@ export function DashboardTable({
   return (
     <div className={`${panelClass} p-6`}>
       <h2 className="text-xl font-bold text-text mb-4">Riwayat Pengamatan</h2>
-      <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-secondary bg-background">
         <table className="w-full border-collapse text-sm">
           <thead className="bg-secondary/20 text-text">
             <tr>
@@ -190,12 +190,12 @@ export function DashboardTable({
               const statusValue = getWaterStatus(distanceValue);
               return (
                 <tr key={i} className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-black">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
-                  <td className="px-5 py-4 font-semibold text-black">{row.curah_hujan || row.rain}</td>
+                  <td className="px-5 py-4 font-semibold text-text">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
+                  <td className="px-5 py-4 font-semibold text-text">{row.curah_hujan || row.rain}</td>
                   <td className="px-5 py-4">
                     <StatusBadge status={statusValue} />
                   </td>
-                  <td className="px-5 py-4 font-semibold text-black">{row.update_terakhir}</td>
+                  <td className="px-5 py-4 font-semibold text-text">{row.update_terakhir}</td>
                 </tr>
               );
             })}
@@ -334,7 +334,7 @@ function Dashboard(data: Data) {
         <button
           onClick={handleBackup}
           disabled={backupStatus === "loading"}
-          className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-background shadow-sm transition-all hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {backupStatus === "loading" ? (
             <>

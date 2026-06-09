@@ -85,6 +85,13 @@ function History({ tbody, thead }: HistoryProps) {
     exportCSV({ data: rows, fileName: `riwayat-${suffix}.csv` });
   }
 
+  const colorStyle: Record<string, { bg: string; text: string; icon: string }> = {
+    green:  { bg: "bg-green-100",  text: "text-green-600",  icon: "text-green-600" },
+    yellow: { bg: "bg-yellow-100", text: "text-yellow-600", icon: "text-yellow-600" },
+    red:    { bg: "bg-red-100",    text: "text-red-600",    icon: "text-red-600" },
+    text:   { bg: "bg-primary/10", text: "text-primary",    icon: "text-primary" },
+  };
+
   const statCards = [
     { label: "Total Aman",   key: "Aman",    color: "green",  Icon: ShieldCheck },
     { label: "Total Waspada", key: "Waspada", color: "yellow", Icon: AlertTriangle },
@@ -114,13 +121,13 @@ function History({ tbody, thead }: HistoryProps) {
               <div className="flex rounded-xl overflow-hidden border border-secondary">
                 <button
                   onClick={() => { setFilterMode("harian"); setSelectedMonth(null); }}
-                  className={`px-4 py-3 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-white" : "bg-background text-text hover:bg-secondary/20"}`}
+                  className={`px-4 py-3 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-background" : "bg-background text-text hover:bg-secondary/20"}`}
                 >
                   Harian
                 </button>
                 <button
                   onClick={() => { setFilterMode("bulanan"); setSelectedDate(null); }}
-                  className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "bulanan" ? "bg-primary text-white" : "bg-background text-text hover:bg-secondary/20"}`}
+                  className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "bulanan" ? "bg-primary text-background" : "bg-background text-text hover:bg-secondary/20"}`}
                 >
                   Bulanan
                 </button>
@@ -140,7 +147,7 @@ function History({ tbody, thead }: HistoryProps) {
                     isClearable={!!dateValue}
                     popperClassName="z-[9999]"
                     calendarClassName="shadow-2xl border border-secondary rounded-xl"
-                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-text/50 shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                   {!selectedDate && (
                     <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
@@ -161,7 +168,7 @@ function History({ tbody, thead }: HistoryProps) {
                     isClearable={!!monthValue}
                     popperClassName="z-[9999]"
                     calendarClassName="shadow-2xl border border-secondary rounded-xl"
-                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-black shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-text/50 shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                   {!selectedMonth && (
                     <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
@@ -175,7 +182,7 @@ function History({ tbody, thead }: HistoryProps) {
               <button
                 onClick={handleExport}
                 disabled={filteredData.length === 0}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl border border-primary bg-primary text-white text-sm font-semibold shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl border border-primary bg-primary text-background text-sm font-semibold shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Download className="w-4 h-4" />
                 Unduh CSV
@@ -186,21 +193,24 @@ function History({ tbody, thead }: HistoryProps) {
       </AceUICard>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map(({ label, key, color, Icon }) => (
-          <AceUICard key={label}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-text/60">{label}</p>
-                <h3 className={`text-3xl font-bold text-${color}-600 mt-2`}>
-                  {key ? filteredData.filter((i) => i.status === key).length : filteredData.length}
-                </h3>
+        {statCards.map(({ label, key, color, Icon }) => {
+          const cs = colorStyle[color] ?? colorStyle.text;
+          return (
+            <AceUICard key={label}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text/60">{label}</p>
+                  <h3 className={`text-3xl font-bold ${cs.text} mt-2`}>
+                    {key ? filteredData.filter((i) => i.status === key).length : filteredData.length}
+                  </h3>
+                </div>
+                <div className={`w-12 h-12 rounded-2xl ${cs.bg} flex items-center justify-center`}>
+                  <Icon className={`${cs.icon} w-6 h-6`} />
+                </div>
               </div>
-              <div className={`w-12 h-12 rounded-2xl bg-${color}-100 flex items-center justify-center`}>
-                <Icon className={`text-${color}-600 w-6 h-6`} />
-              </div>
-            </div>
-          </AceUICard>
-        ))}
+            </AceUICard>
+          );
+        })}
       </div>
 
       <AceUICardTable

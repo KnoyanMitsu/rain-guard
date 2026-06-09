@@ -129,7 +129,7 @@ function AceUICardTable({
         )}
         <div className="overflow-x-scroll md:overflow-hidden rounded-2xl border mb-3 border-secondary">
           <table className="w-full text-left border-collapse bg-background">
-            <thead className="bg-primary text-primary">
+            <thead className="bg-secondary/20 text-text">
               <tr>
                 {thead.map((item, index) => (
                   <th

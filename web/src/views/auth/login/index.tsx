@@ -59,10 +59,10 @@ const TampilanLogin = () => {
               {/* Header */}
               <div className="text-center mb-8 mt-8">
                 <Image src={logo} alt="Logo Rain Guard" width={85} height={85} className="mx-auto mb-4" />
-                <h1 className="text-3xl font-extrabold text-black">
+                <h1 className="text-3xl font-extrabold text-text">
                   Welcome Back!!
                 </h1>
-                <p className="text-gray-500 text-sm mt-2">
+                <p className="text-text/60 text-sm mt-2">
                   Akses Dashboard Monitoring Rain-Guard
                 </p>
               </div>

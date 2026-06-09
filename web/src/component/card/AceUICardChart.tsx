@@ -10,10 +10,10 @@ import {
 } from "recharts";
 
 const tooltipStyle = {
-  backgroundColor: "#1e293b",
-  border: "none",
+  backgroundColor: "var(--color-background)",
+  border: "1px solid var(--color-secondary)",
   borderRadius: "10px",
-  color: "#f1f5f9",
+  color: "var(--color-text)",
   fontSize: 12,
   padding: "8px 12px",
 };
@@ -39,7 +39,7 @@ export default function AceUICardChart({ title, children, icon, description, onC
           </div>
         </div>
         {onClose && (
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100">
+          <button onClick={onClose} className="text-text/50 hover:text-text p-1.5 rounded-lg hover:bg-secondary/20">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -68,9 +68,9 @@ export function AceUILineChart({ title, data, lines, icon, description, onClose 
     <AceUICardChart title={title} icon={icon} description={description} onClose={onClose}>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="time" tick={{ fontSize: 10 }} />
-          <YAxis tick={{ fontSize: 11 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-secondary)" opacity={0.35} />
+          <XAxis dataKey="time" tick={{ fontSize: 10, fill: "var(--color-text)", opacity: 0.82 }} />
+          <YAxis tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.82 }} />
           <Tooltip contentStyle={tooltipStyle} />
           <Legend />
           {lines.map((line) => (
@@ -95,11 +95,11 @@ export function AceUIBarChart({ title, data, icon, description, onClose }: BarCh
     <AceUICardChart title={title} icon={icon} description={description} onClose={onClose}>
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="time" tick={{ fontSize: 10 }} interval={5} />
-          <YAxis tick={{ fontSize: 11 }} unit=" cm/h" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-secondary)" opacity={0.35} />
+          <XAxis dataKey="time" tick={{ fontSize: 10, fill: "var(--color-text)", opacity: 0.82 }} interval={5} />
+          <YAxis tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.82 }} unit=" cm/h" />
           <Tooltip contentStyle={tooltipStyle} />
-          <ReferenceLine y={0} stroke="#94a3b8" />
+          <ReferenceLine y={0} stroke="var(--color-text)" opacity={0.3} />
           <Bar dataKey="delta_water" radius={[3, 3, 0, 0]}>
             {data.map((entry: any, idx: number) => (
               <Cell key={idx} fill={entry.delta_water > 5 ? "#ef4444" : entry.delta_water > 0 ? "#f59e0b" : "#22c55e"} />
@@ -124,14 +124,14 @@ export function AceUIComposedChart({ title, data, icon, description, onClose }: 
     <AceUICardChart title={title} icon={icon} description={description} onClose={onClose}>
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="time" tick={{ fontSize: 10 }} />
-          <YAxis yAxisId="left" unit=" cm" />
-          <YAxis yAxisId="right" orientation="right" unit="%" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-secondary)" opacity={0.35} />
+          <XAxis dataKey="time" tick={{ fontSize: 10, fill: "var(--color-text)", opacity: 0.82 }} />
+          <YAxis yAxisId="left" unit=" cm" tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.82 }} />
+          <YAxis yAxisId="right" orientation="right" unit="%" tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.82 }} />
           <Tooltip contentStyle={tooltipStyle} />
           <Legend />
-          <Line yAxisId="left" type="monotone" dataKey="water_level" name="Tinggi Air (cm)" stroke="#3b82f6" strokeWidth={2.5} dot={false} />
-          <Line yAxisId="right" type="monotone" dataKey="rain_sensor" name="Intensitas Hujan (%)" stroke="#8b5cf6" strokeWidth={2.5} dot={false} />
+          <Line yAxisId="left" type="monotone" dataKey="water_level" name="Tinggi Air (cm)" stroke="var(--chart-water)" strokeWidth={2.5} dot={false} />
+          <Line yAxisId="right" type="monotone" dataKey="rain_sensor" name="Intensitas Hujan (%)" stroke="var(--chart-rain)" strokeWidth={2.5} dot={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </AceUICardChart>

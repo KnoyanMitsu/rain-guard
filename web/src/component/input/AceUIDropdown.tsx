@@ -37,7 +37,7 @@ function AceUIDropdown({ title, actions }: Props) {
         className={`flex items-center gap-2 border border-primary transition-colors duration-300 rounded-md p-2 ${
           isOpen
             ? "bg-primary text-background"
-            : "text-gray-700 hover:bg-primary hover:text-background"
+            : "text-text/70 hover:bg-primary hover:text-background"
         }`}
       >
         {title}
@@ -57,7 +57,7 @@ function AceUIDropdown({ title, actions }: Props) {
                   action.onClick();
                   setIsOpen(false); // Otomatis menutup menu setelah action ditekan
                 }}
-                className="text-left px-4 py-2 text-sm text-black hover:bg-secondary hover:text-black transition-colors"
+                className="text-left px-4 py-2 text-sm text-text hover:bg-secondary hover:text-text transition-colors"
               >
                 {action.title}
               </button>
