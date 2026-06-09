@@ -2,6 +2,7 @@ import db from "@/utils/db/firebase";
 import GuestDashboard from "@/views/guest/dashboard/Dashboard";
 import {
   collection,
+  doc,
   limit,
   onSnapshot,
   orderBy,
@@ -19,6 +20,7 @@ function Index() {
     status_rain: "-",
     buzzer: "-",
   });
+  const [settings, setSettings] = useState<any>(null);
 
   // 1. Firebase History
   useEffect(() => {
@@ -68,9 +70,25 @@ function Index() {
     return () => unsubscribe();
   }, []);
 
+  // 1b. Firebase Settings
+  useEffect(() => {
+    const unsubscribeSettings = onSnapshot(
+      doc(db, "settings", "config"),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setSettings(docSnap.data());
+        }
+      }
+    );
+    return () => unsubscribeSettings();
+  }, []);
+
   // 2. WebSocket — same config as admin
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
+    const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
+    if (!wsIp || !wsIp.trim()) return;
+
+    let baseUrl = wsIp.trim();
     const wsUrl = baseUrl.endsWith("/")
       ? `${baseUrl}ws/getIot`
       : `${baseUrl}/ws/getIot`;

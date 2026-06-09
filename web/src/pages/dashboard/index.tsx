@@ -105,7 +105,9 @@ function Index() {
   // 3. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
   useEffect(() => {
     const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
-    let formattedWsUrl = wsIp;
+    if (!wsIp || !wsIp.trim()) return; // Tunggu sampai konfigurasi IP tersedia
+
+    let formattedWsUrl = wsIp.trim();
     if (!formattedWsUrl.startsWith("ws://") && !formattedWsUrl.startsWith("wss://")) {
       formattedWsUrl = `wss://${formattedWsUrl}`;
     }
