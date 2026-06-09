@@ -41,10 +41,10 @@ function Index() {
 
           return {
             id: doc.id,
-            tinggi_air: `${item.distance || 0} cm`,
-            curah_hujan: `${item.rain || 0} mm`,
-            distance: item.distance || 0,
-            rain: item.rain || 0,
+            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+            curah_hujan: `${Number(item.rain || 0).toFixed(2)} mm`,
+            distance: parseFloat(Number(item.distance || 0).toFixed(2)),
+            rain: parseFloat(Number(item.rain || 0).toFixed(2)),
             status: item.status_rain === "Ya"
               ? "Bahaya"
               : "Aman",
@@ -195,10 +195,9 @@ function Index() {
         .filter((item) => item.distance >= 0) // hanya data >= 0
         .map((item) => ({
           time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir,
-          tinggiAir:
-            typeof item.distance === "number"
-              ? item.distance
-              : parseFloat(item.tinggi_air),
+          tinggiAir: parseFloat(
+            (typeof item.distance === "number" ? item.distance : parseFloat(item.tinggi_air)).toFixed(2)
+          ),
         }))
         .reverse()}
       />

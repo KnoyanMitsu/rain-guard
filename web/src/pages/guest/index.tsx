@@ -41,8 +41,8 @@ function Index() {
             : new Date();
           return {
             id: doc.id,
-            tinggi_air: `${item.distance || 0} cm`,
-            curah_hujan: `${item.rain || 0} mm`,
+            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+            curah_hujan: `${Number(item.rain || 0).toFixed(2)} mm`,
 
             status:
               distanceValue > 10
@@ -56,7 +56,7 @@ function Index() {
             // GRAPH
             time: lastSeen.toLocaleTimeString("id-ID"),
 
-            tinggiAir: parseFloat(item.distance || 0),
+            tinggiAir: parseFloat(Number(item.distance || 0).toFixed(2)),
           };
         });
         setRealtimeData(data);
