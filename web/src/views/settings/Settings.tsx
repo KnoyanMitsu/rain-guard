@@ -149,7 +149,7 @@ export default function Settings() {
         type={toast.type}
       />
 
-      <div className="rounded-2xl border border-secondary bg-white/80 backdrop-blur-xl p-8 shadow-sm">
+      <div className="rounded-2xl border border-secondary bg-background/80 backdrop-blur-xl p-8 shadow-sm">
         <div className="mb-8 border-b border-secondary/30 pb-6">
           <h2 className="text-2xl font-bold text-text mb-2">
             Konfigurasi Sistem
@@ -220,7 +220,7 @@ export default function Settings() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30"
+            className="flex items-center gap-2 bg-primary text-background hover:bg-primary/90 px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30"
           >
             {isSaving ? (
               <>

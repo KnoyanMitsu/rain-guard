@@ -26,8 +26,8 @@ export interface SensorReading {
 }
 
 // Design tokens
-const C_WATER = "#3b82f6";
-const C_RAIN = "#6fb3c1";
+const C_WATER = "var(--chart-water)";
+const C_RAIN = "var(--chart-rain)";
 const PIE_COLORS: Record<string, string> = {
   Aman: "#22c55e",
   Waspada: "#f59e0b",
@@ -35,10 +35,10 @@ const PIE_COLORS: Record<string, string> = {
 };
 
 const tooltipStyle = {
-  backgroundColor: "#1e293b",
-  border: "none",
+  backgroundColor: "var(--color-background)",
+  border: "1px solid var(--color-secondary)",
   borderRadius: "10px",
-  color: "#f1f5f9",
+  color: "var(--color-text)",
   fontSize: 12,
   padding: "8px 12px",
 };
@@ -58,21 +58,21 @@ export const ANALYSIS_META: Record<
     deskripsi: "Menampilkan pola naik turun tinggi air terhadap waktu.",
     dataDigunakan: ["Water Level (cm)", "Timestamp"],
     visualisasi: "Line Chart",
-    colorAccent: "#3b82f6",
+    colorAccent: "var(--chart-water)",
     icon: "📈",
   },
   "Tren Intensitas Hujan": {
     deskripsi: "Menampilkan perubahan intensitas hujan terhadap waktu.",
     dataDigunakan: ["Rain Sensor Value (%)", "Timestamp"],
     visualisasi: "Line Chart",
-    colorAccent: "#6fb3c1",
+    colorAccent: "var(--chart-rain)",
     icon: "🌧️",
   },
   "Korelasi Hujan dan Tinggi Air": {
     deskripsi: "Menampilkan hubungan antara hujan dan kenaikan tinggi air.",
     dataDigunakan: ["Rain Sensor Value (%)", "Water Level (cm)"],
     visualisasi: "Dual Line Chart",
-    colorAccent: "#8b5cf6",
+    colorAccent: "#a855f7",
     icon: "🔗",
   },
   "Analisis Kecepatan Kenaikan Air": {
@@ -93,7 +93,7 @@ export const ANALYSIS_META: Record<
     deskripsi: "Menampilkan frekuensi status aman, waspada, dan bahaya.",
     dataDigunakan: ["Alert Status"],
     visualisasi: "Pie Chart",
-    colorAccent: "#6366f1",
+    colorAccent: "#f59e0b",
     icon: "🚨",
   },
   "Prediksi Kenaikan Air": {
@@ -119,13 +119,13 @@ function TrenKetinggianAir({
       description={meta.deskripsi}
       onClose={onClose}
       data={data}
-      lines={[
-        {
-          dataKey: "water_level",
-          name: "Tinggi Air (cm)",
-          color: "#3b82f6",
-        },
-      ]}
+        lines={[
+          {
+            dataKey: "water_level",
+            name: "Tinggi Air (cm)",
+            color: "var(--chart-water)",
+          },
+        ]}
     />
   );
 }
@@ -142,13 +142,13 @@ function TrenIntensitasHujan({
       description={meta.deskripsi}
       onClose={onClose}
       data={data}
-      lines={[
-        {
-          dataKey: "rain_sensor",
-          name: "Intensitas Hujan (%)",
-          color: "#6fb3c1",
-        },
-      ]}
+        lines={[
+          {
+            dataKey: "rain_sensor",
+            name: "Intensitas Hujan (%)",
+            color: "var(--chart-rain)",
+          },
+        ]}
     />
   );
 }
@@ -179,7 +179,7 @@ function StatistikHarian({ data, meta, onClose }: { data: SensorReading[]; meta:
   const rain = data.map((d) => d.rain_sensor);
 
   if (wl.length === 0) {
-    return <p className="py-8 text-center text-sm text-slate-400">Tidak ada data untuk ditampilkan.</p>;
+    return <p className="py-8 text-center text-sm text-text/50">Tidak ada data untuk ditampilkan.</p>;
   }
 
   const stats = [
@@ -209,17 +209,17 @@ function StatistikHarian({ data, meta, onClose }: { data: SensorReading[]; meta:
         <AceUICardStats
           title="Tinggi Air"
           stats={[
-            { label: "Minimum", value: Math.min(...wl), unit: "cm", color: "#3b82f6" },
+            { label: "Minimum", value: Math.min(...wl), unit: "cm", color: "var(--chart-water)" },
             { label: "Maksimum", value: Math.max(...wl), unit: "cm", color: "#ef4444" },
-            { label: "Rata-rata", value: Math.round(wl.reduce((a, b) => a + b, 0) / wl.length), unit: "cm", color: "#64748b" },
+            { label: "Rata-rata", value: Math.round(wl.reduce((a, b) => a + b, 0) / wl.length), unit: "cm", color: "var(--color-text)" },
           ]}
         />
         <AceUICardStats
           title="Intensitas Hujan"
           stats={[
-            { label: "Minimum", value: Math.min(...rain), unit: "%", color: "#3b82f6" },
+            { label: "Minimum", value: Math.min(...rain), unit: "%", color: "var(--chart-rain)" },
             { label: "Maksimum", value: Math.max(...rain), unit: "%", color: "#ef4444" },
-            { label: "Rata-rata", value: Math.round(rain.reduce((a, b) => a + b, 0) / rain.length), unit: "%", color: "#64748b" },
+            { label: "Rata-rata", value: Math.round(rain.reduce((a, b) => a + b, 0) / rain.length), unit: "%", color: "var(--color-text)" },
           ]}
         />
       </div>
@@ -380,7 +380,7 @@ function PrediksiKenaikanAir({ data, meta, onClose }: { data: SensorReading[]; m
             type="monotone"
             dataKey="water_level"
             name="Tinggi Air Aktual (cm)"
-            stroke="var(--color-accent)"
+            stroke="var(--chart-water)"
             strokeWidth={2.5}
             dot={false}
             connectNulls={false}
@@ -397,7 +397,7 @@ function PrediksiKenaikanAir({ data, meta, onClose }: { data: SensorReading[]; m
           />
         </ComposedChart>
       </ResponsiveContainer>
-      <p className="mt-3 text-xs text-slate-400 text-center">
+      <p className="mt-3 text-xs text-text/50 text-center">
         Prediksi menggunakan regresi linear dari {ACTUAL_POINTS} data aktual terakhir.
         Akurasi meningkat seiring bertambahnya data.
       </p>
@@ -423,22 +423,22 @@ export default function AnalysisPanel({
 
   if (data.length === 0) {
     return (
-      <div className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
+      <div className="mt-5 rounded-2xl border border-secondary bg-background shadow-md overflow-hidden">
         <div
-          className="flex items-start justify-between px-6 py-4 border-b border-slate-100"
+          className="flex items-start justify-between px-6 py-4 border-b border-secondary"
           style={{ borderLeftColor: meta.colorAccent, borderLeftWidth: 4 }}
         >
           <div className="flex items-center gap-3">
             <span className="text-2xl">{meta.icon}</span>
-            <h3 className="text-base font-semibold text-slate-800">{selectedAnalysis}</h3>
+            <h3 className="text-base font-semibold text-text">{selectedAnalysis}</h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100">
+          <button onClick={onClose} className="text-text/50 hover:text-text p-1.5 rounded-lg hover:bg-secondary/20">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="p-10 text-center text-sm text-slate-400 bg-white">
+        <div className="p-10 text-center text-sm text-text/50 bg-background">
           Tidak ada data untuk rentang tanggal yang dipilih.
         </div>
       </div>

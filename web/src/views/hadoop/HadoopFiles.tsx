@@ -33,7 +33,7 @@ function StatusBadge({ status }: { status: string }) {
     Tidak: "bg-emerald-100 text-emerald-800 border-emerald-300",
   };
   return (
-    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${map[status] ?? "bg-white text-text border-secondary"}`}>
+    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${map[status] ?? "bg-background text-text border-secondary"}`}>
       {status}
     </span>
   );
@@ -133,7 +133,7 @@ export default function HadoopFiles() {
     previewPage * PREVIEW_PER_PAGE
   );
 
-  const panelClass = "rounded-2xl border border-secondary bg-white backdrop-blur-sm";
+  const panelClass = "rounded-2xl border border-secondary bg-background backdrop-blur-sm";
 
   return (
     <div className="flex flex-col gap-6">
@@ -152,7 +152,7 @@ export default function HadoopFiles() {
         <button
           onClick={fetchFiles}
           disabled={loadingFiles}
-          className="flex shrink-0 items-center gap-2 rounded-xl border border-secondary bg-white px-4 py-2 text-sm font-medium text-text transition-all hover:bg-secondary/20 disabled:opacity-60"
+          className="flex shrink-0 items-center gap-2 rounded-xl border border-secondary bg-background px-4 py-2 text-sm font-medium text-text transition-all hover:bg-secondary/20 disabled:opacity-60"
         >
           <RefreshCw className={`h-4 w-4 ${loadingFiles ? "animate-spin" : ""}`} />
           Refresh
@@ -194,7 +194,7 @@ export default function HadoopFiles() {
             <p className="text-xs">Klik "Backup ke Hadoop" di halaman Dasbor untuk membuat backup pertama.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-secondary bg-background">
             <table className="w-full border-collapse text-sm">
               <thead className="bg-secondary/20 text-text">
                 <tr>

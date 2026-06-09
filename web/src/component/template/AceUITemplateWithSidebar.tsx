@@ -1,9 +1,10 @@
-import logo from "@/component/asset/logo rain-guard.png"; // Sesuaikan path-nya
-import { ArrowRight, LogOut, Menu } from "lucide-react";
+import logo from "@/component/asset/logo rain-guard.png";
+import logoWhite from "@/component/asset/logo rain-guard white.png";
+import { ArrowRight, LogOut, Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export type MenuItem = {
   title: string;
@@ -36,6 +37,29 @@ function AceUITemplateWithSidebar({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      setDark(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  function toggleDark() {
+    setDark((prev) => {
+      const next = !prev;
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return next;
+    });
+  }
   const profileNameClass = "max-w-[10rem] truncate text-lg font-semibold leading-tight text-text";
   const profileRoleClass = "text-sm text-text/70 leading-tight";
   return (
@@ -45,7 +69,7 @@ function AceUITemplateWithSidebar({
         <div className="hidden md:flex col-span-1 p-6 flex-col gap-6">
           <div className="flex items-center gap-2 min-w-0">
             <div className="flex-shrink-0">
-              <Image src={logo} alt="Logo" width={40} height={40} />
+              <Image src={dark ? logoWhite : logo} alt="Logo" width={40} height={40} />
             </div>
             <h1 className="text-3xl font-bold truncate">{appname}</h1>
           </div>
@@ -73,7 +97,14 @@ function AceUITemplateWithSidebar({
               })}
             </ul>
           </nav>
-          <div className="container mx-auto mt-auto">
+          <div className="container mx-auto mt-auto flex flex-col gap-2">
+            <button
+              onClick={toggleDark}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-text hover:bg-secondary transition-all w-full"
+            >
+              {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              <span className="text-sm font-medium">{dark ? "Mode Terang" : "Mode Gelap"}</span>
+            </button>
             {account && (
               <div
                 className={`relative ${isProfilePopupOpen ? "p-2 absolute rounded-b-2xl mb-2 bg-background border border-secondary shadow-[0_8px_30px_rgb(0,0,0,0.12)]" : ""}`}
@@ -130,7 +161,7 @@ function AceUITemplateWithSidebar({
         >
           <div className="flex justify-between items-center mb-10">
             <div className="flex items-center gap-2">
-            <Image src={logo} alt="Logo" width={32} height={32} />
+            <Image src={dark ? logoWhite : logo} alt="Logo" width={32} height={32} />
             <h1 className="text-3xl font-bold">{appname}</h1>
           </div>
             <button
@@ -165,10 +196,17 @@ function AceUITemplateWithSidebar({
               })}
             </ul>
           </nav>
-          <div className="container mx-auto mt-auto">
+          <div className="container mx-auto mt-auto flex flex-col gap-2">
+            <button
+              onClick={toggleDark}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-text hover:bg-secondary transition-all w-full"
+            >
+              {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              <span className="text-sm font-medium">{dark ? "Mode Terang" : "Mode Gelap"}</span>
+            </button>
             {account && (
               <div
-                className={`relative ${isProfilePopupOpen ? "p-2 absolute bg-white600 rounded-b-2xl border-gray-100 mb-2 bg-white border shadow-[0_8px_30px_rgb(0,0,0,0.12)]" : ""}`}
+                className={`relative ${isProfilePopupOpen ? "p-2 absolute rounded-b-2xl mb-2 bg-background border border-secondary shadow-[0_8px_30px_rgb(0,0,0,0.12)]" : ""}`}
               >
                 <div
                   className="flex items-center gap-2 cursor-pointer p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors"
@@ -216,7 +254,7 @@ function AceUITemplateWithSidebar({
               <h1 className="font-bold text-2xl">{header}</h1>
             </div>
           </div>
-          <div className="bg-secondary/10 rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
+          <div className="bg-background rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
             <div className="flex justify-between items-center mb-4">
               <h1 className="hidden md:block text-3xl font-bold">{header}</h1>
             </div>

@@ -115,7 +115,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
     <div className="flex flex-col gap-6">
 
       {/* HEADER */}
-      <div className="relative z-20 rounded-3xl border border-secondary bg-white backdrop-blur-sm p-6 shadow-sm">
+      <div className="relative z-20 rounded-3xl border border-secondary bg-background backdrop-blur-sm p-6 shadow-sm">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
 
           <div>
@@ -149,7 +149,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                     border border-secondary bg-background
                     px-4 py-3 pr-11
                     text-sm font-medium text-text
-                    placeholder:text-black shadow-sm outline-none
+                    placeholder:text-text/50 shadow-sm outline-none
                     transition-all hover:border-primary
                     focus:border-primary focus:ring-2 focus:ring-primary/20
                   "
@@ -228,7 +228,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
       </div>
 
       {activeAnalyses.length === 0 && !loading && (
-        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-10 text-center">
+        <div className="rounded-2xl border border-secondary bg-background backdrop-blur-sm p-10 text-center">
           <Activity className="mx-auto mb-3 h-10 w-10 text-text/20" />
           <p className="text-sm font-semibold text-text/50">Pilih jenis analisis dari dropdown di atas</p>
           <p className="mt-1 text-xs text-text/30">
@@ -239,7 +239,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
       )}
 
       {loading && (
-        <div className="rounded-2xl border border-secondary bg-white backdrop-blur-sm p-10 text-center">
+        <div className="rounded-2xl border border-secondary bg-background backdrop-blur-sm p-10 text-center">
           <p className="text-sm text-text/50">Memuat data sensor...</p>
         </div>
       )}

@@ -110,7 +110,7 @@ function HistoryPage() {
         </div>
         
         {loading ? (
-          <div className="text-center py-10 text-slate-800 text-sm">
+          <div className="text-center py-10 text-text text-sm">
             Memuat data sensor...
           </div>
         ) : (
