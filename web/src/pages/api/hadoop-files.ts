@@ -13,7 +13,7 @@ function hdfsRequest(
   return new Promise((resolve, reject) => {
     const options: RequestInit = {
       method,
-      redirect: "manual",
+      redirect: "manual", // Menahan agar tidak otomatis pindah ke IP lokal Hadoop
     };
     if (body) {
       options.headers = {
@@ -73,14 +73,14 @@ async function listFiles(hadoopBaseUrl: string) {
   const statuses: any[] = json?.FileStatuses?.FileStatus ?? [];
 
   return statuses
-    .filter((f) => f.type === "FILE")
-    .map((f) => ({
+    .filter((f: any) => f.type === "FILE")
+    .map((f: any) => ({
       fileName: f.pathSuffix as string,
       size: f.length as number,
       modifiedAt: new Date(f.modificationTime as number).toLocaleString("id-ID"),
       modifiedTimestamp: f.modificationTime as number,
     }))
-    .sort((a, b) => b.modifiedTimestamp - a.modifiedTimestamp);
+    .sort((a: any, b: any) => b.modifiedTimestamp - a.modifiedTimestamp);
 }
 
 async function readFile(fileName: string, hadoopBaseUrl: string) {
@@ -98,10 +98,22 @@ async function readFile(fileName: string, hadoopBaseUrl: string) {
     );
   }
 
-  // Step 2: baca data dari DataNode (ganti hostname → hostname proxy)
+  // Step 2: Olah URL dari DataNode agar bisa diakses dari luar (lewat Cloudflare/Nginx)
   const dataNodeUrl = new URL(step1.location);
   const originalUrl = new URL(hadoopBaseUrl);
-  dataNodeUrl.hostname = originalUrl.hostname;
+  
+  // Deteksi otomatis: Jika NameNode diakses via hadoop.domain.com,
+  // maka arahkan request DataNode ke datanode.domain.com
+  if (originalUrl.hostname.includes("hadoop")) {
+    dataNodeUrl.hostname = originalUrl.hostname.replace("hadoop", "datanode");
+  } else {
+    // Fallback manual jika format domain berbeda
+    dataNodeUrl.hostname = "datanode.rain-guard.my.id"; 
+  }
+
+  // Wajib menggunakan protokol HTTPS dan menghapus port 9864 bawaan Hadoop
+  dataNodeUrl.protocol = "https:";
+  dataNodeUrl.port = ""; 
 
   const step2 = await hdfsRequest(
     "GET",
