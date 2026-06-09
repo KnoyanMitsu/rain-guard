@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 
 // Alamat server WebSocket Anda (Ganti jika berbeda)
-const url = 'ws://4.145.113.15:1880/ws/iot';
+const url = process.env.WEBSOCKET_URL || 'ws://localhost:1880/ws/iot';
 const ws = new WebSocket(url);
 
 // Fungsi untuk menghasilkan angka acak dalam rentang tertentu

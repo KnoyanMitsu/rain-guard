@@ -70,8 +70,7 @@ function Index() {
 
   // 2. WebSocket — same config as admin
   useEffect(() => {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
+    const baseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
     const wsUrl = baseUrl.endsWith("/")
       ? `${baseUrl}ws/getIot`
       : `${baseUrl}/ws/getIot`;
