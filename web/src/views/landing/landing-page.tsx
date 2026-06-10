@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { 
-  Droplets, Bell, Play, ArrowRight, Cpu, CloudHail, 
-  Monitor, ShieldCheck, ChevronRight, Activity, 
+import {
+  Droplets, Bell, Play, ArrowRight, Cpu, CloudHail,
+  Monitor, ShieldCheck, ChevronRight, Activity,
   Wifi, Database, BatteryCharging, Waves, AlertTriangle,
   Siren
 } from "lucide-react";
@@ -29,9 +29,8 @@ const AnimateOnScroll = ({ children, delay = 0 }: { children: ReactNode, delay?:
   return (
     <div
       ref={domRef}
-      className={`transition-all duration-1000 ease-out ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
+      className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+        }`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
@@ -49,7 +48,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] text-slate-800 font-sans antialiased overflow-x-hidden">
-      
+
       {/* 1. NAVBAR */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -61,7 +60,7 @@ export default function LandingPage() {
               Rain<span className="text-primary font-extrabold">Guard</span>
             </span>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <Link href="/guest">
               <span className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors duration-200 cursor-pointer hidden sm:block">
@@ -91,7 +90,7 @@ export default function LandingPage() {
               Tugas Akhir / Prototype IoT Polinema
             </div>
           </AnimateOnScroll>
-          
+
           <AnimateOnScroll delay={100}>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] mb-6">
               Deteksi Dini, <br />
@@ -115,7 +114,7 @@ export default function LandingPage() {
                   <ArrowRight size={18} />
                 </button>
               </Link>
-              <button 
+              <button
                 onClick={scrollToVideo}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-sm hover:-translate-y-1"
               >
@@ -136,7 +135,7 @@ export default function LandingPage() {
                 <div className="w-3 h-3 rounded-full bg-amber-400"></div>
                 <div className="w-3 h-3 rounded-full bg-green-600"></div>
               </div>
-              
+
               {/* Ilustrasi Sensor IoT Custom */}
               <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-xl group-hover:scale-105 transition-transform duration-700 ease-out" fill="none" xmlns="http://www.w3.org/2000/svg">
                 {/* Awan & Hujan */}
@@ -144,15 +143,15 @@ export default function LandingPage() {
                 <rect x="150" y="200" width="4" height="15" rx="2" fill="#4546c2" className="animate-pulse" />
                 <rect x="190" y="195" width="4" height="20" rx="2" fill="#4546c2" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
                 <rect x="230" y="205" width="4" height="12" rx="2" fill="#4546c2" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
-                
+
                 {/* Tiang Sensor & Box ESP32 */}
                 <rect x="195" y="180" width="10" height="120" fill="#94A3B8" />
                 <rect x="175" y="150" width="50" height="40" rx="4" fill="#1E293B" />
-                
+
                 {/* Sensor Ultrasonik */}
                 <path d="M185 280L165 310H235L215 280H185Z" fill="#64748B" opacity="0.8" />
                 <path d="M165 310 C165 330, 235 330, 235 310" stroke="#4546c2" strokeWidth="2" strokeDasharray="4 4" className="animate-pulse" />
-                
+
                 {/* Air Sungai */}
                 <path d="M50 340Q125 320 200 340T350 340L350 400L50 400Z" fill="#4546c2" opacity="0.2" />
                 <path d="M50 350Q125 370 200 350T350 350L350 400L50 400Z" fill="#4546c2" opacity="0.4" />
@@ -215,7 +214,7 @@ export default function LandingPage() {
           <AnimateOnScroll>
             <div className="text-center mb-16">
               <h2 className="text-3xl font-extrabold text-slate-900">Kondisi Terpantau Sepenuhnya</h2>
-              <p className="text-slate-500 mt-3 max-w-xl mx-auto">Indikator visual dasbor dirancang menggunakan standar warna keamanan untuk mempercepat pengambilan keputusan.</p>
+              <p className="text-slate-500 mt-3 max-w-xl mx-auto">Indikator visual Dashboard dirancang menggunakan standar warna keamanan untuk mempercepat pengambilan keputusan.</p>
             </div>
           </AnimateOnScroll>
 
@@ -238,7 +237,7 @@ export default function LandingPage() {
                   <AlertTriangle size={28} />
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 mb-3">Status: Siaga (Waspada)</h3>
-                <p className="text-sm text-slate-500 leading-relaxed">Sistem mendeteksi anomali kenaikan air atau hujan deras berkepanjangan. Dasbor memberikan sinyal kuning peringatan awal.</p>
+                <p className="text-sm text-slate-500 leading-relaxed">Sistem mendeteksi anomali kenaikan air atau hujan deras berkepanjangan. Dashboard memberikan sinyal kuning peringatan awal.</p>
               </div>
             </AnimateOnScroll>
 
@@ -261,7 +260,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 relative">
           {/* Latar belakang abstrak */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
-          
+
           <AnimateOnScroll>
             <div className="text-center mb-16">
               <h2 className="text-3xl font-extrabold text-white">Alur Data (Pipeline)</h2>
@@ -296,7 +295,7 @@ export default function LandingPage() {
             <AnimateOnScroll delay={300}>
               <div className="bg-slate-800/80 backdrop-blur border border-slate-700 p-6 rounded-2xl w-64 text-center">
                 <Monitor className="text-emerald-400 mx-auto mb-4" size={32} />
-                <h4 className="font-bold mb-2">3. Visualisasi Dasbor</h4>
+                <h4 className="font-bold mb-2">3. Visualisasi Dashboard</h4>
                 <p className="text-xs text-slate-400">Web Next.js merender grafik & alarm</p>
               </div>
             </AnimateOnScroll>
@@ -308,17 +307,18 @@ export default function LandingPage() {
       <section ref={videoSectionRef} className="py-24 bg-[#FAFBFC] scroll-mt-10">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <AnimateOnScroll>
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-8">Video Demonstrasi</h2>
-            <div className="relative aspect-video w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl shadow-slate-300 border-4 border-white group cursor-pointer">
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-transparent z-10" />
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-20 transition-transform duration-500 group-hover:scale-105">
-                <div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center shadow-xl shadow-primary/40 mb-4 group-hover:bg-primary/80">
-                  <Play size={32} className="ml-2 fill-white" />
-                </div>
-                <p className="text-white font-bold text-lg">Tonton Pengujian Alat</p>
-              </div>
+            <h2 className="text-3xl font-extrabold text-slate-900 mb-8">
+              Video Demonstrasi
+            </h2>
+
+            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-2xl shadow-slate-300 border-4 border-white">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/z1zr1utJNpM"
+                title="RainGuard Demonstration"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
           </AnimateOnScroll>
         </div>
@@ -331,11 +331,11 @@ export default function LandingPage() {
             <div className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl shadow-primary/20">
               <h2 className="text-3xl md:text-4xl font-black mb-4">Siap Memantau Secara Langsung?</h2>
               <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-                Eksplorasi antarmuka Dasbor Publik RainGuard. Pantau perubahan tinggi air dan pergerakan grafik sensor saat ini juga tanpa perlu mendaftar.
+                Eksplorasi antarmuka Dashboard Publik RainGuard. Pantau perubahan tinggi air dan pergerakan grafik sensor saat ini juga tanpa perlu mendaftar.
               </p>
               <Link href="/">
                 <button className="bg-white text-primary font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-slate-50 transition-all hover:scale-105 active:scale-95">
-                  Buka Dasbor Sekarang
+                  Buka Dashboard Sekarang
                 </button>
               </Link>
             </div>
@@ -355,7 +355,7 @@ export default function LandingPage() {
               <p className="text-xs text-slate-400">Sistem Peringatan Dini Banjir</p>
             </div>
           </div>
-          
+
           <div className="text-center md:text-right">
             <p className="text-sm font-semibold text-slate-600">Dikembangkan oleh Kelompok 3</p>
             <p className="text-xs text-slate-400 mt-1">© 2026 Politeknik Negeri Malang. All Rights Reserved.</p>

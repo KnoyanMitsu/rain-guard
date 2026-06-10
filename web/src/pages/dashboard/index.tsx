@@ -174,7 +174,7 @@ function Index() {
       accountName={displayName}
       accountImage={`https://ui-avatars.com/api/?name=${displayName}`}
       accountRole="Admin"
-      header="Dasbor"
+      header="Dashboard"
     >
       <Dashboard
         // Lempar data lokasi dinamis dari settings

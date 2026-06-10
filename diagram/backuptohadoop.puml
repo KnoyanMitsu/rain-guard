@@ -18,10 +18,10 @@ if (Login valid?) then (Ya)
   :Menampilkan Dashboard Admin;
 
   |Admin User|
-  :Memilih menu Dasbor;
+  :Memilih menu Dashboard;
 
   |Sistem|
-  :Menampilkan halaman dasbor;
+  :Menampilkan halaman Dashboard;
 
   |Admin User|
   :Menekan tombol "Backup ke Hadoop";
