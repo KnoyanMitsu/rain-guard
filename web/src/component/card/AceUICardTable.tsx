@@ -134,7 +134,7 @@ function AceUICardTable({
                 {thead.map((item, index) => (
                   <th
                     key={index}
-                    className="px-4 py-3 font-medium text-background cursor-pointer hover:opacity-80 select-none"
+                    className="px-2 sm:px-4 py-2 sm:py-3 font-medium text-background cursor-pointer hover:opacity-80 select-none"
                     onClick={() => requestSort(index)}
                   >
                     <div className="flex text-text items-center gap-1">
@@ -158,7 +158,7 @@ function AceUICardTable({
                     className="border-b border-secondary last:border-b-0"
                   >
                     {Object.values(dataCells).map((cellValue, cellIndex) => (
-                      <td key={cellIndex} className="px-4 py-3 text-text">
+                      <td key={cellIndex} className="px-2 sm:px-4 py-2 sm:py-3 text-text">
                         {renderCell ? renderCell(cellValue, row, cellIndex) : cellValue}
                       </td>
                     ))}
@@ -168,7 +168,7 @@ function AceUICardTable({
             </tbody>
           </table>
         </div>
-        <div className="flex justify-end items-end gap-2">
+        <div className="flex justify-end items-end gap-1 sm:gap-2 flex-wrap">
           <AceUIButton
             onClick={prevPage}
             types="button"

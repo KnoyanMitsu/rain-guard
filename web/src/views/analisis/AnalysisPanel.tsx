@@ -346,7 +346,7 @@ function PrediksiKenaikanAir({ data, meta, onClose }: { data: SensorReading[]; m
   return (
     <AceUICardChart title="Prediksi Kenaikan Air" icon={meta.icon} description={meta.deskripsi} onClose={onClose}>
       {/* Statistik ringkas */}
-      <div className="grid md:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-3 gap-4 mb-4">
         <AceUICardMetric title="Tinggi Air Saat Ini" value={lastActual} unit="cm" />
         <AceUICardMetric title={`Prediksi +${FORECAST_STEPS} Menit`} value={lastForecast} unit="cm" />
         <AceUICardMetric title="Rata-rata Hujan" value={avgRain} unit="%" />
@@ -356,7 +356,7 @@ function PrediksiKenaikanAir({ data, meta, onClose }: { data: SensorReading[]; m
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-secondary)" opacity={0.35}/>
           <XAxis dataKey="time" axisLine={false} tickLine={false}
             tick={{fontSize: 12, fill: "var(--color-text)", opacity: 0.82,}}
-            interval={Math.max(1, Math.floor(combined.length / 10))} dy={10}
+            interval={Math.max(1, Math.floor(combined.length / 8))} dy={10}
           />
           <YAxis tick={{ fontSize: 11 }} unit=" cm" domain={["auto", "auto"]}/>
           <Tooltip

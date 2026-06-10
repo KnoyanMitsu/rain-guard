@@ -66,21 +66,21 @@ function AceUICardStatus({
           )}
           {/* text */}
           <div>
-            <h2 className="text-xl font-medium text-text/70 mb-1">
+              <h2 className="text-base sm:text-xl font-medium text-text/70 mb-1">
               {title}
             </h2>
             <div className="flex items-baseline gap-1">
-              <p className="text-3xl font-bold text-text">
+              <p className="text-2xl sm:text-3xl font-bold text-text">
                 {value}
               </p>
               {unit && (
-                <span className="text-md text-text/80">
+                <span className="text-sm sm:text-md text-text/80">
                   {unit}
                 </span>
               )}
             </div>
             {description && (
-              <p className="text-sm font-normal text-text/200 mt-1">
+              <p className="text-xs sm:text-sm font-normal text-text/200 mt-1">
                 {description}
               </p>
             )}

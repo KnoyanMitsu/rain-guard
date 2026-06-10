@@ -1,4 +1,5 @@
 "use client";
+import { useRef, useState, useEffect, useMemo } from "react";
 import AceUICard from "./AceUICard";
 import {
   ResponsiveContainer,
@@ -91,12 +92,33 @@ type BarChartProps = {
 };
 
 export function AceUIBarChart({ title, data, icon, description, onClose }: BarChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const interval = useMemo(
+    () => containerWidth < 640
+      ? Math.max(1, Math.floor(data.length / 10))   // HP: ~10 label
+      : Math.max(1, Math.floor(data.length / 30)),  // laptop: ~30 label
+    [containerWidth, data.length]
+  );
+
   return (
     <AceUICardChart title={title} icon={icon} description={description} onClose={onClose}>
-      <ResponsiveContainer width="100%" height={320}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-secondary)" opacity={0.35} />
-          <XAxis dataKey="time" tick={{ fontSize: 10, fill: "var(--color-text)", opacity: 0.82 }} interval={5} />
+      <div ref={containerRef}>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-secondary)" opacity={0.35} />
+            <XAxis dataKey="time" tick={{ fontSize: 10, fill: "var(--color-text)", opacity: 0.82 }} interval={interval} />
           <YAxis tick={{ fontSize: 11, fill: "var(--color-text)", opacity: 0.82 }} unit=" cm/h" />
           <Tooltip contentStyle={tooltipStyle} />
           <ReferenceLine y={0} stroke="var(--color-text)" opacity={0.3} />
@@ -107,6 +129,7 @@ export function AceUIBarChart({ title, data, icon, description, onClose }: BarCh
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      </div>
     </AceUICardChart>
   );
 }

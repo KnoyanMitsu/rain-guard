@@ -34,34 +34,13 @@ export default function AceUILocationHeader({
 
   return (
     <AceUICard>
-      {/* Container utama dibuat items-center agar Kiri dan Kanan sejajar vertikal */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        
-        {/* KIRI: Judul dan Dropdown */}
-        <div className="flex flex-col justify-center">
-          
-          {/* Baris ini kita buat items-center agar teks dan dropdown benar-benar lurus */}
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-medium text-text/80 leading-none m-0">
-              Stasiun Pemantau:
-            </h2>
-            
-            {/* Bungkus dropdown agar tidak terpengaruh margin luar */}
-            <div className="flex items-center">
-              <AceUIDropdown 
-                title={activeName} 
-                actions={dropdownActions} 
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* KANAN: Ikon MapPin dan Kota */}
-        <div className="flex items-center gap-2 bg-primary text-background px-4 py-3 rounded-xl text-sm font-bold w-fit shadow-sm">
+      <div className="flex flex-row flex-wrap items-center gap-3">
+        <h2 className="text-xl font-medium text-text/80 whitespace-nowrap">Lokasi:</h2>
+        <AceUIDropdown title={activeName} actions={dropdownActions} />
+        <div className="ml-auto flex items-center gap-2 bg-primary text-background px-4 py-3 rounded-xl text-sm font-bold shadow-sm whitespace-nowrap">
           <MapPin size={18} />
           {city}
         </div>
-
       </div>
     </AceUICard>
   );

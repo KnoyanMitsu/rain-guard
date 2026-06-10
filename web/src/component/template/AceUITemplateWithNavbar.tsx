@@ -36,7 +36,7 @@ function AceUITemplateWithNavbar({
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   return (
     <>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col min-h-screen">
         {/* Desktop Navbar */}
         <div className="hidden md:flex items-center justify-between px-8 py-4 bg-background text-text z-10 relative w-full">
           <div className="grid grid-cols-3 items-center w-full">

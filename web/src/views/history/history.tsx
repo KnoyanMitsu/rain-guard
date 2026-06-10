@@ -115,67 +115,69 @@ function History({ tbody, thead }: HistoryProps) {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text">Mode Filter</label>
-              <div className="flex rounded-xl overflow-hidden border border-secondary">
-                <button
-                  onClick={() => { setFilterMode("harian"); setSelectedMonth(null); }}
-                  className={`px-4 py-3 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-background" : "bg-background text-text hover:bg-secondary/20"}`}
-                >
-                  Harian
-                </button>
-                <button
-                  onClick={() => { setFilterMode("bulanan"); setSelectedDate(null); }}
-                  className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "bulanan" ? "bg-primary text-background" : "bg-background text-text hover:bg-secondary/20"}`}
-                >
-                  Bulanan
-                </button>
+          <div className="flex flex-col sm:flex-row gap-1 sm:gap-3 flex-wrap">
+            <div className="flex flex-row sm:contents gap-3">
+              <div className="flex flex-col gap-1.5 sm:flex-none">
+                <label className="text-sm font-medium text-text">Mode Filter</label>
+                <div className="flex rounded-xl overflow-hidden border border-secondary">
+                  <button
+                    onClick={() => { setFilterMode("harian"); setSelectedMonth(null); }}
+                    className={`px-4 py-3 text-sm font-semibold transition-all ${filterMode === "harian" ? "bg-primary text-background" : "bg-background text-text hover:bg-secondary/20"}`}
+                  >
+                    Harian
+                  </button>
+                  <button
+                    onClick={() => { setFilterMode("bulanan"); setSelectedDate(null); }}
+                    className={`px-4 py-2 text-sm font-semibold transition-all ${filterMode === "bulanan" ? "bg-primary text-background" : "bg-background text-text hover:bg-secondary/20"}`}
+                  >
+                    Bulanan
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {filterMode === "harian" ? (
-              <div className="flex flex-col gap-1.5 min-w-[220px]">
-                <label className="text-sm font-medium text-text">Pilih Tanggal</label>
-                <div className="relative z-50">
-                  <DatePicker
-                    locale="id"
-                    selected={dateValue}
-                    onChange={(date: Date | null) => setSelectedDate(date)}
-                    placeholderText="Semua tanggal"
-                    dateFormat="dd MMM yyyy"
-                    isClearable={!!dateValue}
-                    popperClassName="z-[9999]"
-                    calendarClassName="shadow-2xl border border-secondary rounded-xl"
-                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-text/50 shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                  {!selectedDate && (
-                    <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
-                  )}
+              {filterMode === "harian" ? (
+                <div className="flex-1 sm:flex-none flex flex-col gap-1.5 sm:min-w-[220px]">
+                  <label className="text-sm font-medium text-text">Pilih Tanggal</label>
+                  <div className="relative z-50">
+                    <DatePicker
+                      locale="id"
+                      selected={dateValue}
+                      onChange={(date: Date | null) => setSelectedDate(date)}
+                      placeholderText="Semua tanggal"
+                      dateFormat="dd MMM yyyy"
+                      isClearable={!!dateValue}
+                      popperClassName="z-[9999]"
+                      calendarClassName="shadow-2xl border border-secondary rounded-xl"
+                      className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-text/50 shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                    {!selectedDate && (
+                      <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-1.5 min-w-[220px]">
-                <label className="text-sm font-medium text-text">Pilih Bulan</label>
-                <div className="relative z-50">
-                  <DatePicker
-                    locale="id"
-                    selected={monthValue}
-                    onChange={(date: Date | null) => setSelectedMonth(date)}
-                    placeholderText="Semua bulan"
-                    dateFormat="MMMM yyyy"
-                    showMonthYearPicker
-                    isClearable={!!monthValue}
-                    popperClassName="z-[9999]"
-                    calendarClassName="shadow-2xl border border-secondary rounded-xl"
-                    className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-text/50 shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                  {!selectedMonth && (
-                    <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
-                  )}
+              ) : (
+                <div className="flex-1 sm:flex-none flex flex-col gap-1.5 sm:min-w-[220px]">
+                  <label className="text-sm font-medium text-text">Pilih Bulan</label>
+                  <div className="relative z-50">
+                    <DatePicker
+                      locale="id"
+                      selected={monthValue}
+                      onChange={(date: Date | null) => setSelectedMonth(date)}
+                      placeholderText="Semua bulan"
+                      dateFormat="MMMM yyyy"
+                      showMonthYearPicker
+                      isClearable={!!monthValue}
+                      popperClassName="z-[9999]"
+                      calendarClassName="shadow-2xl border border-secondary rounded-xl"
+                      className="w-full appearance-none rounded-xl border border-secondary bg-background px-4 py-3 pr-11 text-sm font-medium text-text placeholder:text-text/50 shadow-sm outline-none transition-all hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                    {!selectedMonth && (
+                      <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text/70" />
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text opacity-0 select-none">Export</label>
@@ -223,7 +225,7 @@ function History({ tbody, thead }: HistoryProps) {
         renderCell={(value, row, colIndex) => {
           if (colIndex === 2) {
             return (
-              <span className={`inline-flex items-center justify-center min-w-[90px] px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${statusStyles[value as string] || ""}`}>
+              <span className={`inline-flex items-center justify-center min-w-[68px] px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${statusStyles[value as string] || ""}`}>
                 {value}
               </span>
             );

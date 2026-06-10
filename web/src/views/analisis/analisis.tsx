@@ -130,10 +130,10 @@ function Analisis({ tbody, loading }: AnalisisProps) {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-row gap-1 sm:gap-3 flex-wrap">
 
             {/* DATE FILTER */}
-            <div className="flex flex-col gap-1.5 min-w-[220px]">
+            <div className="flex-1 flex flex-col gap-1.5 sm:min-w-[220px]">
               <label className="text-sm font-medium text-text">Filter Tanggal</label>
               <div className="relative z-50">
                 <DatePicker
@@ -147,7 +147,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                   className="
                     w-full appearance-none rounded-xl
                     border border-secondary bg-background
-                    px-4 py-3 pr-11
+                    px-2 sm:px-4 py-2 sm:py-3 pr-8 sm:pr-11
                     text-sm font-medium text-text
                     placeholder:text-text/50 shadow-sm outline-none
                     transition-all hover:border-primary
@@ -166,7 +166,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                 onClick={() => setDropdownOpen((v) => !v)}
                 className={`
                   inline-flex items-center gap-2
-                  px-5 py-3 rounded-xl
+                  px-5 py-2 sm:py-3 rounded-xl
                   border shadow-sm text-sm font-semibold
                   transition-all duration-200
                   ${activeAnalyses.length > 0
@@ -183,8 +183,8 @@ function Analisis({ tbody, loading }: AnalisisProps) {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-3 z-50 w-72 rounded-3xl border border-secondary bg-background shadow-2xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-secondary/20 bg-secondary/10">
+                <div className="absolute right-0 mt-3 z-50 w-64 sm:w-72 rounded-3xl border border-secondary bg-background shadow-2xl overflow-hidden">
+                  <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-secondary/20 bg-secondary/10">
                     <p className="text-xs font-bold uppercase tracking-wider text-text/50">Pilih Analisis</p>
                   </div>
 
@@ -195,7 +195,7 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                         onClick={() => toggleAnalysis(name)}
                         className={`
                           w-full flex items-center gap-3
-                          px-4 py-3 text-sm transition-all
+                          px-3 sm:px-4 py-2 sm:py-3 text-sm transition-all
                           ${activeAnalyses.includes(name)
                             ? "bg-primary/10 text-primary font-semibold"
                             : "hover:bg-secondary/10 text-text"
@@ -211,10 +211,10 @@ function Analisis({ tbody, loading }: AnalisisProps) {
                   </div>
 
                   {activeAnalyses.length > 0 && (
-                    <div className="border-t border-secondary/20 p-3">
+                    <div className="border-t border-secondary/20 p-2 sm:p-3">
                       <button
                         onClick={() => { setActiveAnalyses([]); setDropdownOpen(false); }}
-                        className="w-full py-2 rounded-xl text-sm text-rose-500 hover:bg-rose-50 transition-all"
+                        className="w-full py-1 sm:py-2 rounded-xl text-sm text-rose-500 hover:bg-rose-500/10 transition-all"
                       >
                         Reset Analisis
                       </button>

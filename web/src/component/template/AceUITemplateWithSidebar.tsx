@@ -64,7 +64,7 @@ function AceUITemplateWithSidebar({
   const profileRoleClass = "text-sm text-text/70 leading-tight";
   return (
     <>
-      <div className="md:grid grid-cols-5 h-screen bg-background text-text">
+      <div className="md:grid grid-cols-5 min-h-screen bg-background text-text">
         {/* Desktop */}
         <div className="hidden md:flex col-span-1 p-6 flex-col gap-6">
           <div className="flex items-center gap-2 min-w-0">
@@ -254,7 +254,7 @@ function AceUITemplateWithSidebar({
               <h1 className="font-bold text-2xl">{header}</h1>
             </div>
           </div>
-          <div className="bg-background rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
+          <div className="bg-secondary/10 rounded-l-3xl h-screen overflow-y-auto  md:p-10 p-5 ">
             <div className="flex justify-between items-center mb-4">
               <h1 className="hidden md:block text-3xl font-bold">{header}</h1>
             </div>

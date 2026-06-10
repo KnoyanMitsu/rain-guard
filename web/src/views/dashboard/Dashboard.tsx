@@ -82,7 +82,7 @@ export function DashboardCards({
   const safeRain = Math.max(0, rawRain);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <AceUICardStatus
         className="bg-background border border-secondary shadow-sm"
         title="Tinggi Air"
@@ -178,7 +178,7 @@ export function DashboardTable({
           <thead className="bg-secondary/20 text-text">
             <tr>
               {thead.map((h, i) => (
-                <th key={i} className="text-left px-5 py-4 font-semibold uppercase tracking-wider text-xs">
+                <th key={i} className="text-left px-3 sm:px-5 py-3 sm:py-4 font-semibold uppercase tracking-wider text-xs">
                   {h.title}
                 </th>
               ))}
@@ -190,14 +190,14 @@ export function DashboardTable({
               const statusValue = getWaterStatus(distanceValue);
               return (
                 <tr key={i} className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors">
-                    <td className="px-5 py-4 font-semibold text-text">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
-                    <td className="px-5 py-4 font-semibold text-text">
+                    <td className="px-3 sm:px-5 py-3 sm:py-4 font-semibold text-text">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
+                    <td className="px-3 sm:px-5 py-3 sm:py-4 font-semibold text-text">
                       {row.rain != null ? `${Number(row.rain).toFixed(2)} mm` : row.curah_hujan}
                     </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 sm:px-5 py-3 sm:py-4">
                     <StatusBadge status={statusValue} />
                   </td>
-                  <td className="px-5 py-4 font-semibold text-text">{row.update_terakhir}</td>
+                  <td className="px-3 sm:px-5 py-3 sm:py-4 font-semibold text-text">{row.update_terakhir}</td>
                 </tr>
               );
             })}

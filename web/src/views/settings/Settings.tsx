@@ -165,7 +165,7 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-row gap-6">
             <div className="flex-shrink-0 pt-2 text-primary">
               <Wifi size={24} />
             </div>
@@ -183,7 +183,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-row gap-6">
             <div className="flex-shrink-0 pt-2 text-primary">
               <Database size={24} />
             </div>
@@ -201,7 +201,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-row gap-6">
             <div className="flex-shrink-0 pt-2 text-primary">
               <MapPin size={24} />
             </div>
@@ -246,7 +246,7 @@ export default function Settings() {
             )}
 
             {datanodes.map((dn, index) => (
-              <div key={index} className="flex flex-col md:flex-row gap-4 items-start md:items-center bg-secondary/10 p-4 rounded-xl border border-secondary/20">
+              <div key={index} className="flex flex-row gap-4 items-center bg-secondary/10 p-4 rounded-xl border border-secondary/20">
                 <div className="flex-grow w-full">
                   <AceUIInput
                     label={`External Host / URL (Akses Publik) ${index + 1}`}
@@ -263,7 +263,7 @@ export default function Settings() {
                 <button
                   type="button"
                   onClick={() => setDatanodes(datanodes.filter((_, i) => i !== index))}
-                  className="mt-6 md:mt-2 p-3 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-all"
+                  className="mt-6 p-3 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-all"
                   title="Hapus DataNode"
                 >
                   <Trash2 size={20} />
