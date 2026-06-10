@@ -39,9 +39,9 @@ function AceUIFloatingWarning({ show, title, message, type = "warning" }: AceUIF
     <div className="fixed top-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 animate-fade-in">
       <div
         role="alert"
-        className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-white ${containerClass}`}
+        className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-background ${containerClass}`}
       >
-        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background/15 text-background">
           <span className="text-lg font-bold">{icon}</span>
         </div>
         <div className="min-w-0">

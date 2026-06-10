@@ -2,6 +2,7 @@ import db from "@/utils/db/firebase";
 import GuestDashboard from "@/views/guest/dashboard/Dashboard";
 import {
   collection,
+  doc,
   limit,
   onSnapshot,
   orderBy,
@@ -19,6 +20,7 @@ function Index() {
     status_rain: "-",
     buzzer: "-",
   });
+  const [settings, setSettings] = useState<any>(null);
 
   // 1. Firebase History
   useEffect(() => {
@@ -39,8 +41,8 @@ function Index() {
             : new Date();
           return {
             id: doc.id,
-            tinggi_air: `${item.distance || 0} cm`,
-            curah_hujan: `${item.rain || 0} mm`,
+            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+            curah_hujan: `${Number(item.rain || 0).toFixed(2)} mm`,
 
             status:
               distanceValue > 10
@@ -54,23 +56,39 @@ function Index() {
             // GRAPH
             time: lastSeen.toLocaleTimeString("id-ID"),
 
-            tinggiAir: parseFloat(item.distance || 0),
+            tinggiAir: parseFloat(Number(item.distance || 0).toFixed(2)),
           };
         });
         setRealtimeData(data);
       },
       (error) => {
-        console.error("❌ Firebase Error:", error);
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+        console.error("❌ Firebase Error:", errStr);
       },
     );
 
     return () => unsubscribe();
   }, []);
 
+  // 1b. Firebase Settings
+  useEffect(() => {
+    const unsubscribeSettings = onSnapshot(
+      doc(db, "settings", "config"),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setSettings(docSnap.data());
+        }
+      }
+    );
+    return () => unsubscribeSettings();
+  }, []);
+
   // 2. WebSocket — same config as admin
   useEffect(() => {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
+    const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
+    if (!wsIp || !wsIp.trim()) return;
+
+    let baseUrl = wsIp.trim();
     const wsUrl = baseUrl.endsWith("/")
       ? `${baseUrl}ws/getIot`
       : `${baseUrl}/ws/getIot`;
@@ -81,7 +99,6 @@ function Index() {
       socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
-        console.log("WebSocket Connected: " + wsUrl);
       };
 
       socket.onmessage = (event) => {
@@ -94,7 +111,8 @@ function Index() {
             buzzer: data.buzzer ?? "Non Aktif",
           });
         } catch (err) {
-          console.error("WebSocket parse error:", err);
+          const errStr = String(err).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+          console.error("WebSocket parse error:", errStr);
         }
       };
 

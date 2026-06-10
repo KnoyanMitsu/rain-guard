@@ -19,6 +19,9 @@ type Props = {
   buttonSave?: boolean;
   onClick?: () => void;
   buttonTitle?: string;
+  itemsPerPage?: number;
+  info?: string;
+  renderCell?: (value: any, row: Tbody, columnIndex: number) => React.ReactNode;
 };
 
 function AceUICardTable({
@@ -28,8 +31,10 @@ function AceUICardTable({
   buttonSave,
   onClick,
   buttonTitle,
+  itemsPerPage = 5,
+  info,
+  renderCell,
 }: Props) {
-  const showList = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
     index: number | null;
@@ -77,16 +82,16 @@ function AceUICardTable({
     });
   }, [tbody, sortConfig]);
 
-  const totalPages = Math.ceil(rawData.length / showList);
+  const totalPages = Math.ceil(rawData.length / itemsPerPage);
 
   const isDisablePrev = currentPage <= 1;
   const isDisableNext = currentPage >= totalPages;
 
   const dataTbody = useMemo(() => {
-    const start = (currentPage - 1) * showList;
-    const end = start + showList;
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
     return rawData.slice(start, end);
-  }, [rawData, currentPage, showList]);
+  }, [rawData, currentPage, itemsPerPage]);
 
   function nextPage() {
     if (!isDisableNext) {
@@ -119,9 +124,12 @@ function AceUICardTable({
         titleButton={buttonTitle}
         onClick={onClick}
       >
+        {info && (
+          <p className="text-sm text-text/60 mt-1 mb-4">{info}</p>
+        )}
         <div className="overflow-x-scroll md:overflow-hidden rounded-2xl border mb-3 border-secondary">
           <table className="w-full text-left border-collapse bg-background">
-            <thead className="bg-secondary text-primary">
+            <thead className="bg-secondary/20 text-text">
               <tr>
                 {thead.map((item, index) => (
                   <th
@@ -129,7 +137,7 @@ function AceUICardTable({
                     className="px-4 py-3 font-medium text-background cursor-pointer hover:opacity-80 select-none"
                     onClick={() => requestSort(index)}
                   >
-                    <div className="flex items-center gap-1">
+                    <div className="flex text-text items-center gap-1">
                       {item.title}
                       {sortConfig.index === index && sortConfig.direction && (
                         <span>
@@ -151,7 +159,7 @@ function AceUICardTable({
                   >
                     {Object.values(dataCells).map((cellValue, cellIndex) => (
                       <td key={cellIndex} className="px-4 py-3 text-text">
-                        {cellValue}
+                        {renderCell ? renderCell(cellValue, row, cellIndex) : cellValue}
                       </td>
                     ))}
                   </tr>

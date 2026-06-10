@@ -33,11 +33,6 @@ function Index() {
     const unsubscribeHistory = onSnapshot(
       qHistory,
       (snapshot) => {
-        console.log(
-          "✅ Jumlah data dari Firebase:",
-          snapshot.docs.length
-        );
-
         const data = snapshot.docs.map((doc) => {
           const item = doc.data();
           const lastSeen = item.timestamp
@@ -46,10 +41,10 @@ function Index() {
 
           return {
             id: doc.id,
-            tinggi_air: `${item.distance || 0} cm`,
-            curah_hujan: `${item.rain || 0} mm`,
-            distance: item.distance || 0,
-            rain: item.rain || 0,
+            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+            curah_hujan: `${Number(item.rain || 0).toFixed(2)} mm`,
+            distance: parseFloat(Number(item.distance || 0).toFixed(2)),
+            rain: parseFloat(Number(item.rain || 0).toFixed(2)),
             status: item.status_rain === "Ya"
               ? "Bahaya"
               : "Aman",
@@ -61,9 +56,10 @@ function Index() {
         setFirebaseData(data);
       },
       (error) => {
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
         console.error(
           "❌ Gagal mengambil data Firebase:",
-          error
+          errStr
         );
       }
     );
@@ -108,8 +104,10 @@ function Index() {
 
   // 3. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
   useEffect(() => {
-    const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "wss://4.145.113.15:1880";
-    let formattedWsUrl = wsIp;
+    const wsIp = settings?.websocket_ip || process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
+    if (!wsIp || !wsIp.trim()) return; // Tunggu sampai konfigurasi IP tersedia
+
+    let formattedWsUrl = wsIp.trim();
     if (!formattedWsUrl.startsWith("ws://") && !formattedWsUrl.startsWith("wss://")) {
       formattedWsUrl = `wss://${formattedWsUrl}`;
     }
@@ -121,7 +119,6 @@ function Index() {
       socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
-        console.log("✅ WebSocket Connected to: " + wsUrl);
       };
 
       socket.onmessage = (event) => {
@@ -136,16 +133,17 @@ function Index() {
             update_terakhir: new Date().toLocaleTimeString("id-ID"),
           });
         } catch (err) {
-          console.error("❌ Gagal baca JSON WebSocket:", err);
+          const errStr = String(err).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+          console.error("❌ Gagal baca JSON WebSocket:", errStr);
         }
       };
 
       socket.onerror = (error) => {
-        console.error("⚠️ WebSocket Error:", error);
+        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+        console.error("⚠️ WebSocket Error:", errStr);
       };
 
       socket.onclose = () => {
-        console.log("🔌 WebSocket Disconnected. Reconnecting in 5s...");
         setTimeout(connect, 5000);
       };
     }
@@ -197,10 +195,9 @@ function Index() {
         .filter((item) => item.distance >= 0) // hanya data >= 0
         .map((item) => ({
           time: item.update_terakhir.split(",")[1]?.trim() || item.update_terakhir,
-          tinggiAir:
-            typeof item.distance === "number"
-              ? item.distance
-              : parseFloat(item.tinggi_air),
+          tinggiAir: parseFloat(
+            (typeof item.distance === "number" ? item.distance : parseFloat(item.tinggi_air)).toFixed(2)
+          ),
         }))
         .reverse()}
       />

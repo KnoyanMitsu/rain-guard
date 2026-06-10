@@ -1,0 +1,55 @@
+@startuml
+title Sequence Diagram - Login Admin
+
+skinparam sequence {
+    ArrowColor #343a40
+    LifeLineBorderColor #343a40
+    LifeLineBackgroundColor #f8f9fa
+    ParticipantBorderColor #343a40
+    ParticipantBackgroundColor #e3f2fd
+    ParticipantFontColor Black
+    ActorBorderColor #343a40
+    ActorBackgroundColor #f8f9fa
+    ActorFontColor Black
+    ArrowFontColor Black
+    DatabaseBackgroundColor #e9ecef
+    DatabaseBorderColor #343a40
+    DatabaseFontColor Black
+    GroupBorderColor #343a40
+    GroupFontColor Black
+    GroupHeaderFontColor Black
+}
+
+skinparam backgroundcolor transparent
+skinparam titleFontColor Black
+
+actor "Admin User" as Admin
+participant "Frontend\n(/auth/login)" as Frontend
+participant "NextAuth API\n(/api/auth)" as NextAuth
+database "Firebase\n(Firestore)" as Firebase
+
+Admin -> Frontend : Memasukkan Email & Password
+activate Frontend
+
+Frontend -> NextAuth : signIn("credentials", { email, password })
+activate NextAuth
+
+NextAuth -> Firebase : query(collection("login"), where("email", "==", email))
+activate Firebase
+Firebase --> NextAuth : Return user document (jika ada)
+deactivate Firebase
+
+alt User ditemukan & password cocok
+    NextAuth -> NextAuth : Generate JWT Token / Session
+    NextAuth --> Frontend : Return success
+    Frontend -> Frontend : Redirect ke /dashboard
+    Frontend --> Admin : Tampilkan Dashboard Admin
+else User tidak ditemukan / password salah
+    NextAuth --> Frontend : Return error (401 Unauthorized)
+    Frontend --> Admin : Tampilkan pesan "Login gagal"
+end
+
+deactivate NextAuth
+deactivate Frontend
+
+@enduml

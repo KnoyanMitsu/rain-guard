@@ -1,0 +1,41 @@
+@startuml
+title Activity Diagram Analisis Data
+
+|Admin User|
+start
+:Membuka halaman Analisis Data;
+
+|Sistem|
+:Memuat riwayat data sensor (tinggi air, curah hujan);
+:Menampilkan halaman dengan opsi filter;
+
+|Admin User|
+:Memilih filter tanggal pada kalender (opsional);
+
+|Sistem|
+:Menyaring data historis berdasarkan tanggal yang dipilih;
+
+|Admin User|
+:Membuka dropdown menu Analisis;
+:Memilih satu atau beberapa jenis analisis\n(misal: Tren Ketinggian Air, Statistik Harian, dll);
+
+|Sistem|
+:Menambahkan jenis analisis ke daftar aktif;
+:Merender dan menampilkan Panel Analisis (Visualisasi/Chart)\nuntuk setiap analisis yang dipilih;
+
+|Admin User|
+:Melihat hasil visualisasi dan analisis;
+
+if (Ingin menghapus analisis dari tampilan?) then (Ya)
+  :Menekan tombol tutup (close) pada panel tertentu\natau menekan tombol "Reset Analisis";
+  
+  |Sistem|
+  :Menghapus visualisasi yang dipilih dari layar;
+  
+  |Admin User|
+else (Tidak)
+endif
+
+stop
+
+@enduml

@@ -42,7 +42,7 @@ export default function AceUILocationHeader({
           
           {/* Baris ini kita buat items-center agar teks dan dropdown benar-benar lurus */}
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-medium text-text/800 leading-none m-0">
+            <h2 className="text-xl font-medium text-text/80 leading-none m-0">
               Stasiun Pemantau:
             </h2>
             
@@ -57,7 +57,7 @@ export default function AceUILocationHeader({
         </div>
 
         {/* KANAN: Ikon MapPin dan Kota */}
-        <div className="flex items-center gap-2 bg-primary text-white px-4 py-3 rounded-xl text-sm font-bold w-fit shadow-sm">
+        <div className="flex items-center gap-2 bg-primary text-background px-4 py-3 rounded-xl text-sm font-bold w-fit shadow-sm">
           <MapPin size={18} />
           {city}
         </div>

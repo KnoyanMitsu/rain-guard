@@ -43,8 +43,8 @@ function AceUICardGraphs({
             >
               <defs>
                 <linearGradient id="colorAir" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.7} />
-                  <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0.05} />
+                  <stop offset="5%" stopColor="var(--chart-line)" stopOpacity={0.7} />
+                  <stop offset="95%" stopColor="var(--chart-line)" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -75,13 +75,13 @@ function AceUICardGraphs({
                   color: "var(--color-text)",
                 }}
                 labelStyle={{ color: "var(--color-text)", fontWeight: 700 }}
-                itemStyle={{ color: "var(--color-accent)" }}
+                itemStyle={{ color: "var(--chart-line)" }}
               />
               <Area
                 type="monotone"
                 dataKey={dataKey}
                 name={titlelegend}
-                stroke="var(--color-accent)"
+                stroke="var(--chart-line)"
                 strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#colorAir)"
