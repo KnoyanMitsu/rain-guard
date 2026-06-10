@@ -88,9 +88,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ...doc.data(),
     }));
 
-    // 2. Generate nama file dengan format backup-YYYY-MM-DD-HH-mm.json
+    // 2. Generate nama file dengan format backup-YYYY-MM-DD-HH-mm-XXXX.json
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, "0");
+    const rand4 = String(Math.floor(1000 + Math.random() * 9000));
     const fileName = [
       "backup",
       now.getFullYear(),
@@ -98,6 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       pad(now.getDate()),
       pad(now.getHours()),
       pad(now.getMinutes()),
+      rand4,
     ].join("-") + ".json";
 
     const hdfsFilePath = `${HDFS_DIR}/${fileName}`;
