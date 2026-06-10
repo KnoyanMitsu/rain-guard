@@ -191,7 +191,7 @@ export default function HadoopFiles() {
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-text/40">
             <FileJson className="h-10 w-10" />
             <p className="text-sm">Belum ada file backup.</p>
-            <p className="text-xs">Klik "Backup ke Hadoop" di halaman Dasbor untuk membuat backup pertama.</p>
+            <p className="text-xs">Klik "Backup ke Hadoop" di halaman Dashboard untuk membuat backup pertama.</p>
           </div>
         ) : (
           <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">

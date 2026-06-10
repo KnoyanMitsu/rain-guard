@@ -65,7 +65,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <Link href="/guest">
               <span className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors duration-200 cursor-pointer hidden sm:block">
-                Dasbor Publik
+                Dashboard Publik
               </span>
             </Link>
             <Link href="/auth/login">
@@ -111,7 +111,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/guest">
                 <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1">
-                  Buka Dasbor
+                  Buka Dashboard
                   <ArrowRight size={18} />
                 </button>
               </Link>
