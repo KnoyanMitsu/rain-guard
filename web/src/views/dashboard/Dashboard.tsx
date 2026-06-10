@@ -65,6 +65,13 @@ function getWaterStatus(distance: number) {
   return "Aman";
 }
 
+function getRainStatus(raw: number) {
+  const v = Math.max(0, Math.min(4095, Math.round(raw)));
+  if (v >= 3500 && v <= 4095) return "Tidak Hujan";
+  if (v >= 2500 && v <= 3499) return "Gerimis";
+  if (v >= 1000 && v <= 2499) return "Hujan Sedang";
+  return "Hujan Deras";
+}
 // ── SHARED COMPONENTS ──
 
 export function DashboardCards({
@@ -80,6 +87,7 @@ export function DashboardCards({
   const rawRain = parseInt(String(latestData.rain ?? 0)) || 0;
   const safeDistance = Math.max(0, rawDistance);
   const safeRain = Math.max(0, rawRain);
+  const rainStatus = getRainStatus(safeRain);
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -96,7 +104,7 @@ export function DashboardCards({
         className="bg-background border border-secondary shadow-sm"
         title="Nilai Sensor Hujan"
         value={safeRain.toString()}
-        description={`Batas: ${MAX_RAIN} raw`}
+        description={rainStatus}
         icon={<Cloud />}
         color="yellow"
         unit="raw"
