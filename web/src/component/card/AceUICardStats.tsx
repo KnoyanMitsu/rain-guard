@@ -23,7 +23,7 @@ export function AceUICardMetric({ title, value, unit }: MetricProps) {
     <AceUICard>
       <p className="text-sm text-text/60 mb-1">{title}</p>
       <div className="flex items-end gap-1">
-        <p className="text-2xl font-bold text-text">{value}</p>
+        <p className="text-lg md:text-2xl font-bold text-text">{value}</p>
         {unit && <span className="text-sm text-text/70 mb-1">{unit}</span>}
       </div>
     </AceUICard>

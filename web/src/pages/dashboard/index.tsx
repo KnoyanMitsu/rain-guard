@@ -164,7 +164,7 @@ function Index() {
       logoutfunc={handleLogout}
       appname="RainGuard"
       listMenu={[
-        { title: "Dashboard", link: "/dashboard/" },
+        { title: "Dashboard", link: "/dashboard" },
         { title: "Riwayat", link: "/history" },
         { title: "Analisis Data", link: "/analisis" },
         { title: "Hadoop Backup", link: "/hadoop" },

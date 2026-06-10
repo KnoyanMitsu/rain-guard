@@ -26,7 +26,7 @@ function AceUICardStatus({
 
   return (
     <AceUICard className={className}>
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2">
         <div>
           {/* icons */}
           {color === "red" && (

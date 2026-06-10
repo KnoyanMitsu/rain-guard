@@ -36,7 +36,9 @@ export default function AceUILocationHeader({
     <AceUICard>
       <div className="flex flex-row flex-wrap items-center gap-3">
         <h2 className="text-xl font-medium text-text/80 whitespace-nowrap">Lokasi:</h2>
-        <AceUIDropdown title={activeName} actions={dropdownActions} />
+        <div className="max-w-[130px] sm:max-w-none min-w-0">
+          <AceUIDropdown title={activeName} actions={dropdownActions} />
+        </div>
         <div className="ml-auto flex items-center gap-2 bg-primary text-background px-4 py-3 rounded-xl text-sm font-bold shadow-sm whitespace-nowrap">
           <MapPin size={18} />
           {city}

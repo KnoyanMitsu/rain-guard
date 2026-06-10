@@ -128,7 +128,7 @@ function AceUICardTable({
           <p className="text-sm text-text/60 mt-1 mb-4">{info}</p>
         )}
         <div className="overflow-x-scroll md:overflow-hidden rounded-2xl border mb-3 border-secondary">
-          <table className="w-full text-left border-collapse bg-background">
+          <table className="w-full text-left border-collapse bg-background text-sm">
             <thead className="bg-secondary/20 text-text">
               <tr>
                 {thead.map((item, index) => (
@@ -174,7 +174,7 @@ function AceUICardTable({
             types="button"
             disable={isDisablePrev}
           >
-            Sebelumnya
+            ←<span className="hidden sm:inline"> Sebelumnya</span>
           </AceUIButton>
           {(() => {
             const maxVisible = 5;
@@ -216,7 +216,7 @@ function AceUICardTable({
             types="button"
             disable={isDisableNext}
           >
-            Selanjutnya
+            <span className="hidden sm:inline">Selanjutnya </span>→
           </AceUIButton>
         </div>
       </AceUICardWithTitle>

@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Database, HistoryIcon, AlertTriangle, Calendar, Download, ShieldCheck, Siren } from "lucide-react";
 import exportCSV from "@/pages/dashboard/saveCSV";
 import { useSessionStorage } from "@/hooks/useSessionStorage";
+import useCountUp from "@/hooks/useCountUp";
 import AceUICard from "@/component/card/AceUICard";
 import AceUICardTable from "@/component/card/AceUICardTable";
 
@@ -43,6 +44,11 @@ const statusStyles: Record<string, string> = {
   Siaga: "bg-amber-100 text-amber-900 border border-amber-300",
   Bahaya: "bg-rose-100 text-rose-900 border border-rose-300",
 };
+
+function AnimatedNumber({ value }: { value: number }) {
+  const count = useCountUp(value, 1000);
+  return <>{count}</>;
+}
 
 function History({ tbody, thead }: HistoryProps) {
   const [filterMode, setFilterMode] = useSessionStorage<FilterMode>("history_filter_mode", "harian");
@@ -203,7 +209,7 @@ function History({ tbody, thead }: HistoryProps) {
                 <div>
                   <p className="text-sm text-text/60">{label}</p>
                   <h3 className={`text-3xl font-bold ${cs.text} mt-2`}>
-                    {key ? filteredData.filter((i) => i.status === key).length : filteredData.length}
+                    <AnimatedNumber value={key ? filteredData.filter((i) => i.status === key).length : filteredData.length} />
                   </h3>
                 </div>
                 <div className={`w-12 h-12 rounded-2xl ${cs.bg} flex items-center justify-center`}>

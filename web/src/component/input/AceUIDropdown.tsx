@@ -40,7 +40,7 @@ function AceUIDropdown({ title, actions }: Props) {
             : "text-text/70 hover:bg-primary hover:text-background"
         }`}
       >
-        {title}
+        <span className="truncate">{title}</span>
         <ChevronDown
           size={18}
           className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}

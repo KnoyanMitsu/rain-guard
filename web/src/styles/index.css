@@ -30,3 +30,17 @@
   right: 0.75rem !important;
   padding: 0 !important;
 }
+
+@media (max-width: 639px) {
+  .react-datepicker {
+    font-size: 12px;
+  }
+  .react-datepicker__day,
+  .react-datepicker__day-name {
+    width: 1.6rem;
+    line-height: 1.6rem;
+  }
+  .react-datepicker__current-month {
+    font-size: 13px;
+  }
+}
