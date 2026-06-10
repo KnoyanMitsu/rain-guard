@@ -63,7 +63,7 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             <Link href="/guest">
-              <span className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors duration-200 cursor-pointer hidden sm:block">
+              <span className="text-sm font-semibold text-slate-500 hover:text-primary transition-colors duration-200 cursor-pointer hidden sm:block">
                 Dashboard Publik
               </span>
             </Link>
@@ -109,7 +109,7 @@ export default function LandingPage() {
           <AnimateOnScroll delay={300}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/guest">
-                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1">
+                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-1">
                   Buka Dashboard
                   <ArrowRight size={18} />
                 </button>
@@ -119,7 +119,7 @@ export default function LandingPage() {
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-sm hover:-translate-y-1"
               >
                 <Play size={18} className="text-primary fill-primary" />
-                Demo Alat
+                Video Profile
               </button>
             </div>
           </AnimateOnScroll>
@@ -127,38 +127,24 @@ export default function LandingPage() {
 
         {/* Visual Kanan (Custom Abstract SVG) */}
         <div className="flex-1 w-full max-w-lg hidden md:block">
-          <AnimateOnScroll delay={400}>
-            <div className="relative w-full aspect-square bg-white rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 flex items-center justify-center p-8 overflow-hidden group">
-              {/* Latar Belakang UI Dashboard Mockup */}
-              <div className="absolute top-4 left-4 right-4 h-12 bg-slate-50 rounded-xl border border-slate-100 flex items-center px-4 gap-2 opacity-50">
-                <div className="w-3 h-3 rounded-full bg-rose-400"></div>
-                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                <div className="w-3 h-3 rounded-full bg-green-600"></div>
-              </div>
+  <AnimateOnScroll delay={400}>
+    <div className="relative w-full aspect-square bg-white rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 flex items-center justify-center p-8 overflow-hidden group">
+      {/* Latar Belakang UI Dashboard Mockup */}
+      <div className="absolute top-4 left-4 right-4 h-12 bg-slate-50 rounded-xl border border-slate-100 flex items-center px-4 gap-2 opacity-50">
+        <div className="w-3 h-3 rounded-full bg-rose-400"></div>
+        <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+        <div className="w-3 h-3 rounded-full bg-green-600"></div>
+      </div>
 
-              {/* Ilustrasi Sensor IoT Custom */}
-              <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-xl group-hover:scale-105 transition-transform duration-700 ease-out" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Awan & Hujan */}
-                <path d="M120 130C120 110 140 90 165 90C180 90 195 100 200 110C210 100 230 100 240 115C255 115 270 130 270 150C270 170 250 185 225 185H145C125 185 120 165 120 130Z" fill="#E2E8F0" />
-                <rect x="150" y="200" width="4" height="15" rx="2" fill="#4546c2" className="animate-pulse" />
-                <rect x="190" y="195" width="4" height="20" rx="2" fill="#4546c2" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
-                <rect x="230" y="205" width="4" height="12" rx="2" fill="#4546c2" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
-
-                {/* Tiang Sensor & Box ESP32 */}
-                <rect x="195" y="180" width="10" height="120" fill="#94A3B8" />
-                <rect x="175" y="150" width="50" height="40" rx="4" fill="#1E293B" />
-
-                {/* Sensor Ultrasonik */}
-                <path d="M185 280L165 310H235L215 280H185Z" fill="#64748B" opacity="0.8" />
-                <path d="M165 310 C165 330, 235 330, 235 310" stroke="#4546c2" strokeWidth="2" strokeDasharray="4 4" className="animate-pulse" />
-
-                {/* Air Sungai */}
-                <path d="M50 340Q125 320 200 340T350 340L350 400L50 400Z" fill="#4546c2" opacity="0.2" />
-                <path d="M50 350Q125 370 200 350T350 350L350 400L50 400Z" fill="#4546c2" opacity="0.4" />
-              </svg>
-            </div>
-          </AnimateOnScroll>
-        </div>
+      {/* Gambar PNG */}
+      <img
+        src="/sensor-iot.png"
+        alt="Ilustrasi sensor IoT"
+        className="w-full h-full object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700 ease-out"
+      />
+    </div>
+  </AnimateOnScroll>
+</div>
       </section>
 
       {/* 3. METRIK & STATISTIK (HIGHLIGHT KAPABILITAS) */}
@@ -308,7 +294,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <AnimateOnScroll>
             <h2 className="text-3xl font-extrabold text-slate-900 mb-8">
-              Video Demonstrasi
+              Video Profile
             </h2>
 
             <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-2xl shadow-slate-300 border-4 border-white">
