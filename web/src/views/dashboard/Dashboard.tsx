@@ -200,7 +200,7 @@ export function DashboardTable({
                 <tr key={i} className="border-b border-secondary/15 last:border-0 hover:bg-secondary/10 transition-colors">
                     <td className="px-3 sm:px-5 py-3 sm:py-4 font-semibold text-text">{formatDistance(row.distance ?? row.tinggi_air)} cm</td>
                     <td className="px-3 sm:px-5 py-3 sm:py-4 font-semibold text-text">
-                      {row.rain != null ? `${Number(row.rain).toFixed(2)} mm` : row.curah_hujan}
+                      {row.rain != null ? `${Number(row.rain).toFixed(2)}` : row.curah_hujan}
                     </td>
                   <td className="px-3 sm:px-5 py-3 sm:py-4">
                     <StatusBadge status={statusValue} />
