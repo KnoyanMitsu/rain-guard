@@ -26,11 +26,11 @@ function formatSize(bytes: number): string {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    Aman: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    Waspada: "bg-amber-100 text-amber-800 border-amber-300",
-    Bahaya: "bg-rose-100 text-rose-800 border-rose-300",
-    Ya: "bg-rose-100 text-rose-800 border-rose-300",
-    Tidak: "bg-emerald-100 text-emerald-800 border-emerald-300",
+    Aman: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700",
+    Waspada: "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700",
+    Bahaya: "bg-rose-100 dark:bg-rose-900/30 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700",
+    Ya: "bg-rose-100 dark:bg-rose-900/30 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700",
+    Tidak: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700",
   };
   return (
     <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ${map[status] ?? "bg-background text-text border-secondary"}`}>
@@ -292,7 +292,7 @@ export default function HadoopFiles() {
             <div className="py-12 text-center text-sm text-text/40">File kosong atau format tidak dikenal.</div>
           ) : (
             <>
-              <div className="overflow-x-auto rounded-2xl border border-secondary bg-white">
+              <div className="overflow-x-auto rounded-2xl border border-secondary bg-background">
                 <table className="w-full border-collapse text-sm">
                   <thead className="bg-secondary/20 text-text">
                     <tr>
