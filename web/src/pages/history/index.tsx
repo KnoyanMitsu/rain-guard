@@ -1,7 +1,7 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
 import History from "@/views/history/history";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query, doc } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -10,7 +10,6 @@ function HistoryPage() {
   const displayName =
     session?.user?.name || session?.user?.fullname || session?.user?.nama || "Admin";
   const [dataHistory, setDataHistory] = useState<any[]>([]);
-  const [deviceMap, setDeviceMap] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
   const handleLogout = async () => {
@@ -24,58 +23,67 @@ function HistoryPage() {
   };
 
   useEffect(() => {
-    // 1. Listen ke Devices secara real-time
-    const unsubDevices = onSnapshot(collection(db, "devices"), (deviceSnapshot) => {
-      const map: Record<string, any> = {};
-      deviceSnapshot.forEach((doc) => {
-        map[doc.id] = doc.data();
-      });
-      
-      setDeviceMap(map);
+    let unsubDevices: (() => void) | undefined;
+    let unsubHistory: (() => void) | undefined;
 
-      // 2. Listen ke History (Ditambah orderBy agar data terbaru di atas)
-      const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
-      const unsubHistory = onSnapshot(q, (historySnapshot) => {
-        if (historySnapshot.empty) {
-          setDataHistory([]);
-          setLoading(false);
-          return;
-        }
+    // Listen ke Settings untuk mendapatkan lokasi aktif
+    const unsubSettings = onSnapshot(doc(db, "settings", "config"), (settingsSnapshot) => {
+      const configData = settingsSnapshot.exists() ? settingsSnapshot.data() : {};
+      const currentLokasi = configData.lokasi || "";
 
-        const result = historySnapshot.docs.map((doc) => {
-          const item = doc.data();
-          const deviceData = map[item.device_id] || {};
-          
-          // Mengubah format angka milidetik (timestamp) dari Firebase jadi format tanggal Indo
-          const lastSeen = item.timestamp 
-            ? new Date(item.timestamp) 
-            : new Date();
-
-          return {
-            id: doc.id,
-            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
-            curah_hujan: `${item.rain || 0} mm`,
-            status: getStatus(Number(item.distance || 0)),
-            
-            /**
-             * PERBAIKAN DI SINI:
-             * Tetap gunakan format ISO standar (YYYY-MM-DD HH:mm:ss) agar fungsi new Date() 
-             * pada internal filter komponen History bisa melakukan parsing objek Date dengan valid.
-             */
-            update_terakhir: lastSeen.toISOString(), 
-          };
+      // 1. Listen ke Devices secara real-time
+      if (unsubDevices) unsubDevices();
+      unsubDevices = onSnapshot(collection(db, "devices"), (deviceSnapshot) => {
+        const map: Record<string, any> = {};
+        deviceSnapshot.forEach((doc) => {
+          map[doc.id] = doc.data();
         });
 
-        const shuffledResult = [...result].sort(() => Math.random() - 0.5);
+        // 2. Listen ke History (Ditambah orderBy agar data terbaru di atas)
+        if (unsubHistory) unsubHistory();
+        const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
+        unsubHistory = onSnapshot(q, (historySnapshot) => {
+          if (historySnapshot.empty) {
+            setDataHistory([]);
+            setLoading(false);
+            return;
+          }
 
-        setDataHistory(result);
-        setLoading(false);
+          // Filter data history berdasarkan lokasi dari settings
+          const result = historySnapshot.docs
+            .filter((doc) => {
+              const item = doc.data();
+              // Memastikan hanya menampilkan data riwayat yang memiliki lokasi yang sama dengan settings
+              return item.lokasi === currentLokasi;
+            })
+            .map((doc) => {
+              const item = doc.data();
+              
+              const lastSeen = item.timestamp 
+                ? new Date(item.timestamp) 
+                : new Date();
+
+              return {
+                id: doc.id,
+                lokasi: item.lokasi || "-",
+                tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+                curah_hujan: `${item.rain || 0} mm`,
+                status: getStatus(Number(item.distance || 0)),
+                update_terakhir: lastSeen.toISOString(), 
+              };
+            });
+
+          setDataHistory(result);
+          setLoading(false);
+        });
       });
-
-      return () => unsubHistory();
     });
 
-    return () => unsubDevices();
+    return () => {
+      unsubSettings();
+      if (unsubDevices) unsubDevices();
+      if (unsubHistory) unsubHistory();
+    };
   }, []);
 
   return (
@@ -83,7 +91,7 @@ function HistoryPage() {
       logoutfunc={handleLogout}
       appname="RainGuard"
       listMenu={[
-        { title: "Dashboard", link: "/dashboard/" },
+        { title: "Dasbor", link: "/dashboard" },
         { title: "Riwayat", link: "/history" },
         { title: "Analisis Data", link: "/analisis" },
         { title: "Hadoop Backup", link: "/hadoop" },
@@ -107,6 +115,7 @@ function HistoryPage() {
           <History
             tbody={dataHistory}
             thead={[
+              { title: "Lokasi" },
               { title: "Tinggi Air" },
               { title: "Curah Hujan" },
               { title: "Status Alarm" },

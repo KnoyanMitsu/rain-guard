@@ -1,7 +1,7 @@
 import AceUITemplateWithSidebar from "@/component/template/AceUITemplateWithSidebar";
 import db from "@/utils/db/firebase";
 import Analisis from "@/views/analisis/analisis";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query, doc } from "firebase/firestore";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -23,29 +23,46 @@ function AnalyticsPage() {
   const handleLogout = async () => await signOut({ redirect: true, callbackUrl: "/auth/login" });
 
   useEffect(() => {
-    const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
+    let unsubHistory: (() => void) | undefined;
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      const result = snapshot.docs.map((doc) => {
-        const item = doc.data();
-        const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
-        const distance = Number(item.distance || 0);
-        return {
-          tinggi_air: `${distance.toFixed(2)} cm`,
-          curah_hujan: `${item.rain || 0} mm`,
-          status: distance > 10 ? "Bahaya" : distance >= 5 ? "Waspada" : "Aman",
-          update_terakhir: lastSeen.toISOString(),
-        };
+    const unsubSettings = onSnapshot(doc(db, "settings", "config"), (settingsSnapshot) => {
+      const configData = settingsSnapshot.exists() ? settingsSnapshot.data() : {};
+      const currentLokasi = configData.lokasi || "";
+
+      if (unsubHistory) unsubHistory();
+      
+      const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
+      unsubHistory = onSnapshot(q, (snapshot) => {
+        const result = snapshot.docs
+          .filter((doc) => {
+            const item = doc.data();
+            return item.lokasi === currentLokasi;
+          })
+          .map((doc) => {
+            const item = doc.data();
+            const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
+            const distance = Number(item.distance || 0);
+            return {
+              lokasi: item.lokasi || "-",
+              tinggi_air: `${distance.toFixed(2)} cm`,
+              curah_hujan: `${item.rain || 0} mm`,
+              status: distance > 10 ? "Bahaya" : distance >= 5 ? "Waspada" : "Aman",
+              update_terakhir: lastSeen.toISOString(),
+            };
+          });
+
+        setDataHistory(result);
+        setLoading(false);
+      }, (error) => {
+        console.error("Gagal mengambil data analisis:", error);
+        setLoading(false);
       });
-
-      setDataHistory(result);
-      setLoading(false);
-    }, (error) => {
-      console.error("Gagal mengambil data analisis:", error);
-      setLoading(false);
     });
 
-    return () => unsub();
+    return () => {
+      unsubSettings();
+      if (unsubHistory) unsubHistory();
+    };
   }, []);
 
   return (

@@ -22,84 +22,64 @@ function Index() {
   const [deviceList, setDeviceList] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   
-  // 1. useEffect untuk FIREBASE (Data Riwayat)
+  // 1. useEffect utama untuk Setting, Devices, dan Firebase Data
   useEffect(() => {
-    const qHistory = query(
-      collection(db, "history"),
-      orderBy("timestamp", "desc"),
-      limit(360)
-    );
+    let unsubHistory: (() => void) | undefined;
+    let unsubDevices: (() => void) | undefined;
 
-    const unsubscribeHistory = onSnapshot(
-      qHistory,
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => {
-          const item = doc.data();
-          const lastSeen = item.timestamp
-            ? new Date(item.timestamp)
-            : new Date();
+    const unsubSettings = onSnapshot(doc(db, "settings", "config"), (docSnap) => {
+      const configData = docSnap.exists() ? docSnap.data() : {};
+      setSettings(configData);
+      const currentLokasi = configData.lokasi || "";
 
-          return {
-            id: doc.id,
-            tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
-            curah_hujan: `${Number(item.rain || 0).toFixed(2)} mm`,
-            distance: parseFloat(Number(item.distance || 0).toFixed(2)),
-            rain: parseFloat(Number(item.rain || 0).toFixed(2)),
-            status: item.status_rain === "Ya"
-              ? "Bahaya"
-              : "Aman",
-            update_terakhir:
-              lastSeen.toLocaleString("id-ID"),
-          };
-        });
-
-        setFirebaseData(data);
-      },
-      (error) => {
-        const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
-        console.error(
-          "❌ Gagal mengambil data Firebase:",
-          errStr
-        );
-      }
-    );
-
-    const qDevices = query(
-      collection(db, "devices")
-    );
-
-    const unsubscribeDevices = onSnapshot(
-      qDevices,
-      (snapshot) => {
+      if (unsubDevices) unsubDevices();
+      unsubDevices = onSnapshot(collection(db, "devices"), (snapshot) => {
         const devs = snapshot.docs.map((doc) => ({
-          device_id:
-            doc.data().device_id || doc.id,
-          lokasi:
-            doc.data().lokasi ||
-            "Lokasi Tidak Diketahui",
+          device_id: doc.data().device_id || doc.id,
+          lokasi: doc.data().lokasi || "Lokasi Tidak Diketahui",
         }));
-
         setDeviceList(devs);
-      }
-    );
+
+        if (unsubHistory) unsubHistory();
+        const qHistory = query(
+          collection(db, "history"),
+          orderBy("timestamp", "desc"),
+          limit(360)
+        );
+        unsubHistory = onSnapshot(qHistory, (historySnapshot) => {
+          const data = historySnapshot.docs
+            .filter((doc) => {
+              const item = doc.data();
+              return item.lokasi === currentLokasi;
+            })
+            .map((doc) => {
+              const item = doc.data();
+              const lastSeen = item.timestamp ? new Date(item.timestamp) : new Date();
+
+              return {
+                id: doc.id,
+                lokasi: item.lokasi || "-",
+                tinggi_air: `${Number(item.distance || 0).toFixed(2)} cm`,
+                curah_hujan: `${Number(item.rain || 0).toFixed(2)} mm`,
+                distance: parseFloat(Number(item.distance || 0).toFixed(2)),
+                rain: parseFloat(Number(item.rain || 0).toFixed(2)),
+                status: item.status_rain === "Ya" ? "Bahaya" : "Aman",
+                update_terakhir: lastSeen.toLocaleString("id-ID"),
+              };
+            });
+          setFirebaseData(data);
+        }, (error) => {
+          const errStr = String(error).replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, "***.***.***.***");
+          console.error("❌ Gagal mengambil data Firebase:", errStr);
+        });
+      });
+    });
 
     return () => {
-      unsubscribeHistory();
-      unsubscribeDevices();
+      unsubSettings();
+      if (unsubDevices) unsubDevices();
+      if (unsubHistory) unsubHistory();
     };
-  }, []);
-
-  // 2. useEffect untuk SETTINGS
-  useEffect(() => {
-    const unsubscribeSettings = onSnapshot(
-      doc(db, "settings", "config"),
-      (docSnap) => {
-        if (docSnap.exists()) {
-          setSettings(docSnap.data());
-        }
-      }
-    );
-    return () => unsubscribeSettings();
   }, []);
 
   // 3. useEffect untuk WEBSOCKET (Data Real-time khusus Status Card)
@@ -186,6 +166,7 @@ function Index() {
         // Lempar data Firebase ke tabel dan grafik
         tbody={firebaseData}
         thead={[
+          { title: "Lokasi" },
           { title: "Tinggi Air" },
           { title: "Curah Hujan" },
           { title: "Status Alarm" },
